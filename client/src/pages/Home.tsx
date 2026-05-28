@@ -87,14 +87,46 @@ export default function Home() {
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden bg-white pt-10 pb-4">
-        {/* SENOTA label */}
-        <div className="container mb-2 flex items-center gap-3">
+        {/* SENOTA label + total count badge */}
+        <div className="container mb-2 flex items-center justify-between">
           <p
             className="text-xs tracking-[0.2em] uppercase"
             style={{ fontFamily: "'Space Mono', monospace", color: "#CC0000" }}
           >
             Archive Vol. I — 2026
           </p>
+          {/* Total creatives count badge */}
+          <div
+            className="flex items-center gap-2"
+            style={{
+              fontFamily: "'Space Mono', monospace",
+              fontSize: "11px",
+              color: "#0D0D0D",
+              letterSpacing: "0.08em",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                backgroundColor: "#CC0000",
+                color: "#FFFFFF",
+                fontFamily: "'Space Mono', monospace",
+                fontSize: "11px",
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
+            >
+              {totalCreatives}
+            </span>
+            <span className="hidden sm:inline uppercase tracking-[0.12em]">
+              Creatives — Vol. I
+            </span>
+          </div>
         </div>
 
         {/* Large display title — responsive, never overflows */}

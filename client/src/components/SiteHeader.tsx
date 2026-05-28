@@ -39,9 +39,12 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const [issueOpen, setIssueOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const issueRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
 
   // Close issue card when clicking outside
@@ -60,19 +63,25 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
-  // Lock body scroll when mobile menu open
+  // Lock body scroll when mobile menu or mobile search open
   useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    document.body.style.overflow = (mobileMenuOpen || mobileSearchOpen) ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, mobileSearchOpen]);
 
-  // Close mobile menu on ESC
+  // Focus mobile search input when opened
+  useEffect(() => {
+    if (mobileSearchOpen) setTimeout(() => mobileSearchRef.current?.focus(), 50);
+  }, [mobileSearchOpen]);
+
+  // Close overlays on ESC
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setMobileMenuOpen(false);
         setIssueOpen(false);
         setSearchOpen(false);
+        setMobileSearchOpen(false);
       }
     };
     window.addEventListener("keydown", handler);
@@ -273,9 +282,10 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               <BookOpen size={17} strokeWidth={1.5} color="#1A1A1A" />
             </button>
 
-            {/* Search icon / input */}
+            {/* Search icon / input — desktop: inline expand; mobile: full-screen overlay */}
+            {/* Desktop inline search */}
             {searchOpen ? (
-              <div className="flex items-center gap-1">
+              <div className="hidden md:flex items-center gap-1">
                 <input
                   ref={searchRef}
                   type="text"
@@ -307,7 +317,14 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               </div>
             ) : (
               <button
-                onClick={() => setSearchOpen(true)}
+                onClick={() => {
+                  // On mobile, open full-screen overlay; on desktop, inline expand
+                  if (window.innerWidth < 768) {
+                    setMobileSearchOpen(true);
+                  } else {
+                    setSearchOpen(true);
+                  }
+                }}
                 className="flex items-center justify-center w-8 h-8 transition-opacity hover:opacity-60"
                 aria-label="Search"
               >
@@ -496,6 +513,112 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                 />
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Full-Screen Mobile Search Overlay ───────────────────── */}
+      {mobileSearchOpen && (
+        <div
+          className="fixed inset-0 z-[110] flex flex-col"
+          style={{ backgroundColor: "#F7F7F7" }}
+        >
+          {/* Search header bar */}
+          <div
+            className="flex items-center gap-3 px-4"
+            style={{ height: "49px", borderBottom: "1px solid #E5E7EB" }}
+          >
+            <Search size={18} strokeWidth={1.5} color="#8A8A8A" />
+            <input
+              ref={mobileSearchRef}
+              type="text"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && mobileSearchQuery.trim()) {
+                  setMobileSearchOpen(false);
+                  setMobileSearchQuery("");
+                }
+              }}
+              placeholder="Search SENOTA..."
+              className="flex-1 outline-none bg-transparent"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "16px", /* 16px prevents iOS zoom */
+                color: "#1A1A1A",
+              }}
+            />
+            <button
+              onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); }}
+              className="flex items-center justify-center w-8 h-8 transition-opacity hover:opacity-60"
+              aria-label="Close search"
+            >
+              <X size={20} strokeWidth={1.5} color="#1A1A1A" />
+            </button>
+          </div>
+
+          {/* Search suggestions / recent */}
+          <div className="flex-1 overflow-y-auto px-6 py-8">
+            {mobileSearchQuery.trim() === "" ? (
+              <div>
+                <p
+                  className="text-xs tracking-[0.15em] uppercase mb-5"
+                  style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
+                >
+                  Explore
+                </p>
+                <div className="flex flex-col gap-0">
+                  {NAV_LINKS.map((link, i) => (
+                    <button
+                      key={link.href}
+                      onClick={() => { setMobileSearchOpen(false); navigate(link.href); }}
+                      className="flex items-center justify-between py-4 text-left transition-colors"
+                      style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: "22px",
+                        fontWeight: 500,
+                        color: "#1A1A1A",
+                        borderBottom: i < NAV_LINKS.length - 1 ? "1px solid #E5E7EB" : "none",
+                        background: "none",
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#CC0000"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#1A1A1A"; }}
+                    >
+                      {link.label}
+                      <span style={{ color: "#CC0000", fontSize: "18px" }}>→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p
+                  className="text-xs tracking-[0.15em] uppercase mb-4"
+                  style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
+                >
+                  Results for “{mobileSearchQuery}”
+                </p>
+                <p
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "18px",
+                    fontStyle: "italic",
+                    color: "#8A8A8A",
+                  }}
+                >
+                  Search coming soon — visit the{" "}
+                  <button
+                    onClick={() => { setMobileSearchOpen(false); navigate("/creatives"); }}
+                    style={{ color: "#CC0000", background: "none", border: "none", cursor: "pointer",
+                      fontFamily: "'Cormorant Garamond', serif", fontSize: "18px", fontStyle: "italic" }}
+                  >
+                    Creative Showcase
+                  </button>
+                  {" "}to browse all creatives.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
