@@ -157,119 +157,138 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                 <span className="sm:hidden text-xs" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Issue 01</span>
               </button>
 
-              {/* Issue hover card */}
+              {/* Issue card — desktop: right-anchored dropdown; mobile: centered modal with dark overlay */}
               {issueOpen && (
-                <div
-                  className="absolute right-0 top-full mt-1 z-50"
-                  style={{
-                    width: "min(420px, 92vw)",
-                    backgroundColor: "#1A1A1A",
-                    boxShadow: "0 8px 40px rgba(0,0,0,0.35)",
-                  }}
-                >
-                  <div className="flex gap-0">
-                    {/* Text panel */}
-                    <div className="flex-1 p-5 flex flex-col gap-3">
-                      <div>
+                <>
+                  {/* Dark backdrop — covers full page */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    style={{ backgroundColor: "rgba(0,0,0,0.55)", backdropFilter: "blur(2px)" }}
+                    onClick={() => setIssueOpen(false)}
+                  />
+
+                  {/* Card — desktop: absolute dropdown; mobile: fixed centered modal */}
+                  <div
+                    className="issue-card-popup z-50"
+                    style={{
+                      backgroundColor: "#1A1A1A",
+                      boxShadow: "0 12px 60px rgba(0,0,0,0.6)",
+                    }}
+                  >
+                    {/* Close button — visible on mobile */}
+                    <button
+                      onClick={() => setIssueOpen(false)}
+                      className="md:hidden absolute top-3 right-3 flex items-center justify-center w-7 h-7 transition-opacity hover:opacity-60"
+                      style={{ zIndex: 1 }}
+                      aria-label="Close"
+                    >
+                      <X size={16} strokeWidth={1.5} color="#A0A0A0" />
+                    </button>
+
+                    <div className="flex gap-0">
+                      {/* Text panel */}
+                      <div className="flex-1 p-5 flex flex-col gap-3">
+                        <div>
+                          <p
+                            style={{
+                              fontFamily: "'Cormorant Garamond', serif",
+                              fontSize: "13px",
+                              fontWeight: 600,
+                              color: "#CC0000",
+                              letterSpacing: "0.1em",
+                              textTransform: "uppercase",
+                              marginBottom: "2px",
+                            }}
+                          >
+                            Issue 01
+                          </p>
+                          <p
+                            style={{
+                              fontFamily: "'Cormorant Garamond', serif",
+                              fontSize: "20px",
+                              fontWeight: 600,
+                              color: "#F7F7F7",
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            Origins
+                          </p>
+                        </div>
                         <p
-                          style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            fontSize: "13px",
-                            fontWeight: 600,
-                            color: "#CC0000",
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            marginBottom: "2px",
-                          }}
-                        >
-                          Issue 01
-                        </p>
-                        <p
-                          style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            fontSize: "20px",
-                            fontWeight: 600,
-                            color: "#F7F7F7",
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          Origins
-                        </p>
-                      </div>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#A0A0A0",
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        The debut issue of SENOTA Magazine — introducing the creatives, stories, and
-                        voices that define a new generation of art, culture, and expression.
-                      </p>
-                      <div className="flex flex-col gap-2 mt-1">
-                        <a
-                          href="/magazine"
-                          onClick={(e) => { e.preventDefault(); handleNavClick("/magazine"); }}
-                          className="block text-center py-2 transition-colors"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "12px",
-                            color: "#F7F7F7",
-                            border: "1px solid #F7F7F7",
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                            textDecoration: "none",
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = "#F7F7F7";
-                            (e.currentTarget as HTMLElement).style.color = "#1A1A1A";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
-                            (e.currentTarget as HTMLElement).style.color = "#F7F7F7";
-                          }}
-                        >
-                          Buy Now
-                        </a>
-                        <a
-                          href="/magazine"
-                          onClick={(e) => { e.preventDefault(); handleNavClick("/magazine"); }}
-                          className="block text-center py-2 transition-colors"
                           style={{
                             fontFamily: "'DM Sans', sans-serif",
                             fontSize: "12px",
                             color: "#A0A0A0",
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                            textDecoration: "none",
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLElement).style.color = "#F7F7F7";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLElement).style.color = "#A0A0A0";
+                            lineHeight: 1.6,
                           }}
                         >
-                          Explore Issue
-                        </a>
+                          The debut issue of SENOTA Magazine — introducing the creatives, stories, and
+                          voices that define a new generation of art, culture, and expression.
+                        </p>
+                        <div className="flex flex-col gap-2 mt-1">
+                          <a
+                            href="/magazine"
+                            onClick={(e) => { e.preventDefault(); handleNavClick("/magazine"); }}
+                            className="block text-center py-2 transition-colors"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: "12px",
+                              color: "#F7F7F7",
+                              border: "1px solid #F7F7F7",
+                              letterSpacing: "0.08em",
+                              textTransform: "uppercase",
+                              textDecoration: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = "#F7F7F7";
+                              (e.currentTarget as HTMLElement).style.color = "#1A1A1A";
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
+                              (e.currentTarget as HTMLElement).style.color = "#F7F7F7";
+                            }}
+                          >
+                            Buy Now
+                          </a>
+                          <a
+                            href="/magazine"
+                            onClick={(e) => { e.preventDefault(); handleNavClick("/magazine"); }}
+                            className="block text-center py-2 transition-colors"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: "12px",
+                              color: "#A0A0A0",
+                              letterSpacing: "0.08em",
+                              textTransform: "uppercase",
+                              textDecoration: "none",
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.currentTarget as HTMLElement).style.color = "#F7F7F7";
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.currentTarget as HTMLElement).style.color = "#A0A0A0";
+                            }}
+                          >
+                            Explore Issue
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* Cover image */}
+                      <div
+                        className="flex-shrink-0"
+                        style={{ width: "130px" }}
+                      >
+                        <img
+                          src={COVER_URL}
+                          alt="SENOTA Issue 01 — Origins"
+                          className="w-full h-full object-cover"
+                          style={{ display: "block" }}
+                        />
                       </div>
                     </div>
-
-                    {/* Cover image */}
-                    <div
-                      className="flex-shrink-0"
-                      style={{ width: "130px" }}
-                    >
-                      <img
-                        src={COVER_URL}
-                        alt="SENOTA Issue 01 — Origins"
-                        className="w-full h-full object-cover"
-                        style={{ display: "block" }}
-                      />
-                    </div>
                   </div>
-                </div>
+                </>
               )}
             </div>
 

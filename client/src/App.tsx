@@ -7,6 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import HomePage from "./pages/HomePage";
 import CreativeShowcase from "./pages/Home";
+import CommunityPage from "./pages/CommunityPage";
 
 const UNDER_CONSTRUCTION_ROUTES = [
   "/magazine",
@@ -17,7 +18,6 @@ const UNDER_CONSTRUCTION_ROUTES = [
   "/modeling",
   "/advertising",
   "/academy",
-  "/community",
   "/branding",
   "/events",
   "/about",
@@ -35,6 +35,9 @@ function Router() {
 
       {/* Creative Showcase archive */}
       <Route path={"/creatives"} component={CreativeShowcase} />
+
+      {/* Community page */}
+      <Route path={"/community"} component={CommunityPage} />
 
       {/* Under-construction section pages */}
       {UNDER_CONSTRUCTION_ROUTES.map((path) => (

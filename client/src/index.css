@@ -116,6 +116,27 @@
 }
 
 @layer components {
+  /* Issue 01 card: fixed centered modal on mobile, absolute dropdown on desktop */
+  .issue-card-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100vw - 32px);
+    max-width: 420px;
+  }
+  @media (min-width: 768px) {
+    .issue-card-popup {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      left: auto;
+      transform: none;
+      width: 420px;
+      max-width: none;
+    }
+  }
+
   .container {
     width: 100%;
     margin-left: auto;
