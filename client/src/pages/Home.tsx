@@ -86,23 +86,45 @@ export default function Home() {
       <SiteHeader />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden" style={{ height: "340px" }}>
-        <img
-          src={HERO_IMG}
-          alt="SENOTA Creative Showcase"
-          className="w-full h-full object-cover object-center"
-        />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0) 40%, rgba(255,255,255,0.95) 100%)" }}
-        />
-        <div className="absolute bottom-8 left-0 right-0 container">
+      <section className="relative w-full overflow-hidden bg-white pt-10 pb-4">
+        {/* SENOTA label */}
+        <div className="container mb-2 flex items-center gap-3">
           <p
-            className="text-xs tracking-[0.2em] uppercase mb-1"
+            className="text-xs tracking-[0.2em] uppercase"
             style={{ fontFamily: "'Space Mono', monospace", color: "#CC0000" }}
           >
             Archive Vol. I — 2026
           </p>
+        </div>
+
+        {/* Large display title — responsive, never overflows */}
+        <div className="w-full overflow-hidden" style={{ paddingLeft: "1rem", paddingRight: "1rem" }}>
+          <div
+            style={{
+              fontFamily: "'Syne', sans-serif",
+              fontWeight: 800,
+              lineHeight: 0.88,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              color: "#0D0D0D",
+              /* Scale from 28px on tiny phones up to 120px on wide screens */
+              fontSize: "clamp(28px, 8.5vw, 120px)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+            }}
+          >
+            <div>Creative</div>
+            <div>Showcase</div>
+          </div>
+        </div>
+
+        {/* Red divider */}
+        <div className="container mt-4 mb-3">
+          <div style={{ height: "1px", backgroundColor: "#CC0000", width: "100%" }} />
+        </div>
+
+        {/* Subtitle */}
+        <div className="container">
           <p
             className="text-sm max-w-md"
             style={{ fontFamily: "'DM Sans', sans-serif", color: "#0D0D0D" }}
