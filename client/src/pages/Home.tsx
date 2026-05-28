@@ -14,6 +14,8 @@ import {
   type CategoryKey,
 } from "@/data/creatives";
 import ProfileOverlay from "@/components/ProfileOverlay";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663669938069/R2tmVQHg3mxoijLEDBNh7f/senota-showcase-hero-dLi8jXhwsXWkp5QuPnYQ3s.webp";
@@ -80,63 +82,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Syne', sans-serif" }}>
-      {/* ── Top Nav Bar ───────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-40 bg-white border-b"
-        style={{ borderColor: "#E8E6E1" }}
-      >
-        <div className="container flex items-center justify-between h-14">
-          <div className="flex items-center gap-6">
-            <span
-              className="text-sm font-800 tracking-[0.25em] uppercase"
-              style={{ fontFamily: "'Syne', sans-serif", color: "#0D0D0D" }}
-            >
-              SENOTA
-            </span>
-            <span
-              className="hidden sm:block text-xs tracking-[0.15em] uppercase"
-              style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-            >
-              Creative Showcase
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span
-              className="text-xs"
-              style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-            >
-              {totalCreatives} Creatives
-            </span>
-            {/* Search */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-xs pl-3 pr-8 py-1.5 border bg-transparent outline-none focus:border-[#CC0000] transition-colors"
-                style={{
-                  fontFamily: "'Space Mono', monospace",
-                  borderColor: "#E8E6E1",
-                  color: "#0D0D0D",
-                  width: "160px",
-                }}
-              />
-              <svg
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3"
-                style={{ color: "#8A8A8A" }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden" style={{ height: "340px" }}>
@@ -400,42 +346,7 @@ export default function Home() {
         </main>
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────── */}
-      <footer
-        className="border-t py-8"
-        style={{ borderColor: "#E8E6E1" }}
-      >
-        <div className="container flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <span
-              className="text-sm font-700 tracking-[0.25em] uppercase block mb-1"
-              style={{ fontFamily: "'Syne', sans-serif", color: "#0D0D0D" }}
-            >
-              SENOTA
-            </span>
-            <span
-              className="text-xs"
-              style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-            >
-              Creative Showcase — Archive Vol. I
-            </span>
-          </div>
-          <div className="flex gap-6">
-            <span
-              className="text-xs"
-              style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-            >
-              © 2026 SENOTA LLC
-            </span>
-            <span
-              className="text-xs"
-              style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-            >
-              All Rights Reserved
-            </span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
 
       {/* ── Profile Overlay ───────────────────────────────────────── */}
       <ProfileOverlay
