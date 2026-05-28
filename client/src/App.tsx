@@ -5,7 +5,8 @@ import UnderConstruction from "@/pages/UnderConstruction";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
+import CreativeShowcase from "./pages/Home";
 
 const UNDER_CONSTRUCTION_ROUTES = [
   "/magazine",
@@ -29,12 +30,19 @@ const UNDER_CONSTRUCTION_ROUTES = [
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      {/* Main homepage */}
+      <Route path={"/"} component={HomePage} />
+
+      {/* Creative Showcase archive */}
+      <Route path={"/creatives"} component={CreativeShowcase} />
+
+      {/* Under-construction section pages */}
       {UNDER_CONSTRUCTION_ROUTES.map((path) => (
         <Route key={path} path={path} component={UnderConstruction} />
       ))}
+
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      {/* Final fallback */}
       <Route component={NotFound} />
     </Switch>
   );

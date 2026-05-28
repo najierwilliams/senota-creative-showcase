@@ -1,51 +1,27 @@
 /*
- * SENOTA Under Construction Page
- * Shown for all sections not yet built
- * Design: Editorial, matches SENOTA brand
+ * SENOTA Homepage
+ * The main landing page at "/"
+ * Design: Hunger Magazine-style — editorial, clean, high-contrast
+ * Under construction body between header and footer
  */
 
-import { useLocation } from "wouter";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
-// Map route paths to display names
-const SECTION_NAMES: Record<string, string> = {
-  "/creatives": "Creative Showcase",
-  "/magazine": "Magazine",
-  "/fashion": "Fashion",
-  "/music": "Music",
-  "/photography": "Photography",
-  "/art-culture": "Art + Culture",
-  "/modeling": "Modeling",
-  "/advertising": "Advertising",
-  "/academy": "Academy",
-  "/community": "Community",
-  "/branding": "Branding",
-  "/events": "Events",
-  "/about": "About",
-  "/archive": "Archive",
-  "/submit": "Submit Work",
-  "/contact": "Contact",
-  "/privacy": "Privacy Policy",
-};
-
-export default function UnderConstruction() {
-  const [location] = useLocation();
-  const sectionName = SECTION_NAMES[location] || "This Section";
-
+export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F7F7F7" }}>
       <SiteHeader />
 
-      {/* Main content */}
+      {/* ── Under Construction Body ───────────────────────────────── */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-24">
-        {/* Decorative top line */}
+        {/* Decorative vertical line */}
         <div
           className="mb-8"
           style={{ width: "1px", height: "60px", backgroundColor: "#CC0000" }}
         />
 
-        {/* Section label */}
+        {/* Label */}
         <p
           className="mb-3"
           style={{
@@ -57,44 +33,56 @@ export default function UnderConstruction() {
             color: "#CC0000",
           }}
         >
-          {sectionName}
+          SENOTA Studios
         </p>
 
         {/* Main heading */}
         <h1
-          className="text-center mb-6"
+          className="text-center mb-4"
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "clamp(42px, 8vw, 80px)",
+            fontSize: "clamp(48px, 9vw, 96px)",
             fontWeight: 700,
             color: "#1A1A1A",
-            lineHeight: 1.05,
+            lineHeight: 1.0,
             letterSpacing: "0.02em",
           }}
         >
-          Under Construction
+          Coming Soon
         </h1>
 
-        {/* Subtext */}
+        {/* Italic subheading */}
         <p
-          className="text-center max-w-md mb-10"
+          className="text-center mb-6"
+          style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "clamp(18px, 3vw, 26px)",
+            fontStyle: "italic",
+            fontWeight: 400,
+            color: "#555",
+            letterSpacing: "0.04em",
+          }}
+        >
+          Art. Culture. Expression.
+        </p>
+
+        {/* Body text */}
+        <p
+          className="text-center max-w-lg mb-10"
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: "15px",
             color: "#8A8A8A",
-            lineHeight: 1.7,
+            lineHeight: 1.75,
           }}
         >
-          We're building something worth waiting for. The{" "}
-          <span style={{ color: "#1A1A1A", fontWeight: 500 }}>{sectionName}</span> section of
-          SENOTA is coming soon — check back for updates.
+          The SENOTA homepage is under construction. We're building a world-class editorial
+          experience — magazine, modeling, photography, music, and more. In the meantime, explore
+          the Creative Showcase below.
         </p>
 
-        {/* Decorative grid of dashes */}
-        <div
-          className="flex items-center gap-3 mb-10"
-          style={{ color: "#D0D0D0" }}
-        >
+        {/* Decorative dash row */}
+        <div className="flex items-center gap-3 mb-10">
           {[...Array(7)].map((_, i) => (
             <div
               key={i}
@@ -107,9 +95,9 @@ export default function UnderConstruction() {
           ))}
         </div>
 
-        {/* Back to home */}
+        {/* CTA: go to Creative Showcase */}
         <a
-          href="/"
+          href="/creatives"
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: "12px",
@@ -131,7 +119,7 @@ export default function UnderConstruction() {
             (e.currentTarget as HTMLElement).style.borderColor = "#1A1A1A";
           }}
         >
-          ← Back to Home
+          Explore the Creative Showcase →
         </a>
       </main>
 

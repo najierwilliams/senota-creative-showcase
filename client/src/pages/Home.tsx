@@ -16,6 +16,7 @@ import {
 import ProfileOverlay from "@/components/ProfileOverlay";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+// Creative Showcase lives at /creatives
 
 const HERO_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663669938069/R2tmVQHg3mxoijLEDBNh7f/senota-showcase-hero-dLi8jXhwsXWkp5QuPnYQ3s.webp";

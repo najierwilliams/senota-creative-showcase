@@ -30,7 +30,7 @@ const FOOTER_COLS = [
       { label: "Academy", href: "/academy" },
       { label: "Community", href: "/community" },
       { label: "Branding", href: "/branding" },
-      { label: "Creative Showcase", href: "/" },
+      { label: "Creative Showcase", href: "/creatives" },
       { label: "Events", href: "/events" },
     ],
   },

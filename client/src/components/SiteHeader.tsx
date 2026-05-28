@@ -17,6 +17,7 @@ const COVER_URL =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663669938069/R2tmVQHg3mxoijLEDBNh7f/senota-issue-01-cover-FPHewCEVPfJ9k2ps7aYQuT.webp";
 
 const NAV_LINKS = [
+  { label: "Home", href: "/" },
   { label: "Magazine", href: "/magazine" },
   { label: "Fashion", href: "/fashion" },
   { label: "Music", href: "/music" },
@@ -27,7 +28,7 @@ const NAV_LINKS = [
   { label: "Academy", href: "/academy" },
   { label: "Community", href: "/community" },
   { label: "Branding", href: "/branding" },
-  { label: "Creatives", href: "/" },
+  { label: "Creatives", href: "/creatives" },
 ];
 
 interface SiteHeaderProps {
