@@ -7,9 +7,27 @@ type UseAuthOptions = {
   redirectPath?: string;
 };
 
+// Global variable to store the latest Clerk token for tRPC headers
+let latestClerkToken: string | null = null;
+
+export function getClerkToken() {
+  return latestClerkToken;
+}
+
 export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = "/account" } = options ?? {};
-  const { isSignedIn, isLoaded } = useClerkAuthHook();
+  const { isSignedIn, isLoaded, getToken } = useClerkAuthHook();
+
+  // Keep the global token in sync for tRPC headers
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      getToken().then(token => {
+        latestClerkToken = token;
+      });
+    } else {
+      latestClerkToken = null;
+    }
+  }, [isLoaded, isSignedIn, getToken]);
   const { user: clerkUser } = useUser();
   const { signOut } = useClerk();
   const utils = trpc.useUtils();

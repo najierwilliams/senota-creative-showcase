@@ -122,6 +122,14 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
     navigate("/account");
   };
 
+  const handleDashboard = () => {
+    if (user) {
+      navigate(getDashboardPath(user.role));
+    } else {
+      navigate("/account");
+    }
+  };
+
   return (
     <>
       {/* ── Sticky Header Bar ─────────────────────────────────────── */}
@@ -355,7 +363,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     ) : (
                       <UserCircle size={16} strokeWidth={1.5} />
                     )}
-                    <span className="hidden sm:inline max-w-[80px] truncate">{user.name?.split(" ")[0]}</span>
+                    <span className="hidden sm:inline max-w-[80px] truncate">Dashboard</span>
                     <ChevronDown size={12} />
                   </button>
 
@@ -724,7 +732,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     </div>
                   </div>
                   <button
-                    onClick={() => { setMobileMenuOpen(false); navigate(getDashboardPath(user.role)); }}
+                    onClick={() => { setMobileMenuOpen(false); handleDashboard(); }}
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: "12px",
@@ -735,10 +743,10 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                       border: "none",
                       cursor: "pointer",
                       padding: "10px 16px",
-                      textAlign: "left",
+                      textAlign: "center",
                     }}
                   >
-                    My Dashboard
+                    Dashboard
                   </button>
                   <button
                     onClick={() => { setMobileMenuOpen(false); logout(); }}

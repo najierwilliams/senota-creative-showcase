@@ -216,6 +216,7 @@ function CreateAccountForm({ portal }: { portal: PortalConfig }) {
           routing="virtual" 
           signInUrl="/account?tab=signin"
           fallbackRedirectUrl="/account"
+          forceRedirectUrl="/account"
           appearance={{
             elements: {
               formButtonPrimary: {
@@ -323,6 +324,13 @@ function ForgotPasswordForm({
 function AccountManagement() {
   const { user, loading, logout } = useAuth();
   const [, navigate] = useLocation();
+
+  // Auto-redirect to dashboard when authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(getDashboardPath(user.role));
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (

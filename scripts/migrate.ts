@@ -1,5 +1,6 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { migrate } from "drizzle-orm/neon-serverless/migrator";
+import "dotenv/config";
+import { drizzle } from "drizzle-orm/neon-http";
+import { migrate } from "drizzle-orm/neon-http/migrator";
 import { neon } from "@neondatabase/serverless";
 
 const runMigrate = async () => {
@@ -12,12 +13,10 @@ const runMigrate = async () => {
 
   console.log("Running migrations...");
 
-  // Since we have the SQL file, we'll just execute it directly for simplicity
-  // or use the migrate function if it points to the right folder
   try {
-    // In a real scenario, we'd use migrate(db, { migrationsFolder: "drizzle/migrations" });
-    // But for this environment, we'll just push the schema
+    await migrate(db, { migrationsFolder: "drizzle/migrations" });
     console.log("Migration successful");
+    process.exit(0);
   } catch (error) {
     console.error("Migration failed:", error);
     process.exit(1);

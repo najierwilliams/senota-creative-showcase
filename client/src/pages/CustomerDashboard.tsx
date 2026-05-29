@@ -184,7 +184,7 @@ export default function CustomerDashboard() {
               </div>
             </div>
             <button
-              onClick={() => { logout(); navigate("/"); }}
+              onClick={async () => { await logout(); navigate("/"); }}
               className="flex items-center gap-2 px-4 py-2 transition-opacity hover:opacity-70"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
