@@ -8,7 +8,14 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import HomePage from "./pages/HomePage";
 import CreativeShowcase from "./pages/Home";
 import CommunityPage from "./pages/CommunityPage";
+import AdvertisingPage from "./pages/AdvertisingPage";
+import AcademyPage from "./pages/AcademyPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
+import SubmitPage from "./pages/SubmitPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
+// Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
   "/magazine",
   "/fashion",
@@ -16,15 +23,9 @@ const UNDER_CONSTRUCTION_ROUTES = [
   "/photography",
   "/art-culture",
   "/modeling",
-  "/advertising",
-  "/academy",
   "/branding",
   "/events",
-  "/about",
   "/archive",
-  "/submit",
-  "/contact",
-  "/privacy",
 ];
 
 function Router() {
@@ -36,8 +37,26 @@ function Router() {
       {/* Creative Showcase archive */}
       <Route path={"/creatives"} component={CreativeShowcase} />
 
-      {/* Community page */}
+      {/* Community */}
       <Route path={"/community"} component={CommunityPage} />
+
+      {/* Advertising */}
+      <Route path={"/advertising"} component={AdvertisingPage} />
+
+      {/* Academy */}
+      <Route path={"/academy"} component={AcademyPage} />
+
+      {/* About */}
+      <Route path={"/about"} component={AboutPage} />
+
+      {/* Contact */}
+      <Route path={"/contact"} component={ContactPage} />
+
+      {/* Submit Work */}
+      <Route path={"/submit"} component={SubmitPage} />
+
+      {/* Privacy Policy */}
+      <Route path={"/privacy"} component={PrivacyPage} />
 
       {/* Under-construction section pages */}
       {UNDER_CONSTRUCTION_ROUTES.map((path) => (
