@@ -466,88 +466,92 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               ))}
             </nav>
 
-            {/* Mobile Issue 01 card */}
+            {/* Drawer Issue 01 card */}
             <div
-              className="mt-8 p-5 flex gap-4"
+              className="mt-8 overflow-hidden"
               style={{ backgroundColor: "#1A1A1A" }}
             >
-              <div className="flex-1">
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: "#CC0000",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    marginBottom: "4px",
-                  }}
-                >
-                  Issue 01
-                </p>
-                <p
-                  style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "22px",
-                    fontWeight: 600,
-                    color: "#F7F7F7",
-                    marginBottom: "8px",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  Origins
-                </p>
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "12px",
-                    color: "#A0A0A0",
-                    lineHeight: 1.6,
-                    marginBottom: "16px",
-                  }}
-                >
-                  The debut issue of SENOTA Magazine — introducing the creatives, stories, and voices
-                  that define a new generation.
-                </p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleNavClick("/magazine")}
-                    className="px-4 py-2 text-xs transition-colors"
+              <div className="flex items-stretch">
+                {/* Text side */}
+                <div className="flex-1 p-4 flex flex-col gap-2 min-w-0">
+                  <p
                     style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      letterSpacing: "0.08em",
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: "10px",
+                      fontWeight: 600,
+                      color: "#CC0000",
+                      letterSpacing: "0.14em",
                       textTransform: "uppercase",
+                    }}
+                  >
+                    Issue 01
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'Cormorant Garamond', serif",
+                      fontSize: "20px",
+                      fontWeight: 600,
                       color: "#F7F7F7",
-                      border: "1px solid #F7F7F7",
-                      background: "none",
-                      cursor: "pointer",
+                      lineHeight: 1.15,
                     }}
                   >
-                    Buy Now
-                  </button>
-                  <button
-                    onClick={() => handleNavClick("/magazine")}
-                    className="px-4 py-2 text-xs transition-colors"
+                    Origins
+                  </p>
+                  <p
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                      fontSize: "11px",
                       color: "#A0A0A0",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
+                      lineHeight: 1.55,
                     }}
                   >
-                    Explore Issue
-                  </button>
+                    The debut issue of SENOTA Magazine — introducing the creatives, stories, and voices that define a new generation.
+                  </p>
+                  <div className="flex gap-2 mt-1 flex-wrap">
+                    <button
+                      onClick={() => handleNavClick("/magazine")}
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "10px",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "#F7F7F7",
+                        border: "1px solid #F7F7F7",
+                        background: "none",
+                        cursor: "pointer",
+                        padding: "6px 12px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Buy Now
+                    </button>
+                    <button
+                      onClick={() => handleNavClick("/magazine")}
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "10px",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "#A0A0A0",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "6px 0",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Explore Issue
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div style={{ width: "90px", flexShrink: 0 }}>
-                <img
-                  src={COVER_URL}
-                  alt="SENOTA Issue 01"
-                  className="w-full h-full object-cover"
-                />
+                {/* Cover image — fixed width, full height of card */}
+                <div style={{ width: "100px", flexShrink: 0, alignSelf: "stretch" }}>
+                  <img
+                    src={COVER_URL}
+                    alt="SENOTA Issue 01"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
