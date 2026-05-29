@@ -307,3 +307,35 @@
     }
   }
 }
+
+  /* ── Privacy Policy — mobile single-column layout ─────────── */
+  .privacy-grid {
+    grid-template-columns: clamp(120px, 18vw, 200px) 1fr;
+  }
+
+  @media (max-width: 600px) {
+    .privacy-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .privacy-grid nav {
+      position: static !important;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #E5E7EB;
+      margin-bottom: 32px;
+    }
+    .privacy-grid nav p {
+      display: none;
+    }
+    .privacy-grid nav a {
+      flex-shrink: 0;
+      border-bottom: none !important;
+      border-right: 1px solid #E5E7EB;
+      padding: 6px 12px !important;
+      font-size: 11px !important;
+    }
+  }

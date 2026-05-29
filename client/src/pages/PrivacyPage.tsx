@@ -156,13 +156,14 @@ export default function PrivacyPage() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "200px 1fr",
-            gap: "64px",
+            gridTemplateColumns: "clamp(120px, 18vw, 200px) 1fr",
+            gap: "clamp(24px, 5vw, 64px)",
             alignItems: "start",
           }}
+          className="privacy-grid"
         >
           {/* Sticky Nav */}
-          <nav style={{ position: "sticky", top: "80px" }}>
+          <nav style={{ position: "sticky", top: "80px", minWidth: 0 }}>
             <p
               style={{
                 fontFamily: "'DM Sans', sans-serif",
@@ -175,19 +176,20 @@ export default function PrivacyPage() {
             >
               Contents
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0", minWidth: 0 }}>
               {SECTIONS.map((s) => (
-                <a
+                  <a
                   key={s.id}
                   href={`#${s.id}`}
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "13px",
+                    fontSize: "clamp(11px, 1.3vw, 13px)",
                     color: "#555",
                     textDecoration: "none",
                     padding: "8px 0",
                     borderBottom: "1px solid #E5E7EB",
                     transition: "color 150ms",
+                    wordBreak: "break-word",
                   }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#CC0000"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "#555"; }}
@@ -199,7 +201,7 @@ export default function PrivacyPage() {
           </nav>
 
           {/* Content */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "56px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "56px", minWidth: 0, overflow: "hidden" }}>
             {SECTIONS.map((s) => (
               <div key={s.id} id={s.id}>
                 <h2

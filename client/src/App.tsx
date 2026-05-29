@@ -14,6 +14,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import AcademyEnrollPage from "./pages/AcademyEnrollPage";
 
 // Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
@@ -45,6 +46,9 @@ function Router() {
 
       {/* Academy */}
       <Route path={"/academy"} component={AcademyPage} />
+
+      {/* Academy Enrollment */}
+      <Route path={"/academy/enroll"} component={AcademyEnrollPage} />
 
       {/* About */}
       <Route path={"/about"} component={AboutPage} />

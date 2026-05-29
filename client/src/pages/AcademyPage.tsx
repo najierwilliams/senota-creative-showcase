@@ -136,7 +136,7 @@ export default function AcademyPage() {
             SENOTA Academy is a creative education platform built by working professionals for aspiring creatives. No fluff — just real skills, real mentors, and a real community.
           </p>
           <button
-            onClick={() => navigate("/submit")}
+            onClick={() => navigate("/academy/enroll")}
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "11px",
@@ -482,7 +482,7 @@ export default function AcademyPage() {
             SENOTA Academy is currently in development. Apply for early access and be notified when enrollment opens — early applicants receive priority placement and founding member pricing.
           </p>
           <button
-            onClick={() => navigate("/submit")}
+            onClick={() => navigate("/academy/enroll")}
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "11px",
