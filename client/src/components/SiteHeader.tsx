@@ -116,6 +116,13 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
     navigate(href);
   };
 
+  const handleSignIn = () => {
+    const url = getLoginUrl();
+    if (url && url !== "#") {
+      window.location.href = url;
+    }
+  };
+
   return (
     <>
       {/* ── Sticky Header Bar ─────────────────────────────────────── */}
@@ -315,17 +322,17 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               )}
             </div>
 
-            {/* Book icon */}
+            {/* Book icon — desktop only */}
             <button
-              className="flex items-center justify-center w-8 h-8 transition-opacity hover:opacity-60"
+              className="hidden md:flex items-center justify-center w-8 h-8 transition-opacity hover:opacity-60"
               onClick={() => handleNavClick("/magazine")}
               aria-label="Magazine archive"
             >
               <BookOpen size={17} strokeWidth={1.5} color="#1A1A1A" />
             </button>
 
-            {/* Account / Login button */}
-            <div ref={accountRef} className="relative">
+            {/* Account / Login button — desktop only; mobile users access via drawer */}
+            <div ref={accountRef} className="relative hidden md:block">
               {isAuthenticated && user ? (
                 <>
                   <button
@@ -412,7 +419,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                 </>
               ) : (
                 <button
-                  onClick={() => { window.location.href = getLoginUrl(); }}
+                  onClick={handleSignIn}
                   className="flex items-center gap-1.5 px-3 py-1 transition-opacity hover:opacity-70"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
@@ -755,7 +762,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                 </div>
               ) : (
                 <button
-                  onClick={() => { setMobileMenuOpen(false); window.location.href = getLoginUrl(); }}
+                  onClick={() => { setMobileMenuOpen(false); handleSignIn(); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
