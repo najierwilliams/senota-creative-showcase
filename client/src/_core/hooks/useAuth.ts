@@ -77,6 +77,8 @@ export function useAuth(options?: UseAuthOptions) {
 
   return {
     ...state,
+    isSignedIn,
+    isLoaded,
     refresh: () => meQuery.refetch(),
     logout,
   };

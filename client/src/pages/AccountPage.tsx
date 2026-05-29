@@ -523,7 +523,7 @@ function AccountManagement() {
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function AccountPage() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { user, loading, isAuthenticated, isSignedIn, isLoaded } = useAuth();
   const [selectedPortal, setSelectedPortal] = useState<PortalRole>("member");
   const [activeTab, setActiveTab] = useState<AuthTab>("signin");
 
@@ -596,14 +596,14 @@ export default function AccountPage() {
         )}
 
         {/* Signed-in: account management */}
-        {isAuthenticated && (
+        {isSignedIn && (
           <div className="max-w-md mx-auto">
             <AccountManagement />
           </div>
         )}
 
         {/* Not signed in: portal selector + auth forms */}
-        {!isAuthenticated && (
+        {!isSignedIn && isLoaded && (
           <div className="max-w-lg mx-auto">
             {/* Portal role selector */}
             <div
