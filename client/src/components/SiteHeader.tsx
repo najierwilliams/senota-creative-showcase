@@ -11,7 +11,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, BookOpen, X, Menu } from "lucide-react";
+import { Search, BookOpen, X, Menu, UserCircle, Crown, Briefcase, LogOut, ChevronDown } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 
 const COVER_URL =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663669938069/R2tmVQHg3mxoijLEDBNh7f/senota-issue-01-cover-FPHewCEVPfJ9k2ps7aYQuT.webp";
@@ -35,6 +37,13 @@ interface SiteHeaderProps {
   onSearchOpen?: () => void;
 }
 
+function getDashboardPath(role?: string | null) {
+  if (role === "circle") return "/dashboard/circle";
+  if (role === "employee") return "/dashboard/employee";
+  if (role === "admin") return "/dashboard/employee";
+  return "/dashboard/customer";
+}
+
 export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const [issueOpen, setIssueOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,10 +51,13 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
   const issueRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   // Close issue card when clicking outside
   useEffect(() => {
@@ -57,6 +69,17 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
     if (issueOpen) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [issueOpen]);
+
+  // Close account dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+    if (accountOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [accountOpen]);
 
   // Focus search input when opened
   useEffect(() => {
@@ -300,6 +323,113 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
             >
               <BookOpen size={17} strokeWidth={1.5} color="#1A1A1A" />
             </button>
+
+            {/* Account / Login button */}
+            <div ref={accountRef} className="relative">
+              {isAuthenticated && user ? (
+                <>
+                  <button
+                    onClick={() => setAccountOpen((v) => !v)}
+                    className="flex items-center gap-1 px-2 py-1 transition-opacity hover:opacity-70"
+                    aria-label="Account"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "11px",
+                      color: "#1A1A1A",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {user.role === "circle" ? (
+                      <Crown size={16} strokeWidth={1.5} style={{ color: "#CC0000" }} />
+                    ) : user.role === "employee" || user.role === "admin" ? (
+                      <Briefcase size={16} strokeWidth={1.5} />
+                    ) : (
+                      <UserCircle size={16} strokeWidth={1.5} />
+                    )}
+                    <span className="hidden sm:inline max-w-[80px] truncate">{user.name?.split(" ")[0]}</span>
+                    <ChevronDown size={12} />
+                  </button>
+
+                  {accountOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-1 z-50"
+                      style={{
+                        backgroundColor: "#1A1A1A",
+                        minWidth: "180px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                      }}
+                    >
+                      {/* User info */}
+                      <div className="px-4 py-3" style={{ borderBottom: "1px solid #2A2A2A" }}>
+                        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "13px", fontWeight: 600, color: "#F7F7F7", marginBottom: "2px" }}>{user.name}</p>
+                        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#8A8A8A", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                          {user.role === "circle" ? "The Circle" : user.role === "employee" ? "Employee" : user.role === "admin" ? "Admin" : "Customer"}
+                        </p>
+                      </div>
+                      {/* Dashboard link */}
+                      <button
+                        onClick={() => { setAccountOpen(false); navigate(getDashboardPath(user.role)); }}
+                        className="w-full text-left px-4 py-3 transition-colors"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          color: "#D0D0D0",
+                          letterSpacing: "0.06em",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          borderBottom: "1px solid #2A2A2A",
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
+                      >
+                        My Dashboard
+                      </button>
+                      {/* Sign out */}
+                      <button
+                        onClick={() => { setAccountOpen(false); logout(); }}
+                        className="w-full text-left px-4 py-3 flex items-center gap-2 transition-colors"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          color: "#8A8A8A",
+                          letterSpacing: "0.06em",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
+                      >
+                        <LogOut size={12} />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => { window.location.href = getLoginUrl(); }}
+                  className="flex items-center gap-1.5 px-3 py-1 transition-opacity hover:opacity-70"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "11px",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#1A1A1A",
+                    border: "1px solid #1A1A1A",
+                    background: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <UserCircle size={14} strokeWidth={1.5} />
+                  <span className="hidden sm:inline">Sign In</span>
+                </button>
+              )}
+            </div>
 
             {/* Search icon / input — desktop: inline expand; mobile: full-screen overlay */}
             {/* Desktop inline search */}
@@ -553,6 +683,95 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Mobile Account / Login section */}
+            <div className="mt-6 pt-6" style={{ borderTop: "1px solid #E5E7EB" }}>
+              {isAuthenticated && user ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        backgroundColor: user.role === "circle" ? "#CC0000" : "#1A1A1A",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {user.avatar ? (
+                        <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                      ) : user.role === "circle" ? (
+                        <Crown size={16} style={{ color: "#F7F7F7" }} />
+                      ) : user.role === "employee" || user.role === "admin" ? (
+                        <Briefcase size={16} style={{ color: "#F7F7F7" }} />
+                      ) : (
+                        <UserCircle size={16} style={{ color: "#F7F7F7" }} />
+                      )}
+                    </div>
+                    <div>
+                      <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "14px", fontWeight: 600, color: "#1A1A1A" }}>{user.name}</p>
+                      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#8A8A8A", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                        {user.role === "circle" ? "The Circle" : user.role === "employee" ? "Employee" : user.role === "admin" ? "Admin" : "Customer"}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); navigate(getDashboardPath(user.role)); }}
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "12px",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "#F7F7F7",
+                      backgroundColor: "#1A1A1A",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "10px 16px",
+                      textAlign: "left",
+                    }}
+                  >
+                    My Dashboard
+                  </button>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); logout(); }}
+                    className="flex items-center gap-2"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "12px",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "#8A8A8A",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "8px 0",
+                    }}
+                  >
+                    <LogOut size={13} />
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); window.location.href = getLoginUrl(); }}
+                  className="flex items-center gap-2 w-full justify-center py-3"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "12px",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#F7F7F7",
+                    backgroundColor: "#1A1A1A",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <UserCircle size={15} />
+                  Sign In / Create Account
+                </button>
+              )}
             </div>
           </div>
         </div>

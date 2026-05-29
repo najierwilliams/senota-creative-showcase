@@ -15,6 +15,9 @@ import ContactPage from "./pages/ContactPage";
 import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AcademyEnrollPage from "./pages/AcademyEnrollPage";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import CircleDashboard from "./pages/CircleDashboard";
 
 // Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
@@ -28,8 +31,8 @@ const UNDER_CONSTRUCTION_ROUTES = [
   "/events",
   "/archive",
 ];
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       {/* Main homepage */}
@@ -61,6 +64,11 @@ function Router() {
 
       {/* Privacy Policy */}
       <Route path={"/privacy"} component={PrivacyPage} />
+
+      {/* Dashboards */}
+      <Route path={"/dashboard/customer"} component={CustomerDashboard} />
+      <Route path={"/dashboard/employee"} component={EmployeeDashboard} />
+      <Route path={"/dashboard/circle"} component={CircleDashboard} />
 
       {/* Under-construction section pages */}
       {UNDER_CONSTRUCTION_ROUTES.map((path) => (
