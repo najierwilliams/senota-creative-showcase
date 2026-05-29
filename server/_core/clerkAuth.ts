@@ -25,7 +25,7 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
     }
 
     // Sync user with database
-    const dbUser = await db.upsertUser({
+    await db.upsertUser({
       openId: userId, // Use Clerk's user ID as the openId
       name: clerkUser.firstName && clerkUser.lastName 
         ? `${clerkUser.firstName} ${clerkUser.lastName}` 
@@ -35,7 +35,8 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       lastSignedIn: new Date(),
     });
 
-    return dbUser;
+    // Fetch and return the synced user
+    return await db.getUserByOpenId(userId) ?? null;
   } catch (error) {
     console.error("[Clerk Auth] Authentication error:", error);
     return null;
