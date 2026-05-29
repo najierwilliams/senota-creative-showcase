@@ -159,6 +159,8 @@ function SignInForm({
         routing="path" 
         path="/account" 
         signUpUrl="/account?tab=signup"
+        fallbackRedirectUrl="/account"
+        forceRedirectUrl="/account"
         appearance={{
           elements: {
             formButtonPrimary: {
@@ -214,6 +216,8 @@ function CreateAccountForm({ portal }: { portal: PortalConfig }) {
           routing="path" 
           path="/account" 
           signInUrl="/account?tab=signin"
+          fallbackRedirectUrl="/account"
+          forceRedirectUrl="/account"
           appearance={{
             elements: {
               formButtonPrimary: {
@@ -271,6 +275,8 @@ function ForgotPasswordForm({
           routing="path" 
           path="/account" 
           initialValues={{ emailAddress: "" }}
+          fallbackRedirectUrl="/account"
+          forceRedirectUrl="/account"
           appearance={{
             elements: {
               formButtonPrimary: {
