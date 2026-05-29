@@ -384,16 +384,34 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
         </nav>
       </header>
 
-      {/* ── Full-Screen Mobile Menu ────────────────────────────────── */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-[100] flex flex-col"
-          style={{ backgroundColor: "#F7F7F7" }}
-        >
-          {/* Mobile menu header */}
+      {/* ── Slide-In Drawer Menu (mobile + desktop) ──────────────── */}
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[99] transition-opacity duration-300"
+        style={{
+          backgroundColor: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(2px)",
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? "auto" : "none",
+        }}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
+      {/* Drawer panel */}
+      <div
+        className="fixed top-0 left-0 z-[100] h-full flex flex-col"
+        style={{
+          width: "min(320px, 85vw)",
+          backgroundColor: "#F7F7F7",
+          boxShadow: "4px 0 40px rgba(0,0,0,0.18)",
+          transform: mobileMenuOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 280ms cubic-bezier(0.23, 1, 0.32, 1)",
+        }}
+      >
+          {/* Drawer header */}
           <div
             className="flex items-center justify-between px-4"
-            style={{ height: "49px", borderBottom: "1px solid #E5E7EB" }}
+            style={{ height: "49px", borderBottom: "1px solid #E5E7EB", flexShrink: 0 }}
           >
             <Link
               href="/"
@@ -534,7 +552,6 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
             </div>
           </div>
         </div>
-      )}
 
       {/* ── Full-Screen Mobile Search Overlay ───────────────────── */}
       {mobileSearchOpen && (
