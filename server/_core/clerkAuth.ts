@@ -10,10 +10,10 @@ import * as db from "../db";
 export async function authenticateClerkRequest(req: Request): Promise<User | null> {
   try {
     // Get the session from Clerk
-    const sessionId = req.auth?.sessionId;
-    const userId = req.auth?.userId;
+    const auth = (req as any).auth;
+    const userId = auth?.userId;
 
-    if (!sessionId || !userId) {
+    if (!userId) {
       return null;
     }
 
