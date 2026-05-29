@@ -253,54 +253,8 @@ function ForgotPasswordForm({
   portal: PortalConfig;
   onBack: () => void;
 }) {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSent(true);
-  };
-
-  if (sent) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <Mail size={40} style={{ color: portal.accentColor }} />
-        <p
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "22px",
-            color: "#0D0D0D",
-          }}
-        >
-          Check Your Email
-        </p>
-        <p
-          className="text-sm max-w-xs"
-          style={{ fontFamily: "'DM Sans', sans-serif", color: "#8A8A8A" }}
-        >
-          If an account exists for <strong>{email}</strong>, a password reset
-          link has been sent.
-        </p>
-        <button
-          onClick={onBack}
-          className="text-xs mt-2 transition-opacity hover:opacity-60"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: portal.accentColor,
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
-          Back to Sign In
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <p
         className="text-sm"
         style={{
@@ -309,51 +263,40 @@ function ForgotPasswordForm({
           lineHeight: 1.6,
         }}
       >
-        Enter the email address associated with your account and we'll send you
-        a reset link.
+        Click below to securely reset your password via Clerk.
       </p>
 
-      <div className="flex flex-col gap-1.5">
-        <label
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Email Address
-        </label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          required
-          className="w-full border-b bg-transparent outline-none pb-2 text-sm"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: "#0D0D0D",
-            borderColor: "#D0D0D0",
-            fontSize: "14px",
+      <div className="flex justify-center py-4">
+        <SignIn 
+          routing="path" 
+          path="/account" 
+          initialValues={{ emailAddress: "" }}
+          appearance={{
+            elements: {
+              formButtonPrimary: {
+                backgroundColor: portal.accentColor,
+                fontSize: "12px",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+              },
+              card: {
+                boxShadow: "none",
+                border: "none",
+                padding: 0,
+              },
+              headerTitle: {
+                display: "none",
+              },
+              headerSubtitle: {
+                display: "none",
+              },
+              footer: {
+                display: "none",
+              }
+            }
           }}
         />
       </div>
-
-      <button
-        type="submit"
-        className="flex items-center justify-center gap-2 w-full py-3 mt-1 transition-opacity hover:opacity-80 active:scale-[0.98]"
-        style={{
-          backgroundColor: portal.accentColor,
-          color: "#FFFFFF",
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: "12px",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          border: "none",
-          cursor: "pointer",
-          transition: "opacity 0.15s, transform 0.15s cubic-bezier(0.23,1,0.32,1)",
-        }}
-      >
-        Send Reset Link
-        <ArrowRight size={14} />
-      </button>
 
       <button
         type="button"
@@ -369,7 +312,7 @@ function ForgotPasswordForm({
       >
         ← Back to Sign In
       </button>
-    </form>
+    </div>
   );
 }
 
