@@ -72,20 +72,8 @@ export function useAuth(options?: UseAuthOptions) {
     meQuery.isLoading,
   ]);
 
-  useEffect(() => {
-    if (!redirectOnUnauthenticated) return;
-    if (!isLoaded) return;
-    if (isSignedIn) return;
-    if (typeof window === "undefined") return;
-    if (window.location.pathname === redirectPath) return;
-
-    window.location.href = redirectPath;
-  }, [
-    redirectOnUnauthenticated,
-    redirectPath,
-    isLoaded,
-    isSignedIn,
-  ]);
+  // We've removed the automatic redirect logic here to prevent reload loops.
+  // Redirection is now handled by the individual pages and components.
 
   return {
     ...state,
