@@ -1,4 +1,4 @@
-import { useAuth as useClerkAuthHook, useUser, useSignOut } from "@clerk/clerk-react";
+import { useAuth as useClerkAuthHook, useUser, useClerk } from "@clerk/clerk-react";
 import { trpc } from "@/lib/trpc";
 import { useCallback, useEffect, useMemo } from "react";
 
@@ -11,7 +11,7 @@ export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = "/account" } = options ?? {};
   const { isSignedIn, isLoaded } = useClerkAuthHook();
   const { user: clerkUser } = useUser();
-  const { signOut } = useSignOut();
+  const { signOut } = useClerk();
   const utils = trpc.useUtils();
 
   // Fetch the user from the backend (which syncs with Clerk)
