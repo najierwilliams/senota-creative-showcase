@@ -213,11 +213,9 @@ function CreateAccountForm({ portal }: { portal: PortalConfig }) {
 
       <div className="flex justify-center py-4">
         <SignUp 
-          routing="path" 
-          path="/account" 
+          routing="virtual" 
           signInUrl="/account?tab=signin"
           fallbackRedirectUrl="/account"
-          forceRedirectUrl="/account"
           appearance={{
             elements: {
               formButtonPrimary: {
@@ -272,11 +270,9 @@ function ForgotPasswordForm({
 
       <div className="flex justify-center py-4">
         <SignIn 
-          routing="path" 
-          path="/account" 
+          routing="virtual" 
           initialValues={{ emailAddress: "" }}
           fallbackRedirectUrl="/account"
-          forceRedirectUrl="/account"
           appearance={{
             elements: {
               formButtonPrimary: {
