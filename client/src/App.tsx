@@ -15,6 +15,7 @@ import ContactPage from "./pages/ContactPage";
 import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AcademyEnrollPage from "./pages/AcademyEnrollPage";
+import AccountPage from "./pages/AccountPage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import CircleDashboard from "./pages/CircleDashboard";
@@ -64,6 +65,9 @@ function Router() {
 
       {/* Privacy Policy */}
       <Route path={"/privacy"} component={PrivacyPage} />
+
+      {/* Account portal */}
+      <Route path={"/account"} component={AccountPage} />
 
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />

@@ -31,6 +31,7 @@ const NAV_LINKS = [
   { label: "Community", href: "/community" },
   { label: "Branding", href: "/branding" },
   { label: "Creatives", href: "/creatives" },
+  { label: "Account", href: "/account" },
 ];
 
 interface SiteHeaderProps {
@@ -117,10 +118,8 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   };
 
   const handleSignIn = () => {
-    const url = getLoginUrl();
-    if (url && url !== "#") {
-      window.location.href = url;
-    }
+    // Always route through the /account page for a consistent sign-in experience
+    navigate("/account");
   };
 
   return (

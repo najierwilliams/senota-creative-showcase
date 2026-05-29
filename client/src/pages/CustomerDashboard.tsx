@@ -6,7 +6,6 @@
 
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
 import { useState } from "react";
 import { useLocation } from "wouter";
 import SiteHeader from "@/components/SiteHeader";
@@ -80,7 +79,7 @@ export default function CustomerDashboard() {
 
   // Redirect if not authenticated
   if (!loading && !isAuthenticated) {
-    window.location.href = getLoginUrl();
+    window.location.href = "/account";
     return null;
   }
 
