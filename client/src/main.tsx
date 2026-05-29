@@ -6,7 +6,7 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
-import { getLoginUrl } from "./const";
+// Removed legacy getLoginUrl import
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -19,7 +19,7 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = getLoginUrl();
+  window.location.href = "/account";
 };
 
 queryClient.getQueryCache().subscribe(event => {

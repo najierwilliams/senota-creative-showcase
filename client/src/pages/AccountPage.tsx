@@ -13,7 +13,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { SignIn, SignUp } from "@clerk/clerk-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import {
@@ -153,163 +153,46 @@ function SignInForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Route through Manus OAuth — the platform handles credential validation
-    const url = getLoginUrl();
-    if (url && url !== "#") {
-      window.location.href = url;
-    }
-  };
-
   return (
-    <form onSubmit={handleSignIn} className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="signin-email"
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Email
-        </label>
-        <div className="relative">
-          <input
-            id="signin-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full border-b bg-transparent outline-none pb-2 text-sm"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: "#0D0D0D",
-              borderColor: "#D0D0D0",
-              fontSize: "14px",
-            }}
-          />
-          <Mail
-            size={13}
-            className="absolute right-0 top-0 opacity-30"
-            style={{ color: "#0D0D0D" }}
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor="signin-password"
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Password
-        </label>
-        <PasswordInput
-          id="signin-password"
-          value={password}
-          onChange={setPassword}
-          placeholder="••••••••"
-        />
-      </div>
-
-      <div className="flex items-center justify-between mt-1">
-        <button
-          type="button"
-          onClick={onForgot}
-          className="text-xs transition-opacity hover:opacity-60"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: "#8A8A8A",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: 0,
-          }}
-        >
-          Forgot password?
-        </button>
-      </div>
-
-      <button
-        type="submit"
-        className="flex items-center justify-center gap-2 w-full py-3 mt-1 transition-opacity hover:opacity-80 active:scale-[0.98]"
-        style={{
-          backgroundColor: portal.accentColor,
-          color: "#FFFFFF",
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: "12px",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          border: "none",
-          cursor: "pointer",
-          transition: "opacity 0.15s, transform 0.15s cubic-bezier(0.23,1,0.32,1)",
+    <div className="flex justify-center py-4">
+      <SignIn 
+        routing="path" 
+        path="/account" 
+        signUpUrl="/account?tab=signup"
+        appearance={{
+          elements: {
+            formButtonPrimary: {
+              backgroundColor: portal.accentColor,
+              fontSize: "12px",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+            },
+            card: {
+              boxShadow: "none",
+              border: "none",
+              padding: 0,
+            },
+            headerTitle: {
+              display: "none",
+            },
+            headerSubtitle: {
+              display: "none",
+            },
+            footer: {
+              display: "none",
+            }
+          }
         }}
-      >
-        Sign In
-        <ArrowRight size={14} />
-      </button>
-
-      <p
-        className="text-xs text-center"
-        style={{ fontFamily: "'DM Sans', sans-serif", color: "#8A8A8A" }}
-      >
-        By signing in you agree to SENOTA's{" "}
-        <a
-          href="/privacy"
-          style={{ color: portal.accentColor, textDecoration: "underline" }}
-        >
-          Privacy Policy
-        </a>
-        .
-      </p>
-    </form>
+      />
+    </div>
   );
 }
 
 // ── Create Account form ────────────────────────────────────────────────────────
 
 function CreateAccountForm({ portal }: { portal: PortalConfig }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Route through Manus OAuth sign-up flow
-    const url = getLoginUrl();
-    if (url && url !== "#") {
-      window.location.href = url;
-    } else {
-      setSubmitted(true);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
-        <CheckCircle size={40} style={{ color: portal.accentColor }} />
-        <p
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "22px",
-            color: "#0D0D0D",
-          }}
-        >
-          Account Created
-        </p>
-        <p
-          className="text-sm max-w-xs"
-          style={{ fontFamily: "'DM Sans', sans-serif", color: "#8A8A8A" }}
-        >
-          Check your email to verify your account and complete sign-up.
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleCreate} className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       {/* Note for VIP / Employee */}
       {(portal.key === "vip" || portal.key === "employee") && (
         <div
@@ -326,89 +209,38 @@ function CreateAccountForm({ portal }: { portal: PortalConfig }) {
         </div>
       )}
 
-      <div className="flex flex-col gap-1.5">
-        <label
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Full Name
-        </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Your name"
-          className="w-full border-b bg-transparent outline-none pb-2 text-sm"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: "#0D0D0D",
-            borderColor: "#D0D0D0",
-            fontSize: "14px",
+      <div className="flex justify-center py-4">
+        <SignUp 
+          routing="path" 
+          path="/account" 
+          signInUrl="/account?tab=signin"
+          appearance={{
+            elements: {
+              formButtonPrimary: {
+                backgroundColor: portal.accentColor,
+                fontSize: "12px",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+              },
+              card: {
+                boxShadow: "none",
+                border: "none",
+                padding: 0,
+              },
+              headerTitle: {
+                display: "none",
+              },
+              headerSubtitle: {
+                display: "none",
+              },
+              footer: {
+                display: "none",
+              }
+            }
           }}
         />
       </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Email
-        </label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          className="w-full border-b bg-transparent outline-none pb-2 text-sm"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: "#0D0D0D",
-            borderColor: "#D0D0D0",
-            fontSize: "14px",
-          }}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Password
-        </label>
-        <PasswordInput value={password} onChange={setPassword} placeholder="Min. 8 characters" />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          className="text-xs tracking-[0.1em] uppercase"
-          style={{ fontFamily: "'Space Mono', monospace", color: "#8A8A8A" }}
-        >
-          Confirm Password
-        </label>
-        <PasswordInput value={confirm} onChange={setConfirm} placeholder="Repeat password" />
-      </div>
-
-      <button
-        type="submit"
-        className="flex items-center justify-center gap-2 w-full py-3 mt-1 transition-opacity hover:opacity-80 active:scale-[0.98]"
-        style={{
-          backgroundColor: portal.accentColor,
-          color: "#FFFFFF",
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: "12px",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          border: "none",
-          cursor: "pointer",
-          transition: "opacity 0.15s, transform 0.15s cubic-bezier(0.23,1,0.32,1)",
-        }}
-      >
-        Create Account
-        <ArrowRight size={14} />
-      </button>
-    </form>
+    </div>
   );
 }
 
@@ -725,12 +557,16 @@ export default function AccountPage() {
   const [selectedPortal, setSelectedPortal] = useState<PortalRole>("member");
   const [activeTab, setActiveTab] = useState<AuthTab>("signin");
 
-  // Read ?portal= query param to pre-select portal
+  // Read query params to pre-select portal and tab
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const p = params.get("portal") as PortalRole | null;
+    const t = params.get("tab") as AuthTab | null;
     if (p && ["member", "vip", "employee"].includes(p)) {
       setSelectedPortal(p);
+    }
+    if (t && ["signin", "signup", "forgot"].includes(t)) {
+      setActiveTab(t);
     }
   }, []);
 
