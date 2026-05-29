@@ -325,10 +325,31 @@ function ForgotPasswordForm({
 // ── Signed-in Account Management ───────────────────────────────────────────────
 
 function AccountManagement() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [, navigate] = useLocation();
 
-  if (!user) return null;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center gap-4 p-12 bg-white border border-gray-200 shadow-sm text-center">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-red-600 rounded-full animate-spin" />
+        <p className="text-sm text-gray-500 font-medium">Finalizing your secure session...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center gap-4 p-12 bg-white border border-gray-200 shadow-sm text-center">
+        <p className="text-sm text-gray-500 font-medium">We couldn't sync your account. Please try refreshing.</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="text-xs uppercase tracking-widest text-red-600 font-bold underline"
+        >
+          Refresh Page
+        </button>
+      </div>
+    );
+  }
 
   const dashboardPath = getDashboardPath(user.role);
   const roleLabel = getRoleLabel(user.role);
@@ -575,14 +596,14 @@ export default function AccountPage() {
         )}
 
         {/* Signed-in: account management */}
-        {!loading && isAuthenticated && user && (
+        {isAuthenticated && (
           <div className="max-w-md mx-auto">
             <AccountManagement />
           </div>
         )}
 
         {/* Not signed in: portal selector + auth forms */}
-        {!loading && !isAuthenticated && (
+        {!isAuthenticated && (
           <div className="max-w-lg mx-auto">
             {/* Portal role selector */}
             <div
