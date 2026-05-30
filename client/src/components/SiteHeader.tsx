@@ -700,91 +700,23 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Mobile Account / Login section */}
             <div className="mt-6 pt-6" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {isAuthenticated && user ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div
-                      className="flex items-center justify-center flex-shrink-0"
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        backgroundColor: user.role === "circle" ? "#CC0000" : "#1A1A1A",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {user.avatar ? (
-                        <img src={user.avatar} alt="" className="w-full h-full object-cover" />
-                      ) : user.role === "circle" ? (
-                        <Crown size={16} style={{ color: "#F7F7F7" }} />
-                      ) : user.role === "employee" || user.role === "admin" ? (
-                        <Briefcase size={16} style={{ color: "#F7F7F7" }} />
-                      ) : (
-                        <UserCircle size={16} style={{ color: "#F7F7F7" }} />
-                      )}
-                    </div>
-                    <div>
-                      <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "14px", fontWeight: 600, color: "#1A1A1A" }}>{user.name}</p>
-                      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#8A8A8A", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                        {user.role === "circle" ? "The Circle" : user.role === "employee" ? "Employee" : user.role === "admin" ? "Admin" : "Customer"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); handleDashboard(); }}
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "12px",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      color: "#F7F7F7",
-                      backgroundColor: "#1A1A1A",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "10px 16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Dashboard
-                  </button>
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); logout(); }}
-                    className="flex items-center gap-2"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "12px",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      color: "#8A8A8A",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "8px 0",
-                    }}
-                  >
-                    <LogOut size={13} />
-                    Sign Out
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => { setMobileMenuOpen(false); handleSignIn(); }}
-                  className="flex items-center gap-2 w-full justify-center py-3"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "12px",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "#F7F7F7",
-                    backgroundColor: "#1A1A1A",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <UserCircle size={15} />
-                  Sign In / Create Account
-                </button>
-              )}
+              <button
+                onClick={() => { setMobileMenuOpen(false); handleSignIn(); }}
+                className="flex items-center gap-2 w-full justify-center py-3"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "12px",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "#F7F7F7",
+                  backgroundColor: "#1A1A1A",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <UserCircle size={15} />
+                MY ACCOUNT
+              </button>
             </div>
           </div>
         </div>
