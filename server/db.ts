@@ -97,7 +97,25 @@ export async function setUserRole(id: number, role: any) {
 export async function getUserMagazines(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(digitalMagazines).limit(10);
+  // Join userMagazines with digitalMagazines to include downloadCount and magazineId
+  const rows = await db
+    .select({
+      id: digitalMagazines.id,
+      magazineId: userMagazines.magazineId,
+      title: digitalMagazines.title,
+      issueNumber: digitalMagazines.issueNumber,
+      coverUrl: digitalMagazines.coverUrl,
+      fileKey: digitalMagazines.fileKey,
+      fileUrl: digitalMagazines.fileUrl,
+      description: digitalMagazines.description,
+      publishedAt: digitalMagazines.publishedAt,
+      downloadCount: userMagazines.downloadCount,
+      purchasedAt: userMagazines.purchasedAt,
+    })
+    .from(userMagazines)
+    .innerJoin(digitalMagazines, eq(userMagazines.magazineId, digitalMagazines.id))
+    .where(eq(userMagazines.userId, userId));
+  return rows;
 }
 
 export async function getUserEnrollments(userId: number) {
@@ -132,7 +150,27 @@ export async function getTrainingModules() {
 export async function getEmployeeProgress(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(employeeTrainingProgress).where(eq(employeeTrainingProgress.userId, userId));
+  // Join employeeTrainingProgress with trainingModules to include module details
+  const rows = await db
+    .select({
+      id: employeeTrainingProgress.id,
+      userId: employeeTrainingProgress.userId,
+      moduleId: employeeTrainingProgress.moduleId,
+      status: employeeTrainingProgress.status,
+      completedAt: employeeTrainingProgress.completedAt,
+      score: employeeTrainingProgress.score,
+      title: trainingModules.title,
+      description: trainingModules.description,
+      category: trainingModules.category,
+      estimatedMinutes: trainingModules.estimatedMinutes,
+      content: trainingModules.content,
+      order: trainingModules.order,
+      isRequired: trainingModules.isRequired,
+    })
+    .from(employeeTrainingProgress)
+    .innerJoin(trainingModules, eq(employeeTrainingProgress.moduleId, trainingModules.id))
+    .where(eq(employeeTrainingProgress.userId, userId));
+  return rows;
 }
 
 export async function markModuleComplete(userId: number, moduleId: number) {
@@ -168,13 +206,35 @@ export async function getAnnouncements(role: string) {
 export async function getCirclePosts() {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(circlePosts).orderBy(circlePosts.createdAt);
+  // Join circlePosts with users to include authorName and authorAvatar
+  const rows = await db
+    .select({
+      id: circlePosts.id,
+      authorId: circlePosts.authorId,
+      content: circlePosts.content,
+      imageUrl: circlePosts.imageUrl,
+      likes: circlePosts.likes,
+      isPinned: circlePosts.isPinned,
+      createdAt: circlePosts.createdAt,
+      updatedAt: circlePosts.updatedAt,
+      authorName: users.name,
+      authorAvatar: users.avatar,
+    })
+    .from(circlePosts)
+    .leftJoin(users, eq(circlePosts.authorId, users.id))
+    .orderBy(circlePosts.createdAt);
+  return rows;
 }
 
 export async function getUserLikedPosts(userId: number) {
   const db = await getDb();
-  if (!db) return [];
-  return await db.select().from(circlePostLikes).where(eq(circlePostLikes.userId, userId));
+  if (!db) return [] as number[];
+  // Return just the postId numbers so the client can do likedPostIds.includes(post.id)
+  const rows = await db
+    .select({ postId: circlePostLikes.postId })
+    .from(circlePostLikes)
+    .where(eq(circlePostLikes.userId, userId));
+  return rows.map((r) => r.postId);
 }
 
 export async function createCirclePost(data: any) {
