@@ -20,8 +20,8 @@ export default function Account() {
         toast.success("Account synced with Clerk.");
       }
     },
-    onError: () => {
-      toast.error("Failed to sync with Clerk. Please try signing out and back in.");
+    onError: (error) => {
+      toast.error(error.message || "Failed to sync with Clerk. Please try signing out and back in.");
     }
   });
 

@@ -69,8 +69,12 @@ export const appRouter = router({
       return ctx.user;
     }),
     refresh: protectedProcedure.mutation(async ({ ctx }) => {
-      // The context creation already calls authenticateClerkRequest which syncs from Clerk.
-      // By calling this, we ensure the context was re-created and synced.
+      if (!ctx.user) {
+        throw new TRPCError({ 
+          code: "UNAUTHORIZED", 
+          message: "Server could not identify your session. Please sign out and back in." 
+        });
+      }
       return { success: true, user: ctx.user };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
