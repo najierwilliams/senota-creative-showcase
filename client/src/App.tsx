@@ -69,6 +69,8 @@ function Router() {
       {/* Account portal */}
       <Route path={"/account"} component={AccountPage} />
       <Route path={"/account/:rest*"} component={AccountPage} />
+      <Route path={"/sign-in/:rest*"} component={AccountPage} />
+      <Route path={"/sign-up/:rest*"} component={AccountPage} />
 
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />
