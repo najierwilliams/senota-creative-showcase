@@ -97,6 +97,7 @@ export function useAuth(options?: UseAuthOptions) {
     ...state,
     isSignedIn,
     isLoaded,
+    clerkUser,
     refresh: () => meQuery.refetch(),
     logout,
   };

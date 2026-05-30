@@ -75,7 +75,15 @@ export const appRouter = router({
           message: "Server could not identify your session. Please sign out and back in." 
         });
       }
-      return { success: true, user: ctx.user };
+      // Return a simplified object to avoid any potential superjson/drizzle transformation issues
+      return { 
+        success: true, 
+        user: {
+          id: ctx.user.id,
+          role: ctx.user.role,
+          name: ctx.user.name,
+        }
+      };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);

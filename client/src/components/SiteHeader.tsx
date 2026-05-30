@@ -57,7 +57,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, clerkUser } = useAuth();
 
   // Close issue card when clicking outside
   useEffect(() => {
@@ -700,7 +700,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Mobile Account / Login section */}
             <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {(user?.role === "employee" || user?.role === "admin") && (
+              {(user?.role === "employee" || user?.role === "admin" || (clerkUser?.publicMetadata as any)?.role?.toLowerCase() === "employee") && (
                 <button
                   onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
