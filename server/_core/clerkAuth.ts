@@ -1,4 +1,4 @@
-import { clerkClient } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 import type { Request } from "express";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
@@ -10,10 +10,15 @@ import * as db from "../db";
 export async function authenticateClerkRequest(req: Request): Promise<User | null> {
   try {
     // Get the session from Clerk
-    const auth = (req as any).auth;
+    const auth = getAuth(req);
     const userId = auth?.userId;
 
     if (!userId) {
+      // Log more details about the request to help debug
+      console.log("[Clerk Auth] No userId found. Headers:", {
+        hasAuth: !!req.headers.authorization,
+        hasCookie: !!req.headers.cookie,
+      });
       return null;
     }
 
