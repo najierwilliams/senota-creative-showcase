@@ -18,6 +18,7 @@ import AcademyEnrollPage from "./pages/AcademyEnrollPage";
 import AccountPage from "./pages/account";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
+import EmployeePortal from "./pages/EmployeePortal";
 import CircleDashboard from "./pages/CircleDashboard";
 
 // Routes still under construction (not yet built)
@@ -75,6 +76,7 @@ function Router() {
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />
       <Route path={"/dashboard/employee"} component={EmployeeDashboard} />
+      <Route path={"/employee-portal"} component={EmployeePortal} />
       <Route path={"/dashboard/circle"} component={CircleDashboard} />
 
       {/* Under-construction section pages */}

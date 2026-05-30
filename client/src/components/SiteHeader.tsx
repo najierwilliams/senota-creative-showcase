@@ -11,7 +11,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, BookOpen, X, Menu, UserCircle, Crown, Briefcase, LogOut, ChevronDown } from "lucide-react";
+import { Search, BookOpen, X, Menu, UserCircle, Crown, Briefcase, LogOut, ChevronDown, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 
@@ -699,7 +699,26 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
             </div>
 
             {/* Mobile Account / Login section */}
-            <div className="mt-6 pt-6" style={{ borderTop: "1px solid #E5E7EB" }}>
+            <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
+              {(user?.role === "employee" || user?.role === "admin") && (
+                <button
+                  onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
+                  className="flex items-center gap-2 w-full justify-center py-3"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "12px",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#F7F7F7",
+                    backgroundColor: "#CC0000",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <ShieldAlert size={15} />
+                  Employee Portal
+                </button>
+              )}
               <button
                 onClick={() => { setMobileMenuOpen(false); handleSignIn(); }}
                 className="flex items-center gap-2 w-full justify-center py-3"
