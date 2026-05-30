@@ -15,7 +15,6 @@ import ContactPage from "./pages/ContactPage";
 import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AcademyEnrollPage from "./pages/AcademyEnrollPage";
-import AccountPage from "./pages/AccountPage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import CircleDashboard from "./pages/CircleDashboard";
