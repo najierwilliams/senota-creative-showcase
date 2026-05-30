@@ -63,7 +63,16 @@ export const appRouter = router({
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query(async ({ ctx }) => {
+      // If we have a userId but the user object is missing or we want to force sync,
+      // we can do it here. For now, we rely on the context's already synced user.
+      return ctx.user;
+    }),
+    refresh: protectedProcedure.mutation(async ({ ctx }) => {
+      // The context creation already calls authenticateClerkRequest which syncs from Clerk.
+      // By calling this, we ensure the context was re-created and synced.
+      return { success: true, user: ctx.user };
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
