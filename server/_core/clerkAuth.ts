@@ -24,11 +24,12 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       return null;
     }
 
-    // Extract role from Clerk metadata
+    // Extract role from Clerk metadata (case-insensitive)
     const publicMetadata = clerkUser.publicMetadata as { role?: string };
+    const rawRole = publicMetadata.role?.toLowerCase().trim();
     const validRoles = ["user", "employee", "circle", "admin"];
-    const role = publicMetadata.role && validRoles.includes(publicMetadata.role) 
-      ? (publicMetadata.role as "user" | "employee" | "circle" | "admin")
+    const role = rawRole && validRoles.includes(rawRole) 
+      ? (rawRole as "user" | "employee" | "circle" | "admin")
       : undefined;
 
     // Sync user with database
