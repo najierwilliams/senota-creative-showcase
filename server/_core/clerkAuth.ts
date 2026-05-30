@@ -24,6 +24,13 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       return null;
     }
 
+    // Extract role from Clerk metadata
+    const publicMetadata = clerkUser.publicMetadata as { role?: string };
+    const validRoles = ["user", "employee", "circle", "admin"];
+    const role = publicMetadata.role && validRoles.includes(publicMetadata.role) 
+      ? (publicMetadata.role as "user" | "employee" | "circle" | "admin")
+      : undefined;
+
     // Sync user with database
     await db.upsertUser({
       openId: userId, // Use Clerk's user ID as the openId
@@ -33,6 +40,7 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       email: clerkUser.emailAddresses?.[0]?.emailAddress ?? null,
       loginMethod: "clerk",
       lastSignedIn: new Date(),
+      role: role,
     });
 
     // Fetch and return the synced user

@@ -57,7 +57,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
         email: values.email,
         loginMethod: values.loginMethod,
         lastSignedIn: values.lastSignedIn,
-        role: values.role,
+        // Only update the role if a specific role was passed in (not default "user")
+        // OR if it's the admin owner. This prevents resetting manual DB roles.
+        ...(user.role || user.openId === ENV.ownerOpenId ? { role: values.role } : {}),
       },
     });
   } catch (error) {
