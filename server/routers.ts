@@ -64,26 +64,7 @@ export const appRouter = router({
   // ── Auth ──────────────────────────────────────────────────────────────────
   auth: router({
     me: publicProcedure.query(async ({ ctx }) => {
-      // If we have a userId but the user object is missing or we want to force sync,
-      // we can do it here. For now, we rely on the context's already synced user.
       return ctx.user;
-    }),
-    refresh: protectedProcedure.mutation(async ({ ctx }) => {
-      if (!ctx.user) {
-        throw new TRPCError({ 
-          code: "UNAUTHORIZED", 
-          message: "Server could not identify your session. Please sign out and back in." 
-        });
-      }
-      // Return a simplified object to avoid any potential superjson/drizzle transformation issues
-      return { 
-        success: true, 
-        user: {
-          id: ctx.user.id,
-          role: ctx.user.role,
-          name: ctx.user.name,
-        }
-      };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);

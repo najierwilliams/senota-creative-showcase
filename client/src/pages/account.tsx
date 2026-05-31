@@ -1,127 +1,161 @@
-import { UserProfile, SignIn, SignedIn, SignedOut, SignOutButton } from "@clerk/clerk-react";
-import { LogOut, RefreshCw, ShieldCheck } from "lucide-react";
+import { useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { UserCircle, Mail, Lock, Loader2, RefreshCw } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
-export default function Account() {
-  const { user, refresh: refreshAuth } = useAuth();
-  const utils = trpc.useUtils();
-  
-  const syncMutation = trpc.auth.refresh.useMutation({
-    onSuccess: (data) => {
-      refreshAuth();
-      utils.auth.me.invalidate();
-      if (data.user?.role === "employee" || data.user?.role === "admin") {
-        toast.success(`Success! Your role is now: ${data.user.role.toUpperCase()}`);
-      } else {
-        toast.success("Account synced with Clerk.");
-      }
+export default function AccountPage() {
+  const { user, isAuthenticated, loading, refresh, logout } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+
+  const syncMutation = {
+    mutate: () => {
+      toast.success("Account status updated!");
+      refresh();
     },
-    onError: (error) => {
-      toast.error(error.message || "Failed to sync with Clerk. Please try signing out and back in.");
+    isPending: false,
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        toast.success("Check your email for the confirmation link!");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        toast.success("Welcome back!");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Authentication failed.");
+    } finally {
+      setAuthLoading(false);
     }
-  });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7]">
+        <Loader2 className="animate-spin" size={32} color="#1A1A1A" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F7F7F7" }}>
       <SiteHeader />
-      <main className="flex-1 flex items-center justify-center py-12 px-4">
-        <SignedIn>
-          <div className="w-full max-w-4xl flex flex-col gap-6">
-            <div className="overflow-hidden rounded-xl shadow-lg bg-white">
-              <UserProfile 
-                routing="path" 
-                path="/account" 
-                appearance={{
-                  elements: {
-                    rootBox: "w-full",
-                    card: "shadow-none w-full max-w-none border-none",
-                    navbar: "hidden md:flex",
-                    scrollBox: "rounded-none"
-                  }
-                }}
-              />
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="flex flex-col items-center gap-4 pt-4">
-              {/* Role Indicator */}
-              <div className="flex items-center gap-2 px-4 py-2 bg-white border border-[#E5E7EB] rounded-full shadow-sm">
-                <ShieldCheck size={14} className={user?.role === 'employee' || user?.role === 'admin' ? "text-[#CC0000]" : "text-[#8A8A8A]"} />
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-                  Status: <span className="font-bold">{user?.role ?? 'User'}</span>
-                </span>
+      
+      <main className="flex-1 flex items-center justify-center px-4 py-20">
+        <div className="w-full max-w-md bg-white p-10 shadow-sm border border-[#E5E7EB]">
+          {isAuthenticated && user ? (
+            <div className="text-center">
+              <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 bg-[#F7F7F7] rounded-full flex items-center justify-center border border-[#E5E7EB]">
+                  <UserCircle size={40} color="#1A1A1A" strokeWidth={1} />
+                </div>
               </div>
+              
+              <h1 className="text-3xl font-serif mb-2 uppercase tracking-widest text-[#1A1A1A]">
+                {user.name || "My Account"}
+              </h1>
+              <p className="text-xs font-mono text-[#8A8A8A] mb-8 uppercase tracking-[0.2em]">
+                Status: {user.role || "User"}
+              </p>
 
-              <div className="flex flex-wrap justify-center gap-4">
+              <div className="space-y-4">
                 <button
                   onClick={() => syncMutation.mutate()}
                   disabled={syncMutation.isPending}
-                  className="flex items-center gap-2 px-6 py-3 transition-all hover:border-[#CC0000] hover:text-[#CC0000]"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "11px",
-                    fontWeight: 500,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    backgroundColor: "white",
-                    color: "#1A1A1A",
-                    border: "1px solid #E5E7EB",
-                    cursor: "pointer",
-                  }}
+                  className="w-full py-4 flex items-center justify-center gap-2 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
                 >
-                  <RefreshCw size={13} className={syncMutation.isPending ? "animate-spin" : ""} />
-                  {syncMutation.isPending ? "Syncing..." : "Sync Account Status"}
+                  {syncMutation.isPending ? (
+                    <Loader2 className="animate-spin" size={14} />
+                  ) : (
+                    <RefreshCw size={14} />
+                  )}
+                  Sync Account Status
                 </button>
 
-                <SignOutButton redirectUrl="/">
-                  <button
-                    className="flex items-center gap-2 px-6 py-3 transition-all hover:bg-[#CC0000] hover:text-white"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "11px",
-                      fontWeight: 500,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      backgroundColor: "transparent",
-                      color: "#1A1A1A",
-                      border: "1px solid #1A1A1A",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <LogOut size={13} />
-                    Sign Out
-                  </button>
-                </SignOutButton>
+                <button
+                  onClick={() => logout()}
+                  className="w-full py-4 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
+                >
+                  Sign Out of Account
+                </button>
               </div>
-              
-              <p className="text-[10px] text-[#8A8A8A] font-sans text-center max-w-xs">
-                If you recently updated your role in Clerk, click "Sync Account Status" to update your website profile.
-              </p>
             </div>
-          </div>
-        </SignedIn>
-        <SignedOut>
-          <div className="w-full max-w-md">
-            <SignIn 
-              routing="path" 
-              path="/account" 
-              signUpUrl="/account/sign-up"
-              appearance={{
-                elements: {
-                  formButtonPrimary: "bg-[#CC0000] hover:bg-[#A30000] text-sm",
-                  card: "shadow-xl border-none",
-                  headerTitle: "font-serif text-2xl",
-                  headerSubtitle: "text-muted-foreground"
-                }
-              }}
-            />
-          </div>
-        </SignedOut>
+          ) : (
+            <div>
+              <div className="text-center mb-10">
+                <h1 className="text-3xl font-serif mb-4 uppercase tracking-widest text-[#1A1A1A]">
+                  {isSignUp ? "Join Senota" : "Sign In"}
+                </h1>
+                <p className="text-xs font-mono text-[#8A8A8A] uppercase tracking-[0.2em]">
+                  {isSignUp ? "Create your creative profile" : "Welcome back to the showcase"}
+                </p>
+              </div>
+
+              <form onSubmit={handleAuth} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A8A8A]" size={16} />
+                    <input
+                      type="email"
+                      placeholder="EMAIL ADDRESS"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-[#F7F7F7] border border-[#E5E7EB] outline-none focus:border-[#1A1A1A] text-xs tracking-widest transition-all"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A8A8A]" size={16} />
+                    <input
+                      type="password"
+                      placeholder="PASSWORD"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-[#F7F7F7] border border-[#E5E7EB] outline-none focus:border-[#1A1A1A] text-xs tracking-widest transition-all"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full py-5 bg-[#1A1A1A] text-white text-xs uppercase tracking-widest font-bold hover:bg-black transition-all disabled:opacity-50"
+                >
+                  {authLoading ? (
+                    <Loader2 className="animate-spin mx-auto" size={18} />
+                  ) : (
+                    isSignUp ? "Create Account" : "Access Portal"
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-[10px] font-mono text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#1A1A1A] transition-all"
+                >
+                  {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
+
       <SiteFooter />
     </div>
   );

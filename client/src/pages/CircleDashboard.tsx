@@ -4,7 +4,7 @@
  * Sections: Community Feed, VIP Events, Perks & Offers, Announcements
  */
 
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -104,13 +104,13 @@ export default function CircleDashboard() {
       const likedPosts = utils.circle.getMyLikedPosts.getData() ?? [];
       const isLiked = likedPosts.includes(postId);
 
-      utils.circle.getPosts.setData(undefined, (old) =>
-        old?.map((p) =>
-          p.id === postId ? { ...p, likes: p.likes + (isLiked ? -1 : 1) } : p
+utils.circle.getPosts.setData(undefined, (old: any) =>
+        old?.map((p: any) =>
+          p.id === postId ? { ...p, likes: isLiked ? p.likes - 1 : p.likes + 1 } : p
         )
       );
-      utils.circle.getMyLikedPosts.setData(undefined, (old) =>
-        isLiked ? (old ?? []).filter((id) => id !== postId) : [...(old ?? []), postId]
+      utils.circle.getMyLikedPosts.setData(undefined, (old: any) =>
+        isLiked ? (old ?? []).filter((id: any) => id !== postId) : [...(old ?? []), postId]
       );
       return { prev };
     },
@@ -152,7 +152,7 @@ export default function CircleDashboard() {
 
   const likedPostIds = likedPostsQuery.data ?? [];
   const myRsvpMap: Record<number, string> = {};
-  (rsvpsQuery.data ?? []).forEach((r) => { myRsvpMap[r.eventId] = r.status; });
+  (rsvpsQuery.data ?? []).forEach((r: any) => { myRsvpMap[r.eventId] = r.status; });
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D", fontFamily: "'DM Sans', sans-serif" }}>
@@ -454,7 +454,7 @@ export default function CircleDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {postsQuery.data?.map((post) => {
+                {postsQuery.data?.map((post: any) => {
                   const isLiked = likedPostIds.includes(post.id);
                   return (
                     <div
@@ -624,7 +624,7 @@ export default function CircleDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {eventsQuery.data?.map((event) => {
+                {eventsQuery.data?.map((event: any) => {
                   const myRsvp = myRsvpMap[event.id];
                   const isPast = new Date(event.eventDate) < new Date();
                   return (
@@ -819,7 +819,7 @@ export default function CircleDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {perksQuery.data?.map((perk) => {
+                {perksQuery.data?.map((perk: any) => {
                   const catColor = PERK_CATEGORY_COLORS[perk.category] ?? "#CC0000";
                   const isExpired = perk.expiresAt && new Date(perk.expiresAt) < new Date();
                   return (
@@ -979,7 +979,7 @@ export default function CircleDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-4 max-w-2xl">
-                {announcementsQuery.data?.map((ann) => (
+                {announcementsQuery.data?.map((ann: any) => (
                   <div
                     key={ann.id}
                     className="p-5"

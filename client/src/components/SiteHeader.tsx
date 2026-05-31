@@ -12,7 +12,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Search, BookOpen, X, Menu, UserCircle, Crown, Briefcase, LogOut, ChevronDown, ShieldAlert } from "lucide-react";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { getLoginUrl } from "@/const";
 
 const COVER_URL =
@@ -57,7 +57,12 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
-  const { user, isAuthenticated, logout, clerkUser } = useAuth();
+  const { user, isAuthenticated, logout, supabaseUser } = useAuth();
+  
+  // Check role from our DB, fallback to Supabase user metadata if available
+  const supabaseRole = (supabaseUser?.user_metadata as any)?.role?.toLowerCase();
+  const isEmployee = user?.role === "employee" || user?.role === "admin" || supabaseRole === "employee" || supabaseRole === "admin";
+  const isCircle = user?.role === "circle" || user?.role === "admin" || supabaseRole === "circle" || supabaseRole === "admin";
 
   // Close issue card when clicking outside
   useEffect(() => {
@@ -700,7 +705,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Mobile Account / Login section */}
             <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {(user?.role === "employee" || user?.role === "admin" || (clerkUser?.publicMetadata as any)?.role?.toLowerCase() === "employee") && (
+              {isEmployee && (
                 <button
                   onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"

@@ -1,4 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 import {
   InsertUser,
   announcements,
@@ -17,12 +18,15 @@ import {
 import { ENV } from "./_core/env";
 import { eq, and, sql } from "drizzle-orm";
 
-let _db: ReturnType<typeof drizzle> | null = null;
+let _db: any = null;
 
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const pool = new pg.Pool({
+        connectionString: process.env.DATABASE_URL,
+      });
+      _db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -33,24 +37,24 @@ export async function getDb() {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
-export async function upsertUser(user: InsertUser): Promise<void> {
+export async function upsertUser(user: InsertUser): Promise<any> {
   if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
-  if (!db) return;
+  if (!db) return null;
 
   try {
     const values: InsertUser = {
       openId: user.openId,
       name: user.name ?? null,
       email: user.email ?? null,
-      loginMethod: user.loginMethod ?? "clerk",
+      loginMethod: user.loginMethod ?? "supabase",
       lastSignedIn: user.lastSignedIn ?? new Date(),
       role: user.role ?? "user",
     };
 
     if (user.openId === ENV.ownerOpenId) values.role = "admin";
 
-    await db.insert(users).values(values).onConflictDoUpdate({
+    const results = await db.insert(users).values(values).onConflictDoUpdate({
       target: users.openId,
       set: {
         name: values.name,
@@ -61,7 +65,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
         // OR if it's the admin owner. This prevents resetting manual DB roles.
         ...(user.role || user.openId === ENV.ownerOpenId ? { role: values.role } : {}),
       },
-    });
+    }).returning();
+    
+    return results[0];
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
@@ -236,7 +242,7 @@ export async function getUserLikedPosts(userId: number) {
     .select({ postId: circlePostLikes.postId })
     .from(circlePostLikes)
     .where(eq(circlePostLikes.userId, userId));
-  return rows.map((r) => r.postId);
+  return rows.map((r: any) => r.postId);
 }
 
 export async function createCirclePost(data: any) {

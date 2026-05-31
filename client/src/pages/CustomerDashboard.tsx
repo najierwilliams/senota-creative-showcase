@@ -4,7 +4,7 @@
  * Sections: Digital Library, My Courses, Profile, Order History
  */
 
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -315,7 +315,7 @@ export default function CustomerDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {magazines.data?.map((mag) => (
+                {magazines.data?.map((mag: any) => (
                   <div
                     key={mag.id}
                     style={{
@@ -493,7 +493,7 @@ export default function CustomerDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {enrollments.data?.map((enrollment) => (
+                {enrollments.data?.map((enrollment: any) => (
                   <div
                     key={enrollment.id}
                     className="flex flex-col sm:flex-row sm:items-center gap-4 p-5"

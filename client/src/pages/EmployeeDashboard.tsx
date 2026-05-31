@@ -4,7 +4,7 @@
  * Sections: Training Tracker, Announcements, Resources, Schedule
  */
 
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -142,15 +142,15 @@ export default function EmployeeDashboard() {
   // Compute progress stats
   const modules = progressQuery.data ?? [];
   const total = modules.length;
-  const completed = modules.filter((m) => m.status === "completed").length;
-  const inProgress = modules.filter((m) => m.status === "in_progress").length;
-  const required = modules.filter((m) => m.isRequired).length;
-  const requiredCompleted = modules.filter((m) => m.isRequired && m.status === "completed").length;
+  const completed = modules.filter((m: any) => m.status === "completed").length;
+  const inProgress = modules.filter((m: any) => m.status === "in_progress").length;
+  const required = modules.filter((m: any) => m.isRequired).length;
+  const requiredCompleted = modules.filter((m: any) => m.isRequired && m.status === "completed").length;
   const overallPct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   // Group modules by category
   const byCategory: Record<string, typeof modules> = {};
-  modules.forEach((m) => {
+  modules.forEach((m: any) => {
     if (!byCategory[m.category]) byCategory[m.category] = [];
     byCategory[m.category].push(m);
   });
@@ -449,7 +449,7 @@ export default function EmployeeDashboard() {
                       {category}
                     </p>
                     <div className="flex flex-col gap-2">
-                      {catModules.map((mod) => {
+                      {catModules.map((mod: any) => {
                         const isExpanded = expandedModule === mod.moduleId;
                         const statusColor =
                           mod.status === "completed"
@@ -694,7 +694,7 @@ export default function EmployeeDashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {announcementsQuery.data?.map((ann) => (
+                {announcementsQuery.data?.map((ann: any) => (
                   <div
                     key={ann.id}
                     className="p-5"

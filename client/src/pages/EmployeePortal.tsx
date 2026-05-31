@@ -4,7 +4,7 @@
  * Exclusively for staff members.
  */
 
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import SiteHeader from "@/components/SiteHeader";

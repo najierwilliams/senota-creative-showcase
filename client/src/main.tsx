@@ -1,9 +1,8 @@
 import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
-import { getClerkToken } from "@/_core/hooks/useAuth";
+import { getSupabaseToken } from "@/_core/hooks/useSupabaseAuth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
-import { ClerkProvider } from "@clerk/clerk-react";
 import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
@@ -45,7 +44,7 @@ const trpcClient = trpc.createClient({
       url: "/api/trpc",
       transformer: superjson,
       async headers() {
-        const token = getClerkToken();
+        const token = getSupabaseToken();
         return token ? { Authorization: `Bearer ${token}` } : {};
       },
       fetch(input, init) {
@@ -58,18 +57,15 @@ const trpcClient = trpc.createClient({
   ],
 });
 
-const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!publishableKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY environment variable");
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+if (!supabaseKey) {
+  throw new Error("Missing VITE_SUPABASE_ANON_KEY environment variable");
 }
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkProvider publishableKey={publishableKey}>
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </trpc.Provider>
-  </ClerkProvider>
+  <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </trpc.Provider>
 );
