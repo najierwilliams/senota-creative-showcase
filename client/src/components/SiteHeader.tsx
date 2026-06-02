@@ -122,7 +122,12 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   };
 
   const handleSignIn = () => {
-    // Always route through the /account page for a consistent sign-in experience
+    // If already authenticated, go to their dashboard directly
+    if (isAuthenticated && user) {
+      navigate(getDashboardPath(user.role));
+      return;
+    }
+    // If not, go to account page to sign in
     navigate("/account");
   };
 

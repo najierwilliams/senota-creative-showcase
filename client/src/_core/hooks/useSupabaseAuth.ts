@@ -67,11 +67,18 @@ export function useAuth() {
       };
     }
 
+    // Full auth state resolved
+    const user = meQuery.data ?? null;
+    const supabaseRole = (session?.user?.user_metadata as any)?.role?.toLowerCase();
+    
+    // Use the database role if available, otherwise fallback to Supabase metadata
+    const effectiveRole = user?.role || supabaseRole;
+
     return {
-      user: meQuery.data ?? null,
+      user: user ? { ...user, role: effectiveRole } : null,
       loading: meQuery.isLoading,
       error: meQuery.error ?? null,
-      isAuthenticated: !!meQuery.data,
+      isAuthenticated: !!user,
     };
   }, [loading, session, meQuery.data, meQuery.isLoading, meQuery.error]);
 
