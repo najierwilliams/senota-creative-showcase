@@ -80,7 +80,11 @@ export default function AccountPage() {
                 </button>
 
                 <button
-                  onClick={() => logout()}
+                  onClick={async () => {
+                    await logout();
+                    // Hard redirect to home to clear all memory state
+                    window.location.href = "/";
+                  }}
                   className="w-full py-4 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
                 >
                   Sign Out

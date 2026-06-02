@@ -70,7 +70,8 @@ export default function DashboardLayout({
           </div>
           <Button
             onClick={() => {
-              window.location.href = "/account";
+              // Using location.replace to avoid back-button loops
+              window.location.replace("/account");
             }}
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all"

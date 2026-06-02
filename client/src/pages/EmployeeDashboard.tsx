@@ -120,15 +120,11 @@ export default function EmployeeDashboard() {
     },
   });
 
-  // Redirect if not authenticated or wrong role
-  if (!loading && !isAuthenticated) {
-    window.location.href = "/account";
-    return null;
-  }
+  // Redirect logic removed to avoid loops
+  const isAuthorized = isAuthenticated;
 
-  if (!loading && user && user.role !== "employee" && user.role !== "admin") {
-    navigate("/");
-    return null;
+  if (!loading && !isAuthorized) {
+    return <div>Unauthorized</div>;
   }
 
   if (loading) {

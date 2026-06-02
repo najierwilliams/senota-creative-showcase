@@ -77,10 +77,11 @@ export default function CustomerDashboard() {
     onError: () => toast.error("Failed to update profile"),
   });
 
-  // Redirect if not authenticated
-  if (!loading && !isAuthenticated) {
-    window.location.href = "/account";
-    return null;
+  // Redirect logic removed to avoid loops
+  const isAuthorized = isAuthenticated;
+
+  if (!loading && !isAuthorized) {
+    return <div>Unauthorized</div>;
   }
 
   if (loading) {
