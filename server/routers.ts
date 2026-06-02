@@ -31,6 +31,8 @@ import {
   updateEnrollmentProgress,
   updateUserProfile,
   upsertRsvp,
+  addToLaunchList,
+  getLaunchList,
 } from "./db";
 
 // ─── Role guards ──────────────────────────────────────────────────────────────
@@ -274,6 +276,20 @@ export const appRouter = router({
       .mutation(({ input }) => createCirclePerk(input)),
 
     getAllMagazines: adminProcedure.query(() => getAllMagazines()),
+    getLaunchList: adminProcedure.query(() => getLaunchList()),
+  }),
+
+  // ── Launch List ───────────────────────────────────────────────────────────
+  launchList: router({
+    join: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          name: z.string().optional(),
+          source: z.string().optional(),
+        })
+      )
+      .mutation(({ input }) => addToLaunchList(input)),
   }),
 });
 

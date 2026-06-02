@@ -14,6 +14,7 @@ import {
   trainingModules,
   userMagazines,
   users,
+  launchList,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { eq, and, sql } from "drizzle-orm";
@@ -325,4 +326,16 @@ export async function getAllMagazines() {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(digitalMagazines);
+}
+
+export async function addToLaunchList(data: { email: string; name?: string; source?: string }) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(launchList).values(data).onConflictDoNothing();
+}
+
+export async function getLaunchList() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(launchList).orderBy(launchList.createdAt);
 }

@@ -152,3 +152,16 @@ export const circlePostLikes = pgTable("circle_post_likes", {
   postId: integer("postId").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
+
+// ─── Launch List: Magazine Signups ──────────────────────────────────────────
+
+export const launchList = pgTable("launch_list", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  name: text("name"),
+  source: varchar("source", { length: 64 }).default("magazine"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type LaunchListEntry = typeof launchList.$inferSelect;
+export type InsertLaunchListEntry = typeof launchList.$inferInsert;

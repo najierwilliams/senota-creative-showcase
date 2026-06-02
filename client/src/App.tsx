@@ -15,6 +15,7 @@ import ContactPage from "./pages/ContactPage";
 import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AcademyEnrollPage from "./pages/AcademyEnrollPage";
+import MagazinePage from "./pages/MagazinePage";
 import AccountPage from "./pages/account";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
@@ -23,7 +24,6 @@ import CircleDashboard from "./pages/CircleDashboard";
 
 // Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
-  "/magazine",
   "/fashion",
   "/music",
   "/photography",
@@ -63,6 +63,9 @@ function Router() {
 
       {/* Submit Work */}
       <Route path={"/submit"} component={SubmitPage} />
+
+      {/* Magazine Launch List */}
+      <Route path={"/magazine"} component={MagazinePage} />
 
       {/* Privacy Policy */}
       <Route path={"/privacy"} component={PrivacyPage} />
