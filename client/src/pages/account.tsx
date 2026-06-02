@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuth } from "@/_core/hooks/useSupabaseAuth";
-import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { UserCircle, Mail, Lock, Loader2, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -14,39 +13,30 @@ export default function AccountPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
 
-  const syncMutation = {
-    mutate: () => {
-      toast.success("Account status updated!");
-      refresh();
-    },
-    isPending: false,
-  };
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
+    
     try {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        toast.success("Check your email for the confirmation link!");
+        toast.success("Account created! Please check your email.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        
         toast.success("Welcome back!");
-        // Small delay to ensure session is stored before redirecting to home
+        // Direct, hard redirect to homepage to break any possible state loops
         setTimeout(() => {
           window.location.href = "/";
-        }, 800);
+        }, 500);
       }
     } catch (error: any) {
       toast.error(error.message || "Authentication failed.");
-    } finally {
       setAuthLoading(false);
     }
   };
-
-  // No automatic redirects anymore - let the user choose where to go from the menu
 
   if (loading) {
     return (
@@ -62,7 +52,7 @@ export default function AccountPage() {
       
       <main className="flex-1 flex items-center justify-center px-4 py-20">
         <div className="w-full max-w-md bg-white p-10 shadow-sm border border-[#E5E7EB]">
-          {isAuthenticated && user ? (
+          {isAuthenticated ? (
             <div className="text-center">
               <div className="flex justify-center mb-6">
                 <div className="w-20 h-20 bg-[#F7F7F7] rounded-full flex items-center justify-center border border-[#E5E7EB]">
@@ -71,31 +61,29 @@ export default function AccountPage() {
               </div>
               
               <h1 className="text-3xl font-serif mb-2 uppercase tracking-widest text-[#1A1A1A]">
-                {user.name || "My Account"}
+                {user?.name || "Member"}
               </h1>
               <p className="text-xs font-mono text-[#8A8A8A] mb-8 uppercase tracking-[0.2em]">
-                Status: {user.role || "User"}
+                {user?.role || "Verified Account"}
               </p>
 
               <div className="space-y-4">
                 <button
-                  onClick={() => syncMutation.mutate()}
-                  disabled={syncMutation.isPending}
+                  onClick={() => {
+                    toast.info("Refreshing account...");
+                    refresh();
+                  }}
                   className="w-full py-4 flex items-center justify-center gap-2 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
                 >
-                  {syncMutation.isPending ? (
-                    <Loader2 className="animate-spin" size={14} />
-                  ) : (
-                    <RefreshCw size={14} />
-                  )}
-                  Sync Account Status
+                  <RefreshCw size={14} />
+                  Sync Profile
                 </button>
 
                 <button
                   onClick={() => logout()}
                   className="w-full py-4 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
                 >
-                  Sign Out of Account
+                  Sign Out
                 </button>
               </div>
             </div>
@@ -103,10 +91,10 @@ export default function AccountPage() {
             <div>
               <div className="text-center mb-10">
                 <h1 className="text-3xl font-serif mb-4 uppercase tracking-widest text-[#1A1A1A]">
-                  {isSignUp ? "Join Senota" : "Sign In"}
+                  {isSignUp ? "Join" : "Sign In"}
                 </h1>
                 <p className="text-xs font-mono text-[#8A8A8A] uppercase tracking-[0.2em]">
-                  {isSignUp ? "Create your creative profile" : "Welcome back to the showcase"}
+                  Senota Studios
                 </p>
               </div>
 
@@ -116,7 +104,7 @@ export default function AccountPage() {
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A8A8A]" size={16} />
                     <input
                       type="email"
-                      placeholder="EMAIL ADDRESS"
+                      placeholder="EMAIL"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -144,7 +132,7 @@ export default function AccountPage() {
                   {authLoading ? (
                     <Loader2 className="animate-spin mx-auto" size={18} />
                   ) : (
-                    isSignUp ? "Create Account" : "Access Portal"
+                    isSignUp ? "Register" : "Access"
                   )}
                 </button>
               </form>
@@ -154,7 +142,7 @@ export default function AccountPage() {
                   onClick={() => setIsSignUp(!isSignUp)}
                   className="text-[10px] font-mono text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#1A1A1A] transition-all"
                 >
-                  {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
+                  {isSignUp ? "Already a member? Sign In" : "New here? Create Account"}
                 </button>
               </div>
             </div>

@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { trpc } from "@/lib/trpc";
-import type { User } from "../../../../drizzle/schema";
 
-// Global variable to store the latest session token for tRPC headers
 let latestSessionToken: string | null = null;
 
 export function getSupabaseToken() {
@@ -16,19 +14,20 @@ export function useAuth() {
   const utils = trpc.useUtils();
 
   useEffect(() => {
-    // Get initial session
+    // 1. Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       latestSessionToken = session?.access_token ?? null;
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // 2. Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       latestSessionToken = session?.access_token ?? null;
       setLoading(false);
-      if (_event === 'SIGNED_IN') {
+      
+      if (_event === 'SIGNED_IN' || _event === 'USER_UPDATED') {
         utils.auth.me.invalidate();
       }
     });
@@ -36,53 +35,43 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, [utils]);
 
+  // Fetch the user profile from our database
   const meQuery = trpc.auth.me.useQuery(undefined, {
     enabled: !!session,
-    retry: false,
+    retry: 1,
     refetchOnWindowFocus: false,
   });
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
-    await utils.auth.me.invalidate();
+    latestSessionToken = null;
     window.location.href = "/";
-  }, [utils]);
+  }, []);
 
   const state = useMemo(() => {
+    // If we're still checking the basic Supabase session
     if (loading) {
-      return {
-        user: null,
-        loading: true,
-        error: null,
-        isAuthenticated: false,
-      };
+      return { user: null, loading: true, isAuthenticated: false };
     }
 
+    // If there's no session, they are definitely not authenticated
     if (!session) {
-      return {
-        user: null,
-        loading: false,
-        error: null,
-        isAuthenticated: false,
-      };
+      return { user: null, loading: false, isAuthenticated: false };
     }
 
-    // Full auth state resolved
-    const user = meQuery.data ?? null;
-    const supabaseRole = (session?.user?.user_metadata as any)?.role?.toLowerCase();
-    
-    // Use the database role if available, otherwise fallback to Supabase metadata
-    const effectiveRole = user?.role || supabaseRole;
+    // If we have a session but are still fetching the profile
+    if (meQuery.isLoading) {
+      return { user: null, loading: true, isAuthenticated: true };
+    }
 
+    // Full state resolved
     return {
-      user: user ? { ...user, role: effectiveRole } : null,
-      // Critical: If we have a session but meQuery is still loading, we MUST report loading: true
-      // to prevent components from thinking we are logged out and triggering a redirect.
-      loading: meQuery.isLoading || meQuery.isFetching,
-      error: meQuery.error ?? null,
-      isAuthenticated: !!user,
+      user: meQuery.data ?? null,
+      loading: false,
+      isAuthenticated: !!meQuery.data,
+      error: meQuery.error
     };
-  }, [loading, session, meQuery.data, meQuery.isLoading, meQuery.error]);
+  }, [loading, session, meQuery.isLoading, meQuery.data, meQuery.error]);
 
   return {
     ...state,
