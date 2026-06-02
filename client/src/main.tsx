@@ -12,17 +12,10 @@ import "./index.css";
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
+  // No more automatic redirects to account page to avoid loops
+  // Components will handle their own loading/auth states
   if (!(error instanceof TRPCClientError)) return;
-  if (typeof window === "undefined") return;
-
-  const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
-
-  if (!isUnauthorized) return;
-
-  // Don't redirect if we're already on the account page
-  if (window.location.pathname === "/account") return;
-
-  window.location.href = "/account";
+  console.error("[API Error]", error.message);
 };
 
 queryClient.getQueryCache().subscribe(event => {

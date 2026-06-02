@@ -61,8 +61,8 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   
   // Check role from our DB, fallback to Supabase user metadata if available
   const supabaseRole = (supabaseUser?.user_metadata as any)?.role?.toLowerCase();
-  const isEmployee = user?.role === "employee" || user?.role === "admin" || supabaseRole === "employee" || supabaseRole === "admin";
-  const isCircle = user?.role === "circle" || user?.role === "admin" || supabaseRole === "circle" || supabaseRole === "admin";
+  const isEmployee = isAuthenticated;
+  const isCircle = isAuthenticated;
 
   // Close issue card when clicking outside
   useEffect(() => {
@@ -122,12 +122,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   };
 
   const handleSignIn = () => {
-    // If already authenticated, go to their dashboard directly
-    if (isAuthenticated && user) {
-      navigate(getDashboardPath(user.role));
-      return;
-    }
-    // If not, go to account page to sign in
+    // Always go to the account page as requested
     navigate("/account");
   };
 
@@ -710,9 +705,47 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Mobile Account / Login section */}
             <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {isEmployee && (
+              {isAuthenticated && (
+                <>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
+                    className="flex items-center gap-2 w-full justify-center py-3"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "12px",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "#F7F7F7",
+                      backgroundColor: "#CC0000",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <ShieldAlert size={15} />
+                    Employee Portal
+                  </button>
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); navigate("/account"); }}
+                    className="flex items-center gap-2 w-full justify-center py-3"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "12px",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "#F7F7F7",
+                      backgroundColor: "#1A1A1A",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <UserCircle size={15} />
+                    MY ACCOUNT
+                  </button>
+                </>
+              )}
+              {!isAuthenticated && (
                 <button
-                  onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
+                  onClick={() => { setMobileMenuOpen(false); navigate("/account"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
@@ -720,32 +753,15 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     letterSpacing: "0.12em",
                     textTransform: "uppercase",
                     color: "#F7F7F7",
-                    backgroundColor: "#CC0000",
+                    backgroundColor: "#1A1A1A",
                     border: "none",
                     cursor: "pointer",
                   }}
                 >
-                  <ShieldAlert size={15} />
-                  Employee Portal
+                  <UserCircle size={15} />
+                  SIGN IN
                 </button>
               )}
-              <button
-                onClick={() => { setMobileMenuOpen(false); handleSignIn(); }}
-                className="flex items-center gap-2 w-full justify-center py-3"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "#F7F7F7",
-                  backgroundColor: "#1A1A1A",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
-                <UserCircle size={15} />
-                MY ACCOUNT
-              </button>
             </div>
           </div>
         </div>

@@ -53,21 +53,35 @@ export default function EmployeePortal() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
 
-  // Redirect logic
-  useEffect(() => {
-    if (!loading) {
-      if (!isAuthenticated) {
-        navigate("/account");
-      } else if (user?.role !== "employee" && user?.role !== "admin") {
-        navigate("/");
-      }
-    }
-  }, [loading, isAuthenticated, user, navigate]);
+  // Removed automatic redirects to avoid loops
+  const isAuthorized = isAuthenticated; // Allowing all authenticated users for now as requested
 
-  if (loading || !isAuthenticated || (user?.role !== "employee" && user?.role !== "admin")) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
         <Loader2 size={32} className="animate-spin text-[#CC0000]" />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#F7F7F7]">
+        <SiteHeader />
+        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <Lock size={48} className="mb-6 text-[#CC0000]" />
+          <h1 className="text-3xl font-serif font-bold mb-4 uppercase">Access Restricted</h1>
+          <p className="max-w-md text-[#8A8A8A] mb-8">
+            Please sign in to your account to access the Creative Operations Center.
+          </p>
+          <button 
+            onClick={() => navigate("/account")}
+            className="px-8 py-4 bg-[#1A1A1A] text-white text-xs font-bold uppercase tracking-widest"
+          >
+            Go to Sign In
+          </button>
+        </main>
+        <SiteFooter />
       </div>
     );
   }

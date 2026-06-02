@@ -34,6 +34,10 @@ export default function AccountPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back!");
+        // Small delay to ensure session is stored before redirecting to home
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 800);
       }
     } catch (error: any) {
       toast.error(error.message || "Authentication failed.");
@@ -42,17 +46,7 @@ export default function AccountPage() {
     }
   };
 
-  // Redirect to dashboard if already authenticated
-  useEffect(() => {
-    if (loading === false && isAuthenticated && user?.role) {
-      const dashboardPath = user.role === "circle" ? "/dashboard/circle" : 
-                            (user.role === "employee" || user.role === "admin") ? "/dashboard/employee" : 
-                            "/dashboard/customer";
-      
-      // Use window.location.replace to prevent back-button loops
-      window.location.replace(dashboardPath);
-    }
-  }, [loading, isAuthenticated, user]);
+  // No automatic redirects anymore - let the user choose where to go from the menu
 
   if (loading) {
     return (
