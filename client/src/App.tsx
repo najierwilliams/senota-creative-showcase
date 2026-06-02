@@ -16,6 +16,7 @@ import SubmitPage from "./pages/SubmitPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AcademyEnrollPage from "./pages/AcademyEnrollPage";
 import MagazinePage from "./pages/MagazinePage";
+import BrandingPage from "./pages/BrandingPage";
 import AccountPage from "./pages/account";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
@@ -29,7 +30,6 @@ const UNDER_CONSTRUCTION_ROUTES = [
   "/photography",
   "/art-culture",
   "/modeling",
-  "/branding",
   "/events",
   "/archive",
 ];
@@ -66,6 +66,9 @@ function Router() {
 
       {/* Magazine Launch List */}
       <Route path={"/magazine"} component={MagazinePage} />
+
+      {/* Branding Lab */}
+      <Route path={"/branding"} component={BrandingPage} />
 
       {/* Privacy Policy */}
       <Route path={"/privacy"} component={PrivacyPage} />
