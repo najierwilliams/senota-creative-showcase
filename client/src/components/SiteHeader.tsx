@@ -122,8 +122,11 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   };
 
   const handleSignIn = () => {
-    // Always go to the account page as requested
-    navigate("/account");
+    if (isAuthenticated) {
+      navigate("/account");
+    } else {
+      navigate("/login");
+    }
   };
 
   const handleDashboard = () => {
@@ -444,7 +447,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                   }}
                 >
                   <UserCircle size={14} strokeWidth={1.5} />
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span className="hidden sm:inline">{isAuthenticated ? "My Account" : "Sign In"}</span>
                 </button>
               )}
             </div>
@@ -745,7 +748,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               )}
               {!isAuthenticated && (
                 <button
-                  onClick={() => { setMobileMenuOpen(false); navigate("/account"); }}
+                  onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",

@@ -1,42 +1,21 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuth } from "@/_core/hooks/useSupabaseAuth";
 import { toast } from "sonner";
-import { UserCircle, Mail, Lock, Loader2, RefreshCw } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { UserCircle, Loader2, RefreshCw, LogOut } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function AccountPage() {
   const { user, isAuthenticated, loading, refresh, logout } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [authLoading, setAuthLoading] = useState(false);
+  const [, navigate] = useLocation();
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        toast.success("Account created! Please check your email.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        
-        toast.success("Welcome back!");
-        // Direct, hard redirect to homepage to break any possible state loops
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 500);
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Authentication failed.");
-      setAuthLoading(false);
+  // If not authenticated, go to login page
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/login");
     }
-  };
+  }, [isAuthenticated, loading, navigate]);
 
   if (loading) {
     return (
@@ -46,111 +25,53 @@ export default function AccountPage() {
     );
   }
 
+  if (!isAuthenticated) return null;
+
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F7F7F7" }}>
       <SiteHeader />
       
       <main className="flex-1 flex items-center justify-center px-4 py-20">
         <div className="w-full max-w-md bg-white p-10 shadow-sm border border-[#E5E7EB]">
-          {isAuthenticated ? (
-            <div className="text-center">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-[#F7F7F7] rounded-full flex items-center justify-center border border-[#E5E7EB]">
-                  <UserCircle size={40} color="#1A1A1A" strokeWidth={1} />
-                </div>
-              </div>
-              
-              <h1 className="text-3xl font-serif mb-2 uppercase tracking-widest text-[#1A1A1A]">
-                {user?.name || "Member"}
-              </h1>
-              <p className="text-xs font-mono text-[#8A8A8A] mb-8 uppercase tracking-[0.2em]">
-                {user?.role || "Verified Account"}
-              </p>
-
-              <div className="space-y-4">
-                <button
-                  onClick={() => {
-                    toast.info("Refreshing account...");
-                    refresh();
-                  }}
-                  className="w-full py-4 flex items-center justify-center gap-2 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
-                >
-                  <RefreshCw size={14} />
-                  Sync Profile
-                </button>
-
-                <button
-                  onClick={async () => {
-                    await logout();
-                    // Hard redirect to home to clear all memory state
-                    window.location.href = "/";
-                  }}
-                  className="w-full py-4 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
-                >
-                  Sign Out
-                </button>
+          <div className="text-center">
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-[#F7F7F7] rounded-full flex items-center justify-center border border-[#E5E7EB]">
+                <UserCircle size={40} color="#1A1A1A" strokeWidth={1} />
               </div>
             </div>
-          ) : (
-            <div>
-              <div className="text-center mb-10">
-                <h1 className="text-3xl font-serif mb-4 uppercase tracking-widest text-[#1A1A1A]">
-                  {isSignUp ? "Join" : "Sign In"}
-                </h1>
-                <p className="text-xs font-mono text-[#8A8A8A] uppercase tracking-[0.2em]">
-                  Senota Studios
-                </p>
-              </div>
+            
+            <h1 className="text-3xl font-serif mb-2 uppercase tracking-widest text-[#1A1A1A]">
+              {user?.name || "Member"}
+            </h1>
+            <p className="text-xs font-mono text-[#8A8A8A] mb-8 uppercase tracking-[0.2em]">
+              {user?.role || "Verified Account"}
+            </p>
 
-              <form onSubmit={handleAuth} className="space-y-6">
-                <div className="space-y-4">
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A8A8A]" size={16} />
-                    <input
-                      type="email"
-                      placeholder="EMAIL"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-[#F7F7F7] border border-[#E5E7EB] outline-none focus:border-[#1A1A1A] text-xs tracking-widest transition-all"
-                    />
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A8A8A]" size={16} />
-                    <input
-                      type="password"
-                      placeholder="PASSWORD"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-[#F7F7F7] border border-[#E5E7EB] outline-none focus:border-[#1A1A1A] text-xs tracking-widest transition-all"
-                    />
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <button
+                onClick={() => {
+                  toast.info("Refreshing account...");
+                  refresh();
+                }}
+                className="w-full py-4 flex items-center justify-center gap-2 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
+              >
+                <RefreshCw size={14} />
+                Sync Profile
+              </button>
 
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full py-5 bg-[#1A1A1A] text-white text-xs uppercase tracking-widest font-bold hover:bg-black transition-all disabled:opacity-50"
-                >
-                  {authLoading ? (
-                    <Loader2 className="animate-spin mx-auto" size={18} />
-                  ) : (
-                    isSignUp ? "Register" : "Access"
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-8 text-center">
-                <button
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="text-[10px] font-mono text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#1A1A1A] transition-all"
-                >
-                  {isSignUp ? "Already a member? Sign In" : "New here? Create Account"}
-                </button>
-              </div>
+              <button
+                onClick={async () => {
+                  await logout();
+                  // Hard redirect to home to clear all memory state
+                  window.location.href = "/";
+                }}
+                className="w-full py-4 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold"
+              >
+                <LogOut size={14} className="mr-2" />
+                Sign Out
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </main>
 

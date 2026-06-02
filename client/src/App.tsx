@@ -18,6 +18,7 @@ import AcademyEnrollPage from "./pages/AcademyEnrollPage";
 import MagazinePage from "./pages/MagazinePage";
 import BrandingPage from "./pages/BrandingPage";
 import AccountPage from "./pages/account";
+import LoginPage from "./pages/LoginPage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import EmployeePortal from "./pages/EmployeePortal";
@@ -75,9 +76,9 @@ function Router() {
 
       {/* Account portal */}
       <Route path={"/account"} component={AccountPage} />
-      <Route path={"/account/:rest*"} component={AccountPage} />
-      <Route path={"/sign-in/:rest*"} component={AccountPage} />
-      <Route path={"/sign-up/:rest*"} component={AccountPage} />
+      <Route path={"/login"} component={LoginPage} />
+      <Route path={"/sign-in/:rest*"} component={LoginPage} />
+      <Route path={"/sign-up/:rest*"} component={LoginPage} />
 
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />
