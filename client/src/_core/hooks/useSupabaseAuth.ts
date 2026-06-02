@@ -76,7 +76,9 @@ export function useAuth() {
 
     return {
       user: user ? { ...user, role: effectiveRole } : null,
-      loading: meQuery.isLoading,
+      // Critical: If we have a session but meQuery is still loading, we MUST report loading: true
+      // to prevent components from thinking we are logged out and triggering a redirect.
+      loading: meQuery.isLoading || meQuery.isFetching,
       error: meQuery.error ?? null,
       isAuthenticated: !!user,
     };

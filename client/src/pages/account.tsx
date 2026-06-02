@@ -42,6 +42,18 @@ export default function AccountPage() {
     }
   };
 
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (loading === false && isAuthenticated && user?.role) {
+      const dashboardPath = user.role === "circle" ? "/dashboard/circle" : 
+                            (user.role === "employee" || user.role === "admin") ? "/dashboard/employee" : 
+                            "/dashboard/customer";
+      
+      // Use window.location.replace to prevent back-button loops
+      window.location.replace(dashboardPath);
+    }
+  }, [loading, isAuthenticated, user]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7]">
