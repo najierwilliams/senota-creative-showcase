@@ -261,35 +261,95 @@ export default function SenotaVaultPage() {
             background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
           }}
         >
-          {/* Pulsating background shield */}
+          {/* Pulsating background shield - Desktop only, positioned right */}
           <div
-            className="absolute pointer-events-none"
+            className="absolute pointer-events-none hidden lg:block"
             style={{
               top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "600px",
-              height: "600px",
+              right: "5%",
+              transform: "translateY(-50%)",
+              width: "700px",
+              height: "700px",
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)",
-              animation: "breathe 4s ease-in-out infinite",
+              background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)",
+              animation: "breathe 3s ease-in-out infinite",
             }}
           />
 
-          {/* Inner pulsating shield circle */}
+          {/* Inner pulsating shield circle - Desktop only */}
           <div
-            className="absolute pointer-events-none"
+            className="absolute pointer-events-none hidden lg:block"
             style={{
               top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "400px",
-              height: "400px",
-              border: "2px solid rgba(124,58,237,0.4)",
+              right: "5%",
+              transform: "translateY(-50%)",
+              width: "480px",
+              height: "480px",
+              border: "3px solid rgba(124,58,237,0.6)",
               borderRadius: "50%",
-              animation: "pulse-ring 3s ease-in-out infinite",
+              animation: "pulse-ring 2.5s ease-in-out infinite",
             }}
           />
+
+          {/* Shield icon - Desktop only, centered in circles */}
+          <div
+            className="absolute pointer-events-none hidden lg:flex items-center justify-center"
+            style={{
+              top: "50%",
+              right: "5%",
+              transform: "translate(0, -50%)",
+              width: "200px",
+              height: "200px",
+              animation: "scale-in 1s ease-out 0.3s both",
+            }}
+          >
+            <Shield size={100} style={{ color: "#A78BFA" }} strokeWidth={1} />
+          </div>
+
+          {/* Mobile version - smaller circles and shield */}
+          <div
+            className="absolute pointer-events-none lg:hidden"
+            style={{
+              top: "50%",
+              right: "10%",
+              transform: "translateY(-50%)",
+              width: "280px",
+              height: "280px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
+              animation: "breathe 3s ease-in-out infinite",
+            }}
+          />
+
+          {/* Mobile inner ring */}
+          <div
+            className="absolute pointer-events-none lg:hidden"
+            style={{
+              top: "50%",
+              right: "10%",
+              transform: "translateY(-50%)",
+              width: "200px",
+              height: "200px",
+              border: "2px solid rgba(124,58,237,0.7)",
+              borderRadius: "50%",
+              animation: "pulse-ring 2.5s ease-in-out infinite",
+            }}
+          />
+
+          {/* Mobile shield icon */}
+          <div
+            className="absolute pointer-events-none lg:hidden flex items-center justify-center"
+            style={{
+              top: "50%",
+              right: "10%",
+              transform: "translate(0, -50%)",
+              width: "100px",
+              height: "100px",
+              animation: "scale-in 1s ease-out 0.3s both",
+            }}
+          >
+            <Shield size={50} style={{ color: "#A78BFA" }} strokeWidth={1} />
+          </div>
 
           {/* Grid overlay */}
           <div
@@ -304,20 +364,20 @@ export default function SenotaVaultPage() {
           <style>{`
             @keyframes breathe {
               0%, 100% {
-                box-shadow: 0 0 60px rgba(124,58,237,0.3), inset 0 0 60px rgba(124,58,237,0.1);
+                box-shadow: 0 0 80px rgba(124,58,237,0.4), inset 0 0 80px rgba(124,58,237,0.15);
               }
               50% {
-                box-shadow: 0 0 100px rgba(124,58,237,0.5), inset 0 0 80px rgba(124,58,237,0.2);
+                box-shadow: 0 0 150px rgba(124,58,237,0.8), inset 0 0 120px rgba(124,58,237,0.35);
               }
             }
             @keyframes pulse-ring {
               0%, 100% {
-                border-color: rgba(124,58,237,0.3);
-                box-shadow: 0 0 0 0 rgba(124,58,237,0.2);
+                border-color: rgba(124,58,237,0.4);
+                box-shadow: 0 0 0 0 rgba(124,58,237,0.3);
               }
               50% {
-                border-color: rgba(124,58,237,0.6);
-                box-shadow: 0 0 20px 10px rgba(124,58,237,0.1);
+                border-color: rgba(124,58,237,0.9);
+                box-shadow: 0 0 40px 15px rgba(124,58,237,0.25);
               }
             }
             @keyframes float-up {
@@ -342,9 +402,9 @@ export default function SenotaVaultPage() {
             }
           `}</style>
 
-          <div className="relative z-10 container px-6 py-24 flex flex-col lg:flex-row items-center gap-16">
+          <div className="relative z-10 container px-6 py-24 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
             {/* Left: text */}
-            <div className="flex-1 max-w-2xl">
+            <div className="flex-1 max-w-2xl lg:pr-12">
               <div
                 style={{
                   animation: "float-up 0.8s ease-out 0.1s both",
@@ -509,32 +569,36 @@ export default function SenotaVaultPage() {
               </div>
             </div>
 
-            {/* Right: shield visual */}
+            {/* Right: spacer for desktop (shield is in background) */}
             <div
-              className="flex-shrink-0 flex items-center justify-center hidden lg:flex"
+              className="flex-shrink-0 hidden lg:block"
               style={{
                 width: "320px",
                 height: "320px",
-                animation: "scale-in 1s ease-out 0.3s both",
+              }}
+            />
+          </div>
+
+          {/* Mobile shield visual - shown below text on small screens */}
+          <div
+            className="lg:hidden flex items-center justify-center mt-8"
+            style={{
+              width: "200px",
+              height: "200px",
+              animation: "scale-in 1s ease-out 0.3s both",
+            }}
+          >
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <div
-                style={{
-                  width: "180px",
-                  height: "180px",
-                  background:
-                    "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.2))",
-                  border: "2px solid rgba(124,58,237,0.6)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow:
-                    "0 0 60px rgba(124,58,237,0.5), inset 0 0 40px rgba(124,58,237,0.1)",
-                }}
-              >
-                <Shield size={80} style={{ color: "#A78BFA" }} strokeWidth={1} />
-              </div>
+              <Shield size={60} style={{ color: "#A78BFA" }} strokeWidth={1} />
             </div>
           </div>
 
