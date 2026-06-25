@@ -32,6 +32,7 @@ const NAV_LINKS = [
   { label: "Branding", href: "/branding" },
   { label: "Creatives", href: "/creatives" },
   { label: "Vault", href: "/vault" },
+  { label: "Vault Dashboard", href: "/vault/dashboard" },
 ];
 
 interface SiteHeaderProps {

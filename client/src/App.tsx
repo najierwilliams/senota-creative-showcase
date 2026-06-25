@@ -27,6 +27,7 @@ import SenotaVaultPage from "./pages/SenotaVaultPage";
 import VaultGetStartedPage from "./pages/VaultGetStartedPage";
 import VaultContactSalesPage from "./pages/VaultContactSalesPage";
 import VaultLearnMorePage from "./pages/VaultLearnMorePage";
+import VaultMemberDashboard from "./pages/VaultMemberDashboard";
 
 // Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
@@ -89,6 +90,7 @@ function Router() {
       <Route path={"/vault/get-started"} component={VaultGetStartedPage} />
       <Route path={"/vault/contact-sales"} component={VaultContactSalesPage} />
       <Route path={"/vault/learn-more"} component={VaultLearnMorePage} />
+      <Route path={"/vault/dashboard"} component={VaultMemberDashboard} />
 
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />
