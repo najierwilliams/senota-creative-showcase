@@ -194,11 +194,10 @@ export default function SenotaVaultPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Randomize and display 3 Q&A options
+  // Display all Q&A options on chat open
   useEffect(() => {
     if (chatOpen && displayedQAs.length === 0) {
-      const shuffled = [...QA_DATA].sort(() => Math.random() - 0.5).slice(0, 3);
-      setDisplayedQAs(shuffled);
+      setDisplayedQAs(QA_DATA);
     }
   }, [chatOpen, displayedQAs.length]);
 
@@ -234,11 +233,10 @@ export default function SenotaVaultPage() {
           content: qa.answer,
         },
       ]);
-      setIsLoading(false);
-      // Refresh the Q&A options
-      const shuffled = [...QA_DATA].sort(() => Math.random() - 0.5).slice(0, 3);
-      setDisplayedQAs(shuffled);
-    }, 800);
+                  setIsLoading(false);
+                  // Keep all Q&A options visible
+      }, 800);
+      // Don't refresh Q&A options - keep showing all
   };
 
   const FAQS = [
@@ -1566,7 +1564,7 @@ export default function SenotaVaultPage() {
               )}
             </div>
 
-            {/* Q&A Buttons */}
+            {/* Q&A Buttons - Scrollable */}
             <div
               style={{
                 borderTop: "1px solid rgba(124,58,237,0.2)",
@@ -1574,6 +1572,9 @@ export default function SenotaVaultPage() {
                 display: "flex",
                 flexDirection: "column",
                 gap: "8px",
+                maxHeight: "200px",
+                overflowY: "auto",
+                overflowX: "hidden",
               }}
             >
               {displayedQAs.map((qa, idx) => (
@@ -1592,7 +1593,7 @@ export default function SenotaVaultPage() {
                     textAlign: "left",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
-                    animation: `slideIn 0.4s ease-out ${idx * 0.1}s both`,
+                    animation: `slideIn 0.4s ease-out ${Math.min(idx * 0.1, 0.4)}s both`,
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
