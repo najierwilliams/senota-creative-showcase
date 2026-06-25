@@ -23,6 +23,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import EmployeePortal from "./pages/EmployeePortal";
 import CircleDashboard from "./pages/CircleDashboard";
+import SenotaVaultPage from "./pages/SenotaVaultPage";
 
 // Routes still under construction (not yet built)
 const UNDER_CONSTRUCTION_ROUTES = [
@@ -79,6 +80,9 @@ function Router() {
       <Route path={"/login"} component={LoginPage} />
       <Route path={"/sign-in/:rest*"} component={LoginPage} />
       <Route path={"/sign-up/:rest*"} component={LoginPage} />
+
+      {/* Senota Vault */}
+      <Route path={"/vault"} component={SenotaVaultPage} />
 
       {/* Dashboards */}
       <Route path={"/dashboard/customer"} component={CustomerDashboard} />
