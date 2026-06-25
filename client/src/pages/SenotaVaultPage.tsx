@@ -7,6 +7,13 @@
 import { useState, useEffect, useRef } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import AIChatBox from "@/components/AIChatBox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Shield,
   Fingerprint,
@@ -20,6 +27,8 @@ import {
   Award,
   ArrowRight,
   ChevronDown,
+  MessageCircle,
+  X,
 } from "lucide-react";
 
 /* ── Membership tier data ─────────────────────────────────────────── */
@@ -223,12 +232,33 @@ export default function SenotaVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { visibleElements, observe } = useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSendMessage = async (message: string) => {
+    // Add user message
+    setMessages((prev) => [...prev, { role: "user", content: message }]);
+    setIsLoading(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Thanks for reaching out! Our team will get back to you shortly about your question regarding Senota Vault.",
+        },
+      ]);
+      setIsLoading(false);
+    }, 1500);
+  };
 
   const FAQS = [
     {
@@ -261,95 +291,7 @@ export default function SenotaVaultPage() {
             background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
           }}
         >
-          {/* Pulsating background shield - Desktop only, positioned right */}
-          <div
-            className="absolute pointer-events-none hidden lg:block"
-            style={{
-              top: "50%",
-              right: "5%",
-              transform: "translateY(-50%)",
-              width: "700px",
-              height: "700px",
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)",
-              animation: "breathe 3s ease-in-out infinite",
-            }}
-          />
 
-          {/* Inner pulsating shield circle - Desktop only */}
-          <div
-            className="absolute pointer-events-none hidden lg:block"
-            style={{
-              top: "50%",
-              right: "5%",
-              transform: "translateY(-50%)",
-              width: "480px",
-              height: "480px",
-              border: "3px solid rgba(124,58,237,0.6)",
-              borderRadius: "50%",
-              animation: "pulse-ring 2.5s ease-in-out infinite",
-            }}
-          />
-
-          {/* Shield icon - Desktop only, centered in circles */}
-          <div
-            className="absolute pointer-events-none hidden lg:flex items-center justify-center"
-            style={{
-              top: "50%",
-              right: "5%",
-              transform: "translate(0, -50%)",
-              width: "200px",
-              height: "200px",
-              animation: "scale-in 1s ease-out 0.3s both",
-            }}
-          >
-            <Shield size={100} style={{ color: "#A78BFA" }} strokeWidth={1} />
-          </div>
-
-          {/* Mobile version - centered circles and shield */}
-          <div
-            className="absolute pointer-events-none lg:hidden"
-            style={{
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "320px",
-              height: "320px",
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
-              animation: "breathe 3s ease-in-out infinite",
-            }}
-          />
-
-          {/* Mobile inner ring */}
-          <div
-            className="absolute pointer-events-none lg:hidden"
-            style={{
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "220px",
-              height: "220px",
-              border: "2px solid rgba(124,58,237,0.7)",
-              borderRadius: "50%",
-              animation: "pulse-ring 2.5s ease-in-out infinite",
-            }}
-          />
-
-          {/* Mobile shield icon - centered and enlarged */}
-          <div
-            className="absolute pointer-events-none lg:hidden flex items-center justify-center"
-            style={{
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "120px",
-              height: "120px",
-              animation: "scale-in 1s ease-out 0.3s both",
-            }}
-          >
-            <Shield size={70} style={{ color: "#A78BFA" }} strokeWidth={1} />
-          </div>
 
           {/* Grid overlay */}
           <div
@@ -362,22 +304,12 @@ export default function SenotaVaultPage() {
           />
 
           <style>{`
-            @keyframes breathe {
+            @keyframes glow-pulse {
               0%, 100% {
-                box-shadow: 0 0 80px rgba(124,58,237,0.4), inset 0 0 80px rgba(124,58,237,0.15);
+                box-shadow: 0 0 20px rgba(124,58,237,0.5), 0 0 40px rgba(124,58,237,0.3);
               }
               50% {
-                box-shadow: 0 0 150px rgba(124,58,237,0.8), inset 0 0 120px rgba(124,58,237,0.35);
-              }
-            }
-            @keyframes pulse-ring {
-              0%, 100% {
-                border-color: rgba(124,58,237,0.4);
-                box-shadow: 0 0 0 0 rgba(124,58,237,0.3);
-              }
-              50% {
-                border-color: rgba(124,58,237,0.9);
-                box-shadow: 0 0 40px 15px rgba(124,58,237,0.25);
+                box-shadow: 0 0 40px rgba(124,58,237,0.8), 0 0 80px rgba(124,58,237,0.5);
               }
             }
             @keyframes float-up {
@@ -569,14 +501,7 @@ export default function SenotaVaultPage() {
               </div>
             </div>
 
-            {/* Right: spacer for desktop (shield is in background) */}
-            <div
-              className="flex-shrink-0 hidden lg:block"
-              style={{
-                width: "320px",
-                height: "320px",
-              }}
-            />
+
           </div>
 
           {/* Scroll indicator */}
@@ -1933,6 +1858,74 @@ export default function SenotaVaultPage() {
       </main>
 
       <SiteFooter />
+
+      {/* AI Chat Button - Fixed bottom-right corner */}
+      <button
+        onClick={() => setChatOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center transition-all duration-300"
+        style={{
+          width: "60px",
+          height: "60px",
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+          border: "none",
+          cursor: "pointer",
+          boxShadow: "0 4px 20px rgba(124,58,237,0.4)",
+          animation: "glow-pulse 3s ease-in-out infinite",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "scale(1.1)";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.transform = "scale(1)";
+        }}
+      >
+        <MessageCircle size={28} style={{ color: "#FFFFFF" }} />
+      </button>
+
+      {/* Chat Dialog */}
+      <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+        <DialogContent
+          className="fixed bottom-24 right-6 top-auto max-w-sm w-full max-h-96 flex flex-col"
+          style={{
+            background: "linear-gradient(135deg, #0A0A1A, #0D0D2B)",
+            border: "1px solid rgba(124,58,237,0.3)",
+            borderRadius: "12px",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+          }}
+        >
+          <DialogHeader
+            style={{
+              borderBottom: "1px solid rgba(124,58,237,0.2)",
+              paddingBottom: "12px",
+            }}
+          >
+            <DialogTitle
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "16px",
+                fontWeight: 600,
+                color: "#FFFFFF",
+              }}
+            >
+              Senota Vault Support
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <AIChatBox
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              placeholder="Ask about Senota Vault..."
+              suggestedPrompts={[
+                "How does Vault Fingerprinting work?",
+                "What's included in Vault Pro?",
+                "Tell me about the referral program",
+              ]}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
