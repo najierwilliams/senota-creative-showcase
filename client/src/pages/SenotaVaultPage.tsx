@@ -1463,7 +1463,7 @@ export default function SenotaVaultPage() {
       {/* Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
         <DialogContent
-          className="fixed inset-0 md:bottom-24 md:right-6 md:top-auto md:max-w-sm md:w-full md:max-h-96 w-full h-full md:h-auto flex flex-col md:rounded-lg rounded-none"
+          className="!fixed !inset-0 md:!inset-auto md:!bottom-6 md:!right-6 md:!top-auto md:!max-w-sm md:!w-auto md:!max-h-96 md:!translate-x-0 md:!translate-y-0 !w-full !h-full md:!h-auto !flex !flex-col md:!rounded-lg !rounded-none !top-0 !left-0 !translate-x-0 !translate-y-0 !gap-0 !p-0"
           style={{
             background: "linear-gradient(135deg, #0A0A1A, #0D0D2B)",
             border: "1px solid rgba(124,58,237,0.3)",
