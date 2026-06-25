@@ -7,7 +7,7 @@
 import { useState, useEffect, useRef } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import AIChatBox from "@/components/AIChatBox";
+import { AIChatBox } from "@/components/AIChatBox";
 import {
   Dialog,
   DialogContent,
@@ -233,7 +233,7 @@ export default function SenotaVaultPage() {
   const { visibleElements, observe } = useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant" | "system"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
