@@ -1,11 +1,10 @@
 /*
  * SENOTA — Senota Vault
- * Design: Dark futuristic cybersecurity / creator-protection aesthetic
- * Inspired by the Senota Vault (formerly Aegis) PDF template
- * Sections: Hero, Features, Membership Tiers, Referral Program, Credit Marketplace, Partner Payout, CTA
+ * Design: Apple-style scroll interactivity with dark futuristic aesthetic
+ * Features: Scroll-triggered animations, pulsating background shield, immersive hero
  */
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import {
@@ -190,8 +189,46 @@ const REVENUE_ROWS = [
   { stream: "Partner Payouts", predictability: "Medium", purpose: "Celebrity creator incentive" },
 ];
 
+/* ── Scroll-triggered animation hook ──────────────────────────────── */
+function useScrollReveal() {
+  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleElements((prev) => new Set(prev).add(entry.target.id));
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  const observe = (id: string, element: HTMLElement | null) => {
+    if (element && observerRef.current) {
+      element.id = id;
+      observerRef.current.observe(element);
+    }
+  };
+
+  return { visibleElements, observe };
+}
+
 export default function SenotaVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const { visibleElements, observe } = useScrollReveal();
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const FAQS = [
     {
@@ -217,43 +254,46 @@ export default function SenotaVaultPage() {
       <SiteHeader />
 
       <main className="flex-1">
-
         {/* ── HERO ──────────────────────────────────────────────────── */}
         <section
-          className="relative min-h-[92vh] flex items-center justify-center overflow-hidden"
+          className="relative min-h-screen flex items-center justify-center overflow-hidden"
           style={{
             background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
           }}
         >
-          {/* Animated background glow orbs */}
+          {/* Pulsating background shield */}
           <div
             className="absolute pointer-events-none"
             style={{
-              top: "15%",
-              right: "10%",
-              width: "500px",
-              height: "500px",
-              background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "600px",
+              height: "600px",
               borderRadius: "50%",
-              filter: "blur(40px)",
+              background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)",
+              animation: "breathe 4s ease-in-out infinite",
             }}
           />
+
+          {/* Inner pulsating shield circle */}
           <div
             className="absolute pointer-events-none"
             style={{
-              bottom: "10%",
-              left: "5%",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
               width: "400px",
               height: "400px",
-              background: "radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)",
+              border: "2px solid rgba(124,58,237,0.4)",
               borderRadius: "50%",
-              filter: "blur(50px)",
+              animation: "pulse-ring 3s ease-in-out infinite",
             }}
           />
 
           {/* Grid overlay */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-10"
+            className="absolute inset-0 pointer-events-none opacity-5"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(124,58,237,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.3) 1px, transparent 1px)",
@@ -261,59 +301,91 @@ export default function SenotaVaultPage() {
             }}
           />
 
+          <style>{`
+            @keyframes breathe {
+              0%, 100% {
+                box-shadow: 0 0 60px rgba(124,58,237,0.3), inset 0 0 60px rgba(124,58,237,0.1);
+              }
+              50% {
+                box-shadow: 0 0 100px rgba(124,58,237,0.5), inset 0 0 80px rgba(124,58,237,0.2);
+              }
+            }
+            @keyframes pulse-ring {
+              0%, 100% {
+                border-color: rgba(124,58,237,0.3);
+                box-shadow: 0 0 0 0 rgba(124,58,237,0.2);
+              }
+              50% {
+                border-color: rgba(124,58,237,0.6);
+                box-shadow: 0 0 20px 10px rgba(124,58,237,0.1);
+              }
+            }
+            @keyframes float-up {
+              0% {
+                opacity: 0;
+                transform: translateY(40px);
+              }
+              100% {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            @keyframes scale-in {
+              0% {
+                opacity: 0;
+                transform: scale(0.95);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+          `}</style>
+
           <div className="relative z-10 container px-6 py-24 flex flex-col lg:flex-row items-center gap-16">
             {/* Left: text */}
             <div className="flex-1 max-w-2xl">
               <div
-                className="inline-flex items-center gap-2 px-4 py-2 mb-8"
                 style={{
-                  border: "1px solid rgba(124,58,237,0.5)",
-                  borderRadius: "100px",
-                  background: "rgba(124,58,237,0.1)",
+                  animation: "float-up 0.8s ease-out 0.1s both",
                 }}
               >
-                <Shield size={14} style={{ color: "#A78BFA" }} />
-                <span
+                <div
+                  className="inline-flex items-center gap-2 px-4 py-2 mb-8"
                   style={{
-                    fontFamily: "'Space Mono', monospace",
-                    fontSize: "10px",
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "#A78BFA",
+                    border: "1px solid rgba(124,58,237,0.5)",
+                    borderRadius: "100px",
+                    background: "rgba(124,58,237,0.1)",
                   }}
                 >
-                  AI-Powered Protection for Creators
-                </span>
+                  <Shield size={14} style={{ color: "#A78BFA" }} />
+                  <span
+                    style={{
+                      fontFamily: "'Space Mono', monospace",
+                      fontSize: "10px",
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: "#A78BFA",
+                    }}
+                  >
+                    AI-Powered Protection for Creators
+                  </span>
+                </div>
               </div>
 
               <h1
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "clamp(56px, 8vw, 100px)",
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                  fontSize: "clamp(56px, 8vw, 120px)",
                   fontWeight: 700,
-                  lineHeight: 0.95,
-                  letterSpacing: "-0.02em",
+                  lineHeight: 0.9,
+                  letterSpacing: "-0.03em",
                   color: "#FFFFFF",
-                  marginBottom: "8px",
+                  marginBottom: "16px",
+                  animation: "float-up 0.8s ease-out 0.2s both",
                 }}
               >
-                SENOTA
-              </h1>
-              <h1
-                style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: "clamp(56px, 8vw, 100px)",
-                  fontWeight: 700,
-                  lineHeight: 0.95,
-                  letterSpacing: "-0.02em",
-                  background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  marginBottom: "32px",
-                }}
-              >
-                VAULT
+                SENOTA VAULT
               </h1>
 
               <p
@@ -324,6 +396,7 @@ export default function SenotaVaultPage() {
                   lineHeight: 1.7,
                   marginBottom: "40px",
                   maxWidth: "520px",
+                  animation: "float-up 0.8s ease-out 0.3s both",
                 }}
               >
                 The all-in-one content protection platform built for creators.{" "}
@@ -331,10 +404,15 @@ export default function SenotaVaultPage() {
                 Backed by trust.
               </p>
 
-              <div className="flex flex-wrap gap-4 mb-12">
+              <div
+                className="flex flex-wrap gap-4 mb-12"
+                style={{
+                  animation: "float-up 0.8s ease-out 0.4s both",
+                }}
+              >
                 <a
                   href="/contact"
-                  className="inline-flex items-center gap-3 px-8 py-4 transition-all"
+                  className="inline-flex items-center gap-3 px-8 py-4 transition-all hover:shadow-2xl"
                   style={{
                     background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
                     color: "#FFFFFF",
@@ -349,10 +427,12 @@ export default function SenotaVaultPage() {
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.boxShadow =
                       "0 0 50px rgba(124,58,237,0.7)";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.boxShadow =
                       "0 0 30px rgba(124,58,237,0.4)";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                   }}
                 >
                   Get Started
@@ -390,7 +470,12 @@ export default function SenotaVaultPage() {
               </div>
 
               {/* Stats row */}
-              <div className="flex flex-wrap gap-8">
+              <div
+                className="flex flex-wrap gap-8"
+                style={{
+                  animation: "float-up 0.8s ease-out 0.5s both",
+                }}
+              >
                 {[
                   { value: "14.2M+", label: "Threats detected & blocked" },
                   { value: "99.7%", label: "Accuracy rate across all detections" },
@@ -399,7 +484,7 @@ export default function SenotaVaultPage() {
                   <div key={stat.value}>
                     <p
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
                         fontSize: "28px",
                         fontWeight: 700,
                         color: "#FFFFFF",
@@ -425,55 +510,30 @@ export default function SenotaVaultPage() {
             </div>
 
             {/* Right: shield visual */}
-            <div className="flex-shrink-0 flex items-center justify-center">
+            <div
+              className="flex-shrink-0 flex items-center justify-center hidden lg:flex"
+              style={{
+                width: "320px",
+                height: "320px",
+                animation: "scale-in 1s ease-out 0.3s both",
+              }}
+            >
               <div
-                className="relative flex items-center justify-center"
-                style={{ width: "320px", height: "320px" }}
+                style={{
+                  width: "180px",
+                  height: "180px",
+                  background:
+                    "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.2))",
+                  border: "2px solid rgba(124,58,237,0.6)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow:
+                    "0 0 60px rgba(124,58,237,0.5), inset 0 0 40px rgba(124,58,237,0.1)",
+                }}
               >
-                {/* Outer glow ring */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    borderRadius: "50%",
-                    background:
-                      "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
-                    animation: "pulse 3s ease-in-out infinite",
-                  }}
-                />
-                {/* Shield icon */}
-                <div
-                  style={{
-                    width: "180px",
-                    height: "180px",
-                    background:
-                      "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.2))",
-                    border: "2px solid rgba(124,58,237,0.6)",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow:
-                      "0 0 60px rgba(124,58,237,0.5), inset 0 0 40px rgba(124,58,237,0.1)",
-                  }}
-                >
-                  <Shield size={80} style={{ color: "#A78BFA" }} strokeWidth={1} />
-                </div>
-                {/* Orbiting dots */}
-                {[0, 60, 120, 180, 240, 300].map((deg) => (
-                  <div
-                    key={deg}
-                    className="absolute"
-                    style={{
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "50%",
-                      background: deg % 120 === 0 ? "#A78BFA" : "rgba(167,139,250,0.4)",
-                      top: `${50 - 46 * Math.cos((deg * Math.PI) / 180)}%`,
-                      left: `${50 + 46 * Math.sin((deg * Math.PI) / 180)}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  />
-                ))}
+                <Shield size={80} style={{ color: "#A78BFA" }} strokeWidth={1} />
               </div>
             </div>
           </div>
@@ -491,7 +551,10 @@ export default function SenotaVaultPage() {
             >
               Scroll to explore
             </span>
-            <div className="w-[1px] h-8" style={{ background: "linear-gradient(to bottom, #7C3AED, transparent)" }} />
+            <div
+              className="animate-bounce"
+              style={{ width: "1px", height: "8px", background: "linear-gradient(to bottom, #7C3AED, transparent)" }}
+            />
           </div>
         </section>
 
@@ -529,7 +592,7 @@ export default function SenotaVaultPage() {
               </div>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
                   fontSize: "clamp(36px, 5vw, 64px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
@@ -568,11 +631,18 @@ export default function SenotaVaultPage() {
               {CAPABILITIES.map((cap, i) => (
                 <div
                   key={cap.number}
+                  ref={(el) => observe(`cap-${i}`, el)}
                   className="group relative overflow-hidden p-8 transition-all duration-300"
                   style={{
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(124,58,237,0.25)",
                     borderRadius: "8px",
+                    opacity: visibleElements.has(`cap-${i}`) ? 1 : 0,
+                    transform: visibleElements.has(`cap-${i}`)
+                      ? "translateY(0)"
+                      : "translateY(40px)",
+                    transition: "all 0.6s ease-out",
+                    transitionDelay: `${i * 100}ms`,
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.borderColor =
@@ -607,7 +677,7 @@ export default function SenotaVaultPage() {
 
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Helvetica Neue', Arial, sans-serif",
                       fontSize: "24px",
                       fontWeight: 700,
                       color: "#FFFFFF",
@@ -693,7 +763,7 @@ export default function SenotaVaultPage() {
             <div className="text-center mb-16">
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
                   fontSize: "clamp(36px, 5vw, 64px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
@@ -729,9 +799,10 @@ export default function SenotaVaultPage() {
 
             {/* Tier cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              {TIERS.map((tier) => (
+              {TIERS.map((tier, i) => (
                 <div
                   key={tier.id}
+                  ref={(el) => observe(`tier-${i}`, el)}
                   className="relative flex flex-col p-8 transition-all duration-300"
                   style={{
                     background: tier.recommended
@@ -744,6 +815,11 @@ export default function SenotaVaultPage() {
                     boxShadow: tier.recommended
                       ? "0 0 40px rgba(124,58,237,0.25)"
                       : "none",
+                    opacity: visibleElements.has(`tier-${i}`) ? 1 : 0,
+                    transform: visibleElements.has(`tier-${i}`)
+                      ? "translateY(0)"
+                      : "translateY(40px)",
+                    transitionDelay: `${i * 100}ms`,
                   }}
                 >
                   {tier.recommended && (
@@ -767,7 +843,7 @@ export default function SenotaVaultPage() {
                   <div className="mb-6">
                     <h3
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
                         fontSize: "22px",
                         fontWeight: 700,
                         color: "#FFFFFF",
@@ -791,7 +867,7 @@ export default function SenotaVaultPage() {
                   <div className="flex items-baseline gap-1 mb-8">
                     <span
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
                         fontSize: "48px",
                         fontWeight: 700,
                         color: "#FFFFFF",
@@ -901,7 +977,16 @@ export default function SenotaVaultPage() {
           <div className="container px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Left: text */}
-              <div>
+              <div
+                ref={(el) => observe("referral-text", el)}
+                style={{
+                  opacity: visibleElements.has("referral-text") ? 1 : 0,
+                  transform: visibleElements.has("referral-text")
+                    ? "translateX(0)"
+                    : "translateX(-40px)",
+                  transition: "all 0.6s ease-out",
+                }}
+              >
                 <div
                   className="inline-flex items-center gap-2 px-4 py-2 mb-6"
                   style={{
@@ -926,7 +1011,7 @@ export default function SenotaVaultPage() {
 
                 <h2
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Helvetica Neue', Arial, sans-serif",
                     fontSize: "clamp(32px, 4vw, 52px)",
                     fontWeight: 700,
                     color: "#FFFFFF",
@@ -1034,7 +1119,16 @@ export default function SenotaVaultPage() {
               </div>
 
               {/* Right: example card */}
-              <div>
+              <div
+                ref={(el) => observe("referral-card", el)}
+                style={{
+                  opacity: visibleElements.has("referral-card") ? 1 : 0,
+                  transform: visibleElements.has("referral-card")
+                    ? "translateX(0)"
+                    : "translateX(40px)",
+                  transition: "all 0.6s ease-out",
+                }}
+              >
                 <div
                   className="p-8"
                   style={{
@@ -1161,7 +1255,7 @@ export default function SenotaVaultPage() {
               </div>
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
                   fontSize: "clamp(32px, 4vw, 52px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
@@ -1196,14 +1290,20 @@ export default function SenotaVaultPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {CREDITS.map((item) => (
+              {CREDITS.map((item, i) => (
                 <div
                   key={item.label}
+                  ref={(el) => observe(`credit-${i}`, el)}
                   className="p-6 transition-all duration-300"
                   style={{
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(124,58,237,0.2)",
                     borderRadius: "8px",
+                    opacity: visibleElements.has(`credit-${i}`) ? 1 : 0,
+                    transform: visibleElements.has(`credit-${i}`)
+                      ? "translateY(0)"
+                      : "translateY(40px)",
+                    transitionDelay: `${i * 50}ms`,
                   }}
                   onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.borderColor =
@@ -1234,7 +1334,7 @@ export default function SenotaVaultPage() {
 
                   <h3
                     style={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "'Helvetica Neue', Arial, sans-serif",
                       fontSize: "20px",
                       fontWeight: 700,
                       color: "#FFFFFF",
@@ -1291,6 +1391,7 @@ export default function SenotaVaultPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Left: partner card */}
               <div
+                ref={(el) => observe("partner-card", el)}
                 className="p-8"
                 style={{
                   background:
@@ -1298,6 +1399,11 @@ export default function SenotaVaultPage() {
                   border: "1px solid rgba(124,58,237,0.4)",
                   borderRadius: "8px",
                   boxShadow: "0 0 60px rgba(124,58,237,0.15)",
+                  opacity: visibleElements.has("partner-card") ? 1 : 0,
+                  transform: visibleElements.has("partner-card")
+                    ? "translateX(0)"
+                    : "translateX(-40px)",
+                  transition: "all 0.6s ease-out",
                 }}
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -1305,7 +1411,7 @@ export default function SenotaVaultPage() {
                   <div>
                     <p
                       style={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
                         fontSize: "22px",
                         fontWeight: 700,
                         color: "#FFFFFF",
@@ -1382,7 +1488,16 @@ export default function SenotaVaultPage() {
               </div>
 
               {/* Right: text */}
-              <div>
+              <div
+                ref={(el) => observe("partner-text", el)}
+                style={{
+                  opacity: visibleElements.has("partner-text") ? 1 : 0,
+                  transform: visibleElements.has("partner-text")
+                    ? "translateX(0)"
+                    : "translateX(40px)",
+                  transition: "all 0.6s ease-out",
+                }}
+              >
                 <div
                   className="inline-flex items-center gap-2 px-4 py-2 mb-6"
                   style={{
@@ -1407,7 +1522,7 @@ export default function SenotaVaultPage() {
 
                 <h2
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: "'Helvetica Neue', Arial, sans-serif",
                     fontSize: "clamp(32px, 4vw, 52px)",
                     fontWeight: 700,
                     color: "#FFFFFF",
@@ -1562,7 +1677,7 @@ export default function SenotaVaultPage() {
             <div className="text-center mb-12">
               <h2
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
                   fontSize: "clamp(32px, 4vw, 48px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
@@ -1587,10 +1702,17 @@ export default function SenotaVaultPage() {
               {FAQS.map((faq, i) => (
                 <div
                   key={i}
+                  ref={(el) => observe(`faq-${i}`, el)}
                   style={{
                     border: "1px solid rgba(124,58,237,0.25)",
                     borderRadius: "6px",
                     overflow: "hidden",
+                    opacity: visibleElements.has(`faq-${i}`) ? 1 : 0,
+                    transform: visibleElements.has(`faq-${i}`)
+                      ? "translateY(0)"
+                      : "translateY(20px)",
+                    transition: "all 0.6s ease-out",
+                    transitionDelay: `${i * 50}ms`,
                   }}
                 >
                   <button
@@ -1672,7 +1794,7 @@ export default function SenotaVaultPage() {
           <div className="relative z-10 container px-6 text-center">
             <h2
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
                 fontSize: "clamp(40px, 6vw, 80px)",
                 fontWeight: 700,
                 color: "#FFFFFF",
@@ -1709,7 +1831,7 @@ export default function SenotaVaultPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <a
                 href="/contact"
-                className="inline-flex items-center gap-3 px-10 py-5 transition-all"
+                className="inline-flex items-center gap-3 px-10 py-5 transition-all hover:shadow-2xl"
                 style={{
                   background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
                   color: "#FFFFFF",
@@ -1724,10 +1846,12 @@ export default function SenotaVaultPage() {
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.boxShadow =
                     "0 0 70px rgba(124,58,237,0.8)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLElement).style.boxShadow =
                     "0 0 40px rgba(124,58,237,0.5)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                 }}
               >
                 Get Started Today
