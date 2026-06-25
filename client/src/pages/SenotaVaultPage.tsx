@@ -306,15 +306,15 @@ export default function SenotaVaultPage() {
             <Shield size={100} style={{ color: "#A78BFA" }} strokeWidth={1} />
           </div>
 
-          {/* Mobile version - smaller circles and shield */}
+          {/* Mobile version - centered circles and shield */}
           <div
             className="absolute pointer-events-none lg:hidden"
             style={{
               top: "50%",
-              right: "10%",
-              transform: "translateY(-50%)",
-              width: "280px",
-              height: "280px",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "320px",
+              height: "320px",
               borderRadius: "50%",
               background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)",
               animation: "breathe 3s ease-in-out infinite",
@@ -326,23 +326,23 @@ export default function SenotaVaultPage() {
             className="absolute pointer-events-none lg:hidden"
             style={{
               top: "50%",
-              right: "10%",
-              transform: "translateY(-50%)",
-              width: "200px",
-              height: "200px",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "220px",
+              height: "220px",
               border: "2px solid rgba(124,58,237,0.7)",
               borderRadius: "50%",
               animation: "pulse-ring 2.5s ease-in-out infinite",
             }}
           />
 
-          {/* Mobile shield icon */}
+          {/* Mobile shield icon - centered */}
           <div
             className="absolute pointer-events-none lg:hidden flex items-center justify-center"
             style={{
               top: "50%",
-              right: "10%",
-              transform: "translate(0, -50%)",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
               width: "100px",
               height: "100px",
               animation: "scale-in 1s ease-out 0.3s both",
@@ -577,29 +577,6 @@ export default function SenotaVaultPage() {
                 height: "320px",
               }}
             />
-          </div>
-
-          {/* Mobile shield visual - shown below text on small screens */}
-          <div
-            className="lg:hidden flex items-center justify-center mt-8"
-            style={{
-              width: "200px",
-              height: "200px",
-              animation: "scale-in 1s ease-out 0.3s both",
-            }}
-          >
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Shield size={60} style={{ color: "#A78BFA" }} strokeWidth={1} />
-            </div>
           </div>
 
           {/* Scroll indicator */}
