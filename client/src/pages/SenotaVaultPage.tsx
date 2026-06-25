@@ -401,7 +401,7 @@ export default function SenotaVaultPage() {
                 }}
               >
                 <a
-                  href="/contact"
+                  href="/vault/get-started"
                   className="inline-flex items-center gap-2 px-8 py-4 transition-all"
                   style={{
                     background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
@@ -427,7 +427,7 @@ export default function SenotaVaultPage() {
                   <ArrowRight size={16} />
                 </a>
                 <a
-                  href="#pricing"
+                  href="/vault/learn-more"
                   className="inline-flex items-center gap-2 px-8 py-4 transition-all"
                   style={{
                     border: "1px solid rgba(167,139,250,0.4)",
@@ -719,8 +719,10 @@ export default function SenotaVaultPage() {
                       </span>
                     </div>
 
-                    <button
+                    <a
+                      href={tier.id === "elite" ? "/vault/contact-sales" : "/vault/get-started"}
                       style={{
+                        display: "block",
                         width: "100%",
                         padding: "12px 16px",
                         marginBottom: "24px",
@@ -733,6 +735,9 @@ export default function SenotaVaultPage() {
                         fontWeight: 600,
                         cursor: "pointer",
                         transition: "all 0.2s ease",
+                        textDecoration: "none",
+                        textAlign: "center",
+                        boxSizing: "border-box",
                       }}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
@@ -746,7 +751,7 @@ export default function SenotaVaultPage() {
                       }}
                     >
                       {tier.cta}
-                    </button>
+                    </a>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                       {tier.features.map((feature, fi) => (
@@ -1373,7 +1378,7 @@ export default function SenotaVaultPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <a
-                href="/contact"
+                href="/vault/get-started"
                 className="inline-flex items-center gap-3 px-10 py-5 transition-all hover:shadow-2xl"
                 style={{
                   background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
