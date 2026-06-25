@@ -1,4 +1,4 @@
-/*
+/**
  * SENOTA — Senota Vault
  * Design: Apple-style scroll interactivity with dark futuristic aesthetic
  * Features: Scroll-triggered animations, pulsating background shield, immersive hero
@@ -31,6 +31,42 @@ import {
   X,
 } from "lucide-react";
 
+/* ── Q&A Data for Interactive Chat ──────────────────────────────────── */
+const QA_DATA = [
+  {
+    question: "How does Vault Fingerprinting work?",
+    answer: "Vault Fingerprinting embeds a unique, invisible signature into your content. This allows us to detect unauthorized copies across the web, even if they've been edited, cropped, or filtered. Our AI can recognize your content at scale with forensic-grade accuracy.",
+  },
+  {
+    question: "What's included in Vault Pro?",
+    answer: "Vault Pro includes everything from Vault Basic, plus active content monitoring, unlimited case tracking, takedown assistance, stolen content detection, and priority support. It's designed for growing teams and creators who need comprehensive protection.",
+  },
+  {
+    question: "How does the referral program work?",
+    answer: "Earn a 20% referral commission on every creator you bring to Senota Vault. Your commissions first offset your own membership cost. Once your membership is free, additional referrals convert to Vault Credits that can be spent on premium services.",
+  },
+  {
+    question: "What are Vault Credits?",
+    answer: "Vault Credits are earned through referrals and can only be spent on exclusive premium add-ons in our Credit Marketplace. These include services like rapid content removal, creator intelligence reports, AI tools, reputation protection, and crisis response services.",
+  },
+  {
+    question: "How do I reach Partner status?",
+    answer: "After reaching 100 active referrals, you unlock Partner status. This gives you cash commissions on top of credits, continued Vault Credits earning, and an official partnership badge. Partners become part of our core creator network.",
+  },
+  {
+    question: "Can I change my membership tier?",
+    answer: "Yes! You can upgrade or downgrade your membership tier at any time. Upgrades take effect immediately, while downgrades apply at the next billing cycle. There are no penalties for changing your tier.",
+  },
+  {
+    question: "What's the difference between Basic and Elite?",
+    answer: "Vault Basic ($29/mo) is perfect for individuals. Vault Pro ($99/mo) is for growing teams with active monitoring and takedown assistance. Vault Elite ($299/mo) includes advanced monitoring, brand protection, faster response times, and a dedicated account manager.",
+  },
+  {
+    question: "How fast are takedowns processed?",
+    answer: "Our automated response system processes takedowns quickly with verified accuracy. Most takedowns are initiated within hours of detection. Vault Pro and Elite members get priority processing and escalation support.",
+  },
+];
+
 /* ── Membership tier data ─────────────────────────────────────────── */
 const TIERS = [
   {
@@ -48,14 +84,13 @@ const TIERS = [
       "Monthly security report",
     ],
     cta: "Get Started",
-    accentColor: "#7C3AED",
   },
   {
     id: "pro",
     name: "Vault Pro",
     price: "$99",
     period: "/month",
-    tagline: "Advanced protection for growing teams and businesses.",
+    tagline: "For growing teams and serious creators.",
     recommended: true,
     features: [
       "Everything in Basic",
@@ -66,163 +101,79 @@ const TIERS = [
       "Priority support",
     ],
     cta: "Get Started",
-    accentColor: "#8B5CF6",
   },
   {
     id: "elite",
     name: "Vault Elite",
     price: "$299",
     period: "/month",
-    tagline: "Custom solutions for large organizations.",
+    tagline: "For enterprises and high-volume creators.",
     recommended: false,
     features: [
       "Everything in Pro",
       "Advanced monitoring",
       "Brand protection",
       "Faster response times",
-      "Agency / team access",
       "Dedicated account manager",
+      "Custom integrations",
     ],
     cta: "Contact Sales",
-    accentColor: "#6D28D9",
   },
 ];
 
-/* ── Credit marketplace items ─────────────────────────────────────── */
-const CREDITS = [
+const FEATURES = [
   {
-    credits: "500",
-    label: "Content Recovery",
-    bundle: "Rapid Removal Bundle",
-    items: [
-      "Priority takedown requests",
-      "Multiple URLs in single request",
-      "Escalation tracking & reporting",
-    ],
-    icon: <Zap size={20} />,
-  },
-  {
-    credits: "750",
-    label: "Creator Intelligence",
-    bundle: "Creator Threat Report",
-    items: [
-      "Impersonator network map",
-      "Fake account connections",
-      "Risk analysis & patterns",
-    ],
-    icon: <Globe size={20} />,
-  },
-  {
-    credits: "1,000",
-    label: "Premium AI Tools",
-    bundle: "AI Content Fingerprint",
-    items: [
-      "Register content fingerprints",
-      "Advanced tracking across platforms",
-      "Historical archive access",
-    ],
-    icon: <Fingerprint size={20} />,
-  },
-  {
-    credits: "1,500",
-    label: "Reputation Protection",
-    bundle: "Digital Reputation Audit",
-    items: [
-      "Search presence review",
-      "Impersonation risk assessment",
-      "Fake information monitoring",
-    ],
-    icon: <Shield size={20} />,
-  },
-  {
-    credits: "2,500",
-    label: "Crisis Services",
-    bundle: "Creator Emergency Response",
-    items: [
-      "Priority team response (24/7)",
-      "Coordinated removal effort",
-      "Legal documentation support",
-    ],
-    icon: <Lock size={20} />,
-  },
-];
-
-/* ── Core capabilities ────────────────────────────────────────────── */
-const CAPABILITIES = [
-  {
-    number: "01",
+    icon: Fingerprint,
     title: "Vault Fingerprinting",
-    subtitle: "UNIQUE. INVISIBLE. PERSISTENT.",
-    description:
-      "Our advanced fingerprinting embeds a unique, invisible signature into your content — allowing us to detect unauthorized copies, even if edited, cropped, or filtered.",
-    bullets: [
-      "Resilient to edits, compression & transformations",
-      "Works across platforms & file types",
-      "Forensic-grade accuracy, unmatched at scale",
-    ],
-    icon: <Fingerprint size={28} />,
+    description: "Embed invisible signatures into your content for forensic-grade detection across the web.",
   },
   {
-    number: "02",
+    icon: Globe,
     title: "Vault Monitoring",
-    subtitle: "GLOBAL. REAL-TIME. RELENTLESS.",
-    description:
-      "We continuously scan billions of sources across the open web, social platforms, and dark web to identify and verify threats in real-time.",
-    bullets: [
-      "Scans 24/7 across surface, deep & dark web",
-      "Real-time detection & instant alerts",
-      "Actionable intelligence in one dashboard",
-    ],
-    icon: <Globe size={28} />,
+    description: "Real-time alerts when your content is detected or stolen anywhere online.",
   },
   {
-    number: "03",
+    icon: Zap,
     title: "Vault Response",
-    subtitle: "AUTOMATED. PRECISE. EFFECTIVE.",
-    description:
-      "Our automated response system takes down infringing content fast — with proven success rates and complete transparency at every step.",
-    bullets: [
-      "Automated takedown across all platforms",
-      "Verified & validated match accuracy",
-      "Full case history & reporting",
-    ],
-    icon: <Zap size={28} />,
+    description: "Automated takedown requests and crisis management for stolen content.",
   },
 ];
 
-/* ── Revenue model rows ───────────────────────────────────────────── */
-const REVENUE_ROWS = [
-  { stream: "Membership Fees", predictability: "High", purpose: "Core recurring revenue" },
-  { stream: "Referral Commissions", predictability: "Medium", purpose: "Customer acquisition cost" },
-  { stream: "Credit Marketplace", predictability: "Medium–High", purpose: "Retention & upsell" },
-  { stream: "Partner Payouts", predictability: "Medium", purpose: "Celebrity creator incentive" },
+const CREDITS = [
+  { label: "Content Recovery", credits: "500", description: "Rapid removal of stolen content" },
+  { label: "Creator Intelligence", credits: "750", description: "Deep-dive reputation analysis" },
+  { label: "Premium AI Tools", credits: "1000", description: "Advanced detection & monitoring" },
+  { label: "Reputation Protection", credits: "1500", description: "Full brand protection suite" },
+  { label: "Crisis Services", credits: "2500", description: "24/7 emergency response team" },
 ];
 
-/* ── Scroll-triggered animation hook ──────────────────────────────── */
+const REVENUE_ROWS = [
+  { stream: "Referral Commissions", predictability: "High", purpose: "Direct creator earnings" },
+  { stream: "Vault Credits", predictability: "Medium", purpose: "Premium service access" },
+  { stream: "Partner Payouts", predictability: "High", purpose: "Cash + credits for 100+ referrals" },
+];
+
+/* ── Scroll Reveal Hook ─────────────────────────────────────────── */
 function useScrollReveal() {
-  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+  const [visibleElements, setVisibleElements] = useState(new Set<string>());
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleElements((prev) => new Set(prev).add(entry.target.id));
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    return () => observerRef.current?.disconnect();
-  }, []);
-
   const observe = (id: string, element: HTMLElement | null) => {
-    if (element && observerRef.current) {
-      element.id = id;
-      observerRef.current.observe(element);
+    if (!element) return;
+    if (!observerRef.current) {
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleElements((prev) => new Set([...prev, entry.target.id]));
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
     }
+    element.id = id;
+    observerRef.current.observe(element);
   };
 
   return { visibleElements, observe };
@@ -235,12 +186,21 @@ export default function SenotaVaultPage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant" | "system"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [displayedQAs, setDisplayedQAs] = useState<typeof QA_DATA>([]);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Randomize and display 3 Q&A options
+  useEffect(() => {
+    if (chatOpen && displayedQAs.length === 0) {
+      const shuffled = [...QA_DATA].sort(() => Math.random() - 0.5).slice(0, 3);
+      setDisplayedQAs(shuffled);
+    }
+  }, [chatOpen, displayedQAs.length]);
 
   const handleSendMessage = async (message: string) => {
     // Add user message
@@ -260,6 +220,27 @@ export default function SenotaVaultPage() {
     }, 1500);
   };
 
+  const handleQuestionClick = (qa: typeof QA_DATA[0]) => {
+    // Add question as user message
+    setMessages((prev) => [...prev, { role: "user", content: qa.question }]);
+    setIsLoading(true);
+
+    // Simulate AI response with the answer
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: qa.answer,
+        },
+      ]);
+      setIsLoading(false);
+      // Refresh the Q&A options
+      const shuffled = [...QA_DATA].sort(() => Math.random() - 0.5).slice(0, 3);
+      setDisplayedQAs(shuffled);
+    }, 800);
+  };
+
   const FAQS = [
     {
       q: "How does the referral commission work?",
@@ -274,31 +255,30 @@ export default function SenotaVaultPage() {
       a: "After reaching 100 active referrals, you unlock Partner status: cash commission on top of credits, continued Vault Credits earning, and an official partnership badge.",
     },
     {
-      q: "Can I upgrade or downgrade my membership tier?",
-      a: "Yes. You can change your tier at any time. Upgrades take effect immediately; downgrades apply at the next billing cycle.",
+      q: "Can I downgrade my membership?",
+      a: "Yes. Downgrades take effect at the next billing cycle. There are no penalties or fees for changing your tier.",
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F7F7F7" }}>
+    <div style={{ background: "#000000", color: "#FFFFFF", minHeight: "100vh" }}>
       <SiteHeader />
 
-      <main className="flex-1">
-        {/* ── HERO ──────────────────────────────────────────────────── */}
+      <main>
+        {/* Hero Section */}
         <section
-          className="relative min-h-screen flex items-center justify-center overflow-hidden"
           style={{
+            minHeight: "100vh",
+            position: "relative",
+            overflow: "hidden",
             background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
           }}
         >
-
-
           {/* Grid overlay */}
           <div
             className="absolute inset-0 pointer-events-none opacity-5"
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(124,58,237,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.3) 1px, transparent 1px)",
+              backgroundImage: "linear-gradient(0deg, transparent 24%, rgba(124,58,237,0.05) 25%, rgba(124,58,237,0.05) 26%, transparent 27%, transparent 74%, rgba(124,58,237,0.05) 75%, rgba(124,58,237,0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(124,58,237,0.05) 25%, rgba(124,58,237,0.05) 26%, transparent 27%, transparent 74%, rgba(124,58,237,0.05) 75%, rgba(124,58,237,0.05) 76%, transparent 77%, transparent)",
               backgroundSize: "60px 60px",
             }}
           />
@@ -332,49 +312,71 @@ export default function SenotaVaultPage() {
                 transform: scale(1);
               }
             }
+            @keyframes fadeIn {
+              from {
+                opacity: 0;
+                transform: translateY(8px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            @keyframes slideIn {
+              from {
+                opacity: 0;
+                transform: translateX(-12px);
+              }
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+            @keyframes bounce {
+              0%, 80%, 100% {
+                transform: scale(1);
+                opacity: 0.8;
+              }
+              40% {
+                transform: scale(1.2);
+                opacity: 1;
+              }
+            }
           `}</style>
 
           <div className="relative z-10 container px-6 py-24 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
             {/* Left: text */}
             <div className="flex-1 max-w-2xl lg:pr-12">
               <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
                 style={{
-                  animation: "float-up 0.8s ease-out 0.1s both",
+                  background: "rgba(124,58,237,0.1)",
+                  border: "1px solid rgba(167,139,250,0.3)",
+                  animation: "float-up 0.8s ease-out",
                 }}
               >
-                <div
-                  className="inline-flex items-center gap-2 px-4 py-2 mb-8"
+                <Shield size={16} style={{ color: "#A78BFA" }} />
+                <span
                   style={{
-                    border: "1px solid rgba(124,58,237,0.5)",
-                    borderRadius: "100px",
-                    background: "rgba(124,58,237,0.1)",
+                    fontFamily: "'Space Mono', monospace",
+                    fontSize: "11px",
+                    letterSpacing: "0.08em",
+                    color: "#A78BFA",
+                    textTransform: "uppercase",
                   }}
                 >
-                  <Shield size={14} style={{ color: "#A78BFA" }} />
-                  <span
-                    style={{
-                      fontFamily: "'Space Mono', monospace",
-                      fontSize: "10px",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      color: "#A78BFA",
-                    }}
-                  >
-                    AI-Powered Protection for Creators
-                  </span>
-                </div>
+                  AI-Powered Protection for Creators
+                </span>
               </div>
 
               <h1
                 style={{
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(56px, 8vw, 120px)",
+                  fontSize: "clamp(36px, 8vw, 72px)",
                   fontWeight: 700,
-                  lineHeight: 0.9,
-                  letterSpacing: "-0.03em",
-                  color: "#FFFFFF",
-                  marginBottom: "16px",
-                  animation: "float-up 0.8s ease-out 0.2s both",
+                  lineHeight: 1.1,
+                  marginBottom: "24px",
+                  animation: "float-up 0.8s ease-out 0.1s both",
                 }}
               >
                 SENOTA VAULT
@@ -383,28 +385,26 @@ export default function SenotaVaultPage() {
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "18px",
-                  color: "#A0A0C0",
+                  fontSize: "clamp(16px, 2vw, 20px)",
+                  color: "#8080B0",
+                  maxWidth: "500px",
+                  marginBottom: "32px",
                   lineHeight: 1.7,
-                  marginBottom: "40px",
-                  maxWidth: "520px",
-                  animation: "float-up 0.8s ease-out 0.3s both",
+                  animation: "float-up 0.8s ease-out 0.2s both",
                 }}
               >
-                The all-in-one content protection platform built for creators.{" "}
-                <span style={{ color: "#A78BFA", fontWeight: 600 }}>Powered by AI.</span>{" "}
-                Backed by trust.
+                The all-in-one content protection platform built for creators. <span style={{ color: "#A78BFA", fontWeight: 600 }}>Powered by AI.</span> <span style={{ color: "#6060A0" }}>Backed by trust.</span>
               </p>
 
               <div
                 className="flex flex-wrap gap-4 mb-12"
                 style={{
-                  animation: "float-up 0.8s ease-out 0.4s both",
+                  animation: "float-up 0.8s ease-out 0.3s both",
                 }}
               >
                 <a
                   href="/contact"
-                  className="inline-flex items-center gap-3 px-8 py-4 transition-all hover:shadow-2xl"
+                  className="inline-flex items-center gap-2 px-8 py-4 transition-all"
                   style={{
                     background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
                     color: "#FFFFFF",
@@ -414,16 +414,14 @@ export default function SenotaVaultPage() {
                     letterSpacing: "0.06em",
                     textDecoration: "none",
                     borderRadius: "4px",
-                    boxShadow: "0 0 30px rgba(124,58,237,0.4)",
+                    boxShadow: "0 0 40px rgba(124,58,237,0.5)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow =
-                      "0 0 50px rgba(124,58,237,0.7)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 70px rgba(124,58,237,0.8)";
                     (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow =
-                      "0 0 30px rgba(124,58,237,0.4)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.5)";
                     (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                   }}
                 >
@@ -431,8 +429,8 @@ export default function SenotaVaultPage() {
                   <ArrowRight size={16} />
                 </a>
                 <a
-                  href="#features"
-                  className="inline-flex items-center gap-3 px-8 py-4 transition-all"
+                  href="#pricing"
+                  className="inline-flex items-center gap-2 px-8 py-4 transition-all"
                   style={{
                     border: "1px solid rgba(167,139,250,0.4)",
                     color: "#A78BFA",
@@ -445,63 +443,55 @@ export default function SenotaVaultPage() {
                     background: "rgba(124,58,237,0.05)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(167,139,250,0.8)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(124,58,237,0.12)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.8)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(167,139,250,0.4)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(124,58,237,0.05)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.4)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
                   }}
                 >
                   Learn More
                 </a>
               </div>
 
-              {/* Stats row */}
               <div
-                className="flex flex-wrap gap-8"
+                className="grid grid-cols-3 gap-6"
                 style={{
-                  animation: "float-up 0.8s ease-out 0.5s both",
+                  animation: "float-up 0.8s ease-out 0.4s both",
                 }}
               >
                 {[
-                  { value: "14.2M+", label: "Threats detected & blocked" },
-                  { value: "99.7%", label: "Accuracy rate across all detections" },
-                  { value: "50K+", label: "Creators worldwide" },
-                ].map((stat) => (
-                  <div key={stat.value}>
+                  { stat: "14.2M+", label: "Threats detected & blocked" },
+                  { stat: "99.7%", label: "Accuracy rate across all detections" },
+                  { stat: "50K+", label: "Creators protected" },
+                ].map((item, i) => (
+                  <div key={i}>
                     <p
                       style={{
-                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                        fontSize: "28px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "clamp(18px, 4vw, 28px)",
                         fontWeight: 700,
                         color: "#FFFFFF",
-                        lineHeight: 1,
                         marginBottom: "4px",
                       }}
                     >
-                      {stat.value}
+                      {item.stat}
                     </p>
                     <p
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "11px",
+                        fontSize: "12px",
                         color: "#6060A0",
                         letterSpacing: "0.04em",
                       }}
                     >
-                      {stat.label}
+                      {item.label}
                     </p>
                   </div>
                 ))}
               </div>
             </div>
-
-
           </div>
 
           {/* Scroll indicator */}
@@ -517,303 +507,184 @@ export default function SenotaVaultPage() {
             >
               Scroll to explore
             </span>
-            <div
-              className="animate-bounce"
-              style={{ width: "1px", height: "8px", background: "linear-gradient(to bottom, #7C3AED, transparent)" }}
-            />
+            <ChevronDown size={16} style={{ color: "#4040A0", animation: "float-up 1s ease-in-out infinite" }} />
           </div>
         </section>
 
-        {/* ── FEATURES / CAPABILITIES ───────────────────────────────── */}
+        {/* Features Section */}
         <section
-          id="features"
           style={{
-            background: "linear-gradient(180deg, #0A0A1A 0%, #0D0D2B 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #000000 0%, #0A0A1A 100%)",
           }}
         >
-          <div className="container px-6">
-            {/* Section header */}
+          <div className="container max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <div
-                className="inline-flex items-center gap-2 px-4 py-2 mb-6"
-                style={{
-                  border: "1px solid rgba(124,58,237,0.4)",
-                  borderRadius: "100px",
-                  background: "rgba(124,58,237,0.08)",
-                }}
-              >
-                <Shield size={12} style={{ color: "#A78BFA" }} />
-                <span
-                  style={{
-                    fontFamily: "'Space Mono', monospace",
-                    fontSize: "10px",
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "#A78BFA",
-                  }}
-                >
-                  Senota Vault
-                </span>
-              </div>
               <h2
                 style={{
-                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(36px, 5vw, 64px)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
                   fontWeight: 700,
-                  color: "#FFFFFF",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.1,
                   marginBottom: "16px",
                 }}
               >
-                Protection That{" "}
-                <span
-                  style={{
-                    background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Works
-                </span>
+                Protection Features
               </h2>
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "16px",
-                  color: "#6060A0",
+                  color: "#8080B0",
                   maxWidth: "500px",
                   margin: "0 auto",
                 }}
               >
-                Three powerful capabilities. One mission: eliminate content theft at scale.
+                Comprehensive tools to detect, monitor, and respond to content theft.
               </p>
             </div>
 
-            {/* Capability cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {CAPABILITIES.map((cap, i) => (
-                <div
-                  key={cap.number}
-                  ref={(el) => observe(`cap-${i}`, el)}
-                  className="group relative overflow-hidden p-8 transition-all duration-300"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(124,58,237,0.25)",
-                    borderRadius: "8px",
-                    opacity: visibleElements.has(`cap-${i}`) ? 1 : 0,
-                    transform: visibleElements.has(`cap-${i}`)
-                      ? "translateY(0)"
-                      : "translateY(40px)",
-                    transition: "all 0.6s ease-out",
-                    transitionDelay: `${i * 100}ms`,
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(124,58,237,0.6)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(124,58,237,0.07)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(124,58,237,0.25)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,255,255,0.03)";
-                  }}
-                >
-                  {/* Number */}
+              {FEATURES.map((feature, i) => {
+                const Icon = feature.icon;
+                return (
                   <div
-                    className="flex items-center gap-3 mb-6"
-                    style={{ color: "#A78BFA" }}
+                    key={i}
+                    ref={(el) => observe(`feature-${i}`, el)}
+                    className="p-8 transition-all duration-300"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "8px",
+                      opacity: visibleElements.has(`feature-${i}`) ? 1 : 0,
+                      transform: visibleElements.has(`feature-${i}`) ? "translateY(0)" : "translateY(40px)",
+                      transitionDelay: `${i * 100}ms`,
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.5)";
+                      (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.06)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.2)";
+                      (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
+                    }}
                   >
-                    <span
+                    <Icon size={32} style={{ color: "#A78BFA", marginBottom: "16px" }} />
+                    <h3
                       style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "12px",
-                        letterSpacing: "0.1em",
-                        color: "#4040A0",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "18px",
+                        fontWeight: 600,
+                        marginBottom: "8px",
                       }}
                     >
-                      {cap.number}
-                    </span>
-                    {cap.icon}
+                      {feature.title}
+                    </h3>
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "14px",
+                        color: "#8080B0",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {feature.description}
+                    </p>
                   </div>
-
-                  <h3
-                    style={{
-                      fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                      fontSize: "24px",
-                      fontWeight: 700,
-                      color: "#FFFFFF",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    {cap.title}
-                  </h3>
-                  <p
-                    style={{
-                      fontFamily: "'Space Mono', monospace",
-                      fontSize: "9px",
-                      letterSpacing: "0.2em",
-                      color: "#A78BFA",
-                      marginBottom: "16px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {cap.subtitle}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "14px",
-                      color: "#8080B0",
-                      lineHeight: 1.7,
-                      marginBottom: "20px",
-                    }}
-                  >
-                    {cap.description}
-                  </p>
-
-                  <ul className="flex flex-col gap-2">
-                    {cap.bullets.map((b) => (
-                      <li
-                        key={b}
-                        className="flex items-start gap-2"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#6060A0",
-                        }}
-                      >
-                        <CheckCircle
-                          size={13}
-                          style={{ color: "#A78BFA", flexShrink: 0, marginTop: "2px" }}
-                        />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-
-            {/* Trust badge */}
-            <div className="flex items-center justify-center gap-2 mt-12">
-              <Shield size={14} style={{ color: "#4040A0" }} />
-              <span
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  color: "#4040A0",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Trusted by creators, studios, and enterprises worldwide to protect what matters most.
-              </span>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* ── MEMBERSHIP TIERS ──────────────────────────────────────── */}
+        {/* Pricing Section */}
         <section
           id="pricing"
           style={{
-            background: "linear-gradient(180deg, #0D0D2B 0%, #0A0A1A 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #0A0A1A 0%, #000000 100%)",
           }}
         >
-          <div className="container px-6">
-            {/* Section header */}
+          <div className="container max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2
                 style={{
-                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(36px, 5vw, 64px)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
                   fontWeight: 700,
-                  color: "#FFFFFF",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.1,
-                  marginBottom: "12px",
+                  marginBottom: "16px",
                 }}
               >
-                Simple pricing.{" "}
-                <span
-                  style={{
-                    background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  Powerful protection.
-                </span>
+                Membership Tiers
               </h2>
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "16px",
-                  color: "#6060A0",
-                  maxWidth: "480px",
+                  color: "#8080B0",
+                  maxWidth: "500px",
                   margin: "0 auto",
                 }}
               >
-                Senota Vault gives you enterprise-grade security and control so you can focus on building what matters.
+                Choose the protection level that fits your needs.
               </p>
             </div>
 
-            {/* Tier cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {TIERS.map((tier, i) => (
                 <div
                   key={tier.id}
                   ref={(el) => observe(`tier-${i}`, el)}
-                  className="relative flex flex-col p-8 transition-all duration-300"
+                  className="relative transition-all duration-300"
                   style={{
-                    background: tier.recommended
-                      ? "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(59,130,246,0.1))"
-                      : "rgba(255,255,255,0.03)",
-                    border: tier.recommended
-                      ? "1px solid rgba(124,58,237,0.7)"
-                      : "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "8px",
-                    boxShadow: tier.recommended
-                      ? "0 0 40px rgba(124,58,237,0.25)"
-                      : "none",
                     opacity: visibleElements.has(`tier-${i}`) ? 1 : 0,
-                    transform: visibleElements.has(`tier-${i}`)
-                      ? "translateY(0)"
-                      : "translateY(40px)",
+                    transform: visibleElements.has(`tier-${i}`) ? "translateY(0)" : "translateY(40px)",
                     transitionDelay: `${i * 100}ms`,
                   }}
                 >
                   {tier.recommended && (
                     <div
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1"
                       style={{
-                        background: "linear-gradient(90deg, #7C3AED, #5B21B6)",
-                        borderRadius: "100px",
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "9px",
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
+                        position: "absolute",
+                        top: "-12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
                         color: "#FFFFFF",
-                        whiteSpace: "nowrap",
+                        padding: "4px 12px",
+                        borderRadius: "20px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
                       }}
                     >
                       Recommended
                     </div>
                   )}
 
-                  <div className="mb-6">
+                  <div
+                    className="p-8 h-full transition-all"
+                    style={{
+                      background: tier.recommended ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.03)",
+                      border: tier.recommended ? "2px solid rgba(124,58,237,0.5)" : "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "8px",
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.8)";
+                      (e.currentTarget as HTMLElement).style.background = tier.recommended ? "rgba(124,58,237,0.15)" : "rgba(124,58,237,0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.borderColor = tier.recommended ? "rgba(124,58,237,0.5)" : "rgba(124,58,237,0.2)";
+                      (e.currentTarget as HTMLElement).style.background = tier.recommended ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.03)";
+                    }}
+                  >
                     <h3
                       style={{
-                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                        fontSize: "22px",
-                        fontWeight: 700,
-                        color: "#FFFFFF",
-                        marginBottom: "4px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "18px",
+                        fontWeight: 600,
+                        marginBottom: "8px",
                       }}
                     >
                       {tier.name}
@@ -821,367 +692,234 @@ export default function SenotaVaultPage() {
                     <p
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "12px",
-                        color: "#6060A0",
-                        lineHeight: 1.5,
+                        fontSize: "13px",
+                        color: "#8080B0",
+                        marginBottom: "20px",
                       }}
                     >
                       {tier.tagline}
                     </p>
-                  </div>
 
-                  <div className="flex items-baseline gap-1 mb-8">
-                    <span
-                      style={{
-                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                        fontSize: "48px",
-                        fontWeight: 700,
-                        color: "#FFFFFF",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {tier.price}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "14px",
-                        color: "#6060A0",
-                      }}
-                    >
-                      {tier.period}
-                    </span>
-                  </div>
-
-                  <ul className="flex flex-col gap-3 mb-8 flex-1">
-                    {tier.features.map((f) => (
-                      <li
-                        key={f}
-                        className="flex items-start gap-3"
+                    <div style={{ marginBottom: "24px" }}>
+                      <span
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "32px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {tier.price}
+                      </span>
+                      <span
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
                           fontSize: "13px",
-                          color: "#A0A0C0",
+                          color: "#8080B0",
                         }}
                       >
-                        <CheckCircle
-                          size={14}
-                          style={{ color: "#A78BFA", flexShrink: 0, marginTop: "2px" }}
-                        />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
+                        {tier.period}
+                      </span>
+                    </div>
 
-                  <a
-                    href="/contact"
-                    className="block text-center py-4 transition-all"
-                    style={{
-                      background: tier.recommended
-                        ? "linear-gradient(135deg, #7C3AED, #5B21B6)"
-                        : "transparent",
-                      border: tier.recommended
-                        ? "none"
-                        : "1px solid rgba(124,58,237,0.4)",
-                      color: "#FFFFFF",
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      letterSpacing: "0.06em",
-                      textDecoration: "none",
-                      borderRadius: "4px",
-                      boxShadow: tier.recommended
-                        ? "0 0 20px rgba(124,58,237,0.4)"
-                        : "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!tier.recommended) {
-                        (e.currentTarget as HTMLElement).style.background =
-                          "rgba(124,58,237,0.15)";
-                        (e.currentTarget as HTMLElement).style.borderColor =
-                          "rgba(124,58,237,0.7)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!tier.recommended) {
-                        (e.currentTarget as HTMLElement).style.background = "transparent";
-                        (e.currentTarget as HTMLElement).style.borderColor =
-                          "rgba(124,58,237,0.4)";
-                      }
-                    }}
-                  >
-                    {tier.cta}
-                  </a>
+                    <button
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        marginBottom: "24px",
+                        background: tier.recommended ? "linear-gradient(135deg, #7C3AED, #5B21B6)" : "rgba(124,58,237,0.1)",
+                        color: tier.recommended ? "#FFFFFF" : "#A78BFA",
+                        border: tier.recommended ? "none" : "1px solid rgba(124,58,237,0.3)",
+                        borderRadius: "4px",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                        if (tier.recommended) {
+                          (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.6)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                      }}
+                    >
+                      {tier.cta}
+                    </button>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {tier.features.map((feature, fi) => (
+                        <div key={fi} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                          <CheckCircle size={16} style={{ color: "#A78BFA", flexShrink: 0, marginTop: "2px" }} />
+                          <span
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: "13px",
+                              color: "#8080B0",
+                            }}
+                          >
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-
-            {/* Trust badge */}
-            <div className="flex items-center justify-center gap-2 mt-10">
-              <Shield size={14} style={{ color: "#4040A0" }} />
-              <span
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  color: "#4040A0",
-                  letterSpacing: "0.06em",
-                }}
-              >
-                Trusted by developers and security teams worldwide
-              </span>
-            </div>
           </div>
         </section>
 
-        {/* ── REFERRAL PROGRAM ──────────────────────────────────────── */}
+        {/* Referral Section */}
         <section
           style={{
-            background: "linear-gradient(180deg, #0A0A1A 0%, #0D0D2B 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #000000 0%, #0A0A1A 100%)",
           }}
         >
-          <div className="container px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              {/* Left: text */}
-              <div
-                ref={(el) => observe("referral-text", el)}
+          <div className="container max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2
                 style={{
-                  opacity: visibleElements.has("referral-text") ? 1 : 0,
-                  transform: visibleElements.has("referral-text")
-                    ? "translateX(0)"
-                    : "translateX(-40px)",
-                  transition: "all 0.6s ease-out",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
+                  fontWeight: 700,
+                  marginBottom: "16px",
                 }}
               >
-                <div
-                  className="inline-flex items-center gap-2 px-4 py-2 mb-6"
-                  style={{
-                    border: "1px solid rgba(124,58,237,0.4)",
-                    borderRadius: "100px",
-                    background: "rgba(124,58,237,0.08)",
-                  }}
-                >
-                  <Users size={12} style={{ color: "#A78BFA" }} />
-                  <span
+                Earn Through Referrals
+              </h2>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "16px",
+                  color: "#8080B0",
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                }}
+              >
+                Refer creators and earn a 20% commission. Your earnings offset your membership, then convert to Vault Credits.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                {[
+                  { step: "1", title: "Refer a Creator", desc: "Share your unique referral link" },
+                  { step: "2", title: "They Sign Up", desc: "They join Senota Vault" },
+                  { step: "3", title: "You Earn 20%", desc: "Commission on their membership" },
+                  { step: "4", title: "Unlock Credits", desc: "After membership is covered" },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    ref={(el) => observe(`referral-${i}`, el)}
+                    className="flex gap-4 mb-6 transition-all duration-300"
                     style={{
-                      fontFamily: "'Space Mono', monospace",
-                      fontSize: "10px",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      color: "#A78BFA",
+                      opacity: visibleElements.has(`referral-${i}`) ? 1 : 0,
+                      transform: visibleElements.has(`referral-${i}`) ? "translateY(0)" : "translateY(40px)",
+                      transitionDelay: `${i * 100}ms`,
                     }}
                   >
-                    Referral Program
-                  </span>
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {item.step}
+                    </div>
+                    <div>
+                      <h4
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "16px",
+                          fontWeight: 600,
+                          marginBottom: "4px",
+                        }}
+                      >
+                        {item.title}
+                      </h4>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "13px",
+                          color: "#8080B0",
+                        }}
+                      >
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                ref={(el) => observe("referral-card", el)}
+                className="transition-all duration-300"
+                style={{
+                  opacity: visibleElements.has("referral-card") ? 1 : 0,
+                  transform: visibleElements.has("referral-card") ? "translateY(0)" : "translateY(40px)",
+                  background: "rgba(124,58,237,0.08)",
+                  border: "1px solid rgba(124,58,237,0.3)",
+                  borderRadius: "12px",
+                  padding: "32px",
+                }}
+              >
+                <div style={{ marginBottom: "16px" }}>
+                  <Users size={32} style={{ color: "#A78BFA" }} />
                 </div>
-
-                <h2
+                <h3
                   style={{
-                    fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                    fontSize: "clamp(32px, 4vw, 52px)",
-                    fontWeight: 700,
-                    color: "#FFFFFF",
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.1,
-                    marginBottom: "16px",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "20px",
+                    fontWeight: 600,
+                    marginBottom: "8px",
                   }}
                 >
-                  Creators Refer Creators.
-                  <br />
-                  <span
-                    style={{
-                      background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    Everyone Wins.
-                  </span>
-                </h2>
-
+                  Example: 5 Referrals
+                </h3>
                 <p
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "16px",
+                    fontSize: "13px",
                     color: "#8080B0",
-                    lineHeight: 1.7,
-                    marginBottom: "32px",
+                    marginBottom: "16px",
                   }}
                 >
-                  Earn a <strong style={{ color: "#A78BFA" }}>20% referral commission</strong> on every creator you bring to Senota Vault. Referral earnings first unlock your own free membership — then convert into Vault Credits for premium services.
+                  At $99/month Vault Pro:
                 </p>
-
-                {/* How it works steps */}
-                <div className="flex flex-col gap-4">
-                  {[
-                    {
-                      step: "01",
-                      title: "Refer a creator",
-                      desc: "Share your unique referral link with fellow creators.",
-                    },
-                    {
-                      step: "02",
-                      title: "Earn 20% commission",
-                      desc: "Commissions first offset your membership cost.",
-                    },
-                    {
-                      step: "03",
-                      title: "Unlock free membership",
-                      desc: "5 referrals on Vault Pro = your membership becomes free.",
-                    },
-                    {
-                      step: "04",
-                      title: "Earn Vault Credits",
-                      desc: "Once membership is covered, all earnings convert to credits.",
-                    },
-                  ].map((s) => (
-                    <div key={s.step} className="flex items-start gap-4">
-                      <div
-                        className="flex-shrink-0 flex items-center justify-center"
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          border: "1px solid rgba(124,58,237,0.5)",
-                          borderRadius: "50%",
-                          background: "rgba(124,58,237,0.1)",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "'Space Mono', monospace",
-                            fontSize: "10px",
-                            color: "#A78BFA",
-                          }}
-                        >
-                          {s.step}
-                        </span>
-                      </div>
-                      <div>
-                        <p
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "14px",
-                            fontWeight: 600,
-                            color: "#FFFFFF",
-                            marginBottom: "2px",
-                          }}
-                        >
-                          {s.title}
-                        </p>
-                        <p
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "13px",
-                            color: "#6060A0",
-                          }}
-                        >
-                          {s.desc}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right: example card */}
-              <div
-                ref={(el) => observe("referral-card", el)}
-                style={{
-                  opacity: visibleElements.has("referral-card") ? 1 : 0,
-                  transform: visibleElements.has("referral-card")
-                    ? "translateX(0)"
-                    : "translateX(40px)",
-                  transition: "all 0.6s ease-out",
-                }}
-              >
-                <div
-                  className="p-8"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(124,58,237,0.3)",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "'Space Mono', monospace",
-                      fontSize: "10px",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      color: "#A78BFA",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    Example: Vault Pro ($99/month)
-                  </p>
-
-                  <div className="flex flex-col gap-3 mb-8">
-                    {[
-                      { referrals: "1 referral", earned: "$19.80 earned" },
-                      { referrals: "3 referrals", earned: "$59.40 earned" },
-                      {
-                        referrals: "5 referrals",
-                        earned: "$99 earned → Membership FREE",
-                        highlight: true,
-                      },
-                    ].map((row) => (
-                      <div
-                        key={row.referrals}
-                        className="flex items-center justify-between px-4 py-3"
-                        style={{
-                          background: row.highlight
-                            ? "rgba(124,58,237,0.15)"
-                            : "rgba(255,255,255,0.02)",
-                          border: row.highlight
-                            ? "1px solid rgba(124,58,237,0.5)"
-                            : "1px solid rgba(255,255,255,0.05)",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "13px",
-                            color: row.highlight ? "#FFFFFF" : "#8080B0",
-                            fontWeight: row.highlight ? 600 : 400,
-                          }}
-                        >
-                          {row.referrals}
-                        </span>
-                        <span
-                          style={{
-                            fontFamily: "'Space Mono', monospace",
-                            fontSize: "12px",
-                            color: row.highlight ? "#A78BFA" : "#6060A0",
-                            fontWeight: row.highlight ? 600 : 400,
-                          }}
-                        >
-                          {row.earned}
-                        </span>
-                      </div>
-                    ))}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0" }}>Total Commission</span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#A78BFA" }}>$99/month</span>
                   </div>
-
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0" }}>Your Membership</span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#FFFFFF" }}>FREE</span>
+                  </div>
                   <div
-                    className="p-4"
                     style={{
-                      background: "rgba(124,58,237,0.1)",
-                      border: "1px solid rgba(124,58,237,0.3)",
-                      borderRadius: "4px",
+                      borderTop: "1px solid rgba(124,58,237,0.2)",
+                      paddingTop: "8px",
+                      marginTop: "8px",
+                      display: "flex",
+                      justifyContent: "space-between",
                     }}
                   >
-                    <p
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "13px",
-                        color: "#A0A0C0",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      Once your membership is free, every additional referral earns{" "}
-                      <strong style={{ color: "#A78BFA" }}>Vault Credits</strong> — redeemable for premium services in the Credit Marketplace.
-                    </p>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0" }}>Vault Credits Earned</span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#A78BFA" }}>Coming Soon</span>
                   </div>
                 </div>
               </div>
@@ -1189,48 +927,23 @@ export default function SenotaVaultPage() {
           </div>
         </section>
 
-        {/* ── CREDIT MARKETPLACE ────────────────────────────────────── */}
+        {/* Credits Marketplace Section */}
         <section
           style={{
-            background: "linear-gradient(180deg, #0D0D2B 0%, #0A0A1A 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #0A0A1A 0%, #000000 100%)",
           }}
         >
-          <div className="container px-6">
+          <div className="container max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <div
-                className="inline-flex items-center gap-2 px-4 py-2 mb-6"
-                style={{
-                  border: "1px solid rgba(124,58,237,0.4)",
-                  borderRadius: "100px",
-                  background: "rgba(124,58,237,0.08)",
-                }}
-              >
-                <Star size={12} style={{ color: "#A78BFA" }} />
-                <span
-                  style={{
-                    fontFamily: "'Space Mono', monospace",
-                    fontSize: "10px",
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "#A78BFA",
-                  }}
-                >
-                  Vault Credit Marketplace
-                </span>
-              </div>
               <h2
                 style={{
-                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(32px, 4vw, 52px)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
                   fontWeight: 700,
-                  color: "#FFFFFF",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.1,
-                  marginBottom: "12px",
+                  marginBottom: "16px",
                 }}
               >
-                Spend Credits on{" "}
                 <span
                   style={{
                     background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
@@ -1239,8 +952,9 @@ export default function SenotaVaultPage() {
                     backgroundClip: "text",
                   }}
                 >
-                  Premium Services
-                </span>
+                  Spend Credits on
+                </span>{" "}
+                Premium Services
               </h2>
               <p
                 style={{
@@ -1266,465 +980,343 @@ export default function SenotaVaultPage() {
                     border: "1px solid rgba(124,58,237,0.2)",
                     borderRadius: "8px",
                     opacity: visibleElements.has(`credit-${i}`) ? 1 : 0,
-                    transform: visibleElements.has(`credit-${i}`)
-                      ? "translateY(0)"
-                      : "translateY(40px)",
+                    transform: visibleElements.has(`credit-${i}`) ? "translateY(0)" : "translateY(40px)",
                     transitionDelay: `${i * 50}ms`,
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(124,58,237,0.5)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(124,58,237,0.06)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.5)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.06)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(124,58,237,0.2)";
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(255,255,255,0.03)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.2)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
                   }}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div style={{ color: "#A78BFA" }}>{item.icon}</div>
-                    <span
-                      style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "11px",
-                        color: "#A78BFA",
-                        letterSpacing: "0.1em",
-                      }}
-                    >
-                      {item.credits} credits
-                    </span>
-                  </div>
-
-                  <h3
+                  <div
                     style={{
-                      fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                      fontSize: "20px",
-                      fontWeight: 700,
-                      color: "#FFFFFF",
-                      marginBottom: "4px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      marginBottom: "12px",
                     }}
                   >
-                    {item.label}
-                  </h3>
+                    <h3
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "16px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {item.label}
+                    </h3>
+                    <span
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "#A78BFA",
+                        background: "rgba(124,58,237,0.1)",
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {item.credits}
+                    </span>
+                  </div>
                   <p
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "11px",
-                      color: "#A78BFA",
-                      letterSpacing: "0.06em",
-                      marginBottom: "16px",
+                      fontSize: "13px",
+                      color: "#8080B0",
                     }}
                   >
-                    "{item.bundle}"
+                    {item.description}
                   </p>
-
-                  <ul className="flex flex-col gap-2">
-                    {item.items.map((it) => (
-                      <li
-                        key={it}
-                        className="flex items-start gap-2"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#6060A0",
-                        }}
-                      >
-                        <CheckCircle
-                          size={12}
-                          style={{ color: "#7C3AED", flexShrink: 0, marginTop: "2px" }}
-                        />
-                        {it}
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── PARTNER PAYOUT ────────────────────────────────────────── */}
+        {/* Partner Payout Section */}
         <section
           style={{
-            background: "linear-gradient(180deg, #0A0A1A 0%, #0D0D2B 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #000000 0%, #0A0A1A 100%)",
           }}
         >
-          <div className="container px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              {/* Left: partner card */}
-              <div
-                ref={(el) => observe("partner-card", el)}
-                className="p-8"
+          <div className="container max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2
                 style={{
-                  background:
-                    "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(59,130,246,0.08))",
-                  border: "1px solid rgba(124,58,237,0.4)",
-                  borderRadius: "8px",
-                  boxShadow: "0 0 60px rgba(124,58,237,0.15)",
-                  opacity: visibleElements.has("partner-card") ? 1 : 0,
-                  transform: visibleElements.has("partner-card")
-                    ? "translateX(0)"
-                    : "translateX(-40px)",
-                  transition: "all 0.6s ease-out",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
+                  fontWeight: 700,
+                  marginBottom: "16px",
                 }}
               >
-                <div className="flex items-center gap-3 mb-6">
-                  <Award size={28} style={{ color: "#A78BFA" }} />
-                  <div>
-                    <p
-                      style={{
-                        fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                        fontSize: "22px",
-                        fontWeight: 700,
-                        color: "#FFFFFF",
-                      }}
-                    >
-                      Partner Status
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "9px",
-                        letterSpacing: "0.2em",
-                        color: "#A78BFA",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      Official Badge
-                    </p>
-                  </div>
-                </div>
+                Partner Payout Model
+              </h2>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "16px",
+                  color: "#8080B0",
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                }}
+              >
+                Unlock Partner status at 100 active referrals and start earning cash commissions.
+              </p>
+            </div>
 
-                <p
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div
+                ref={(el) => observe("partner-benefits", el)}
+                className="transition-all duration-300"
+                style={{
+                  opacity: visibleElements.has("partner-benefits") ? 1 : 0,
+                  transform: visibleElements.has("partner-benefits") ? "translateY(0)" : "translateY(40px)",
+                  background: "rgba(124,58,237,0.08)",
+                  border: "1px solid rgba(124,58,237,0.3)",
+                  borderRadius: "12px",
+                  padding: "32px",
+                }}
+              >
+                <Award size={32} style={{ color: "#A78BFA", marginBottom: "16px" }} />
+                <h3
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "14px",
-                    color: "#8080B0",
-                    lineHeight: 1.7,
-                    marginBottom: "24px",
+                    fontSize: "20px",
+                    fontWeight: 600,
+                    marginBottom: "16px",
                   }}
                 >
-                  After reaching <strong style={{ color: "#FFFFFF" }}>100 active referrals</strong>, you unlock Partner status — the highest tier in the Senota Vault ecosystem.
-                </p>
-
-                <div className="flex flex-col gap-3">
+                  Partner Status Benefits
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {[
-                    { icon: <TrendingUp size={16} />, label: "Cash commission", desc: "On top of credits" },
-                    { icon: <Star size={16} />, label: "Vault Credits", desc: "Continued earning" },
-                    { icon: <Award size={16} />, label: "Partnership status", desc: "Official badge" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center gap-4 px-4 py-3"
-                      style={{
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(124,58,237,0.2)",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      <div style={{ color: "#A78BFA" }}>{item.icon}</div>
-                      <div>
-                        <p
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "13px",
-                            fontWeight: 600,
-                            color: "#FFFFFF",
-                          }}
-                        >
-                          {item.label}
-                        </p>
-                        <p
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: "11px",
-                            color: "#6060A0",
-                          }}
-                        >
-                          {item.desc}
-                        </p>
-                      </div>
+                    "Cash commissions on top of credits",
+                    "Continued Vault Credits earning",
+                    "Official partnership badge",
+                    "Dedicated partner support",
+                    "Early access to new features",
+                  ].map((benefit, i) => (
+                    <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                      <Star size={16} style={{ color: "#A78BFA", flexShrink: 0, marginTop: "2px" }} />
+                      <span
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "13px",
+                          color: "#8080B0",
+                        }}
+                      >
+                        {benefit}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Right: text */}
               <div
-                ref={(el) => observe("partner-text", el)}
+                ref={(el) => observe("partner-table", el)}
+                className="transition-all duration-300"
                 style={{
-                  opacity: visibleElements.has("partner-text") ? 1 : 0,
-                  transform: visibleElements.has("partner-text")
-                    ? "translateX(0)"
-                    : "translateX(40px)",
-                  transition: "all 0.6s ease-out",
+                  opacity: visibleElements.has("partner-table") ? 1 : 0,
+                  transform: visibleElements.has("partner-table") ? "translateY(0)" : "translateY(40px)",
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
                 }}
               >
-                <div
-                  className="inline-flex items-center gap-2 px-4 py-2 mb-6"
-                  style={{
-                    border: "1px solid rgba(124,58,237,0.4)",
-                    borderRadius: "100px",
-                    background: "rgba(124,58,237,0.08)",
-                  }}
-                >
-                  <Award size={12} style={{ color: "#A78BFA" }} />
-                  <span
-                    style={{
-                      fontFamily: "'Space Mono', monospace",
-                      fontSize: "10px",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      color: "#A78BFA",
-                    }}
-                  >
-                    Vault Partner Payout
-                  </span>
-                </div>
-
-                <h2
-                  style={{
-                    fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                    fontSize: "clamp(32px, 4vw, 52px)",
-                    fontWeight: 700,
-                    color: "#FFFFFF",
-                    letterSpacing: "-0.02em",
-                    lineHeight: 1.1,
-                    marginBottom: "16px",
-                  }}
-                >
-                  The{" "}
-                  <span
-                    style={{
-                      background: "linear-gradient(90deg, #A78BFA, #60A5FA)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    Partner Advantage
-                  </span>
-                </h2>
-
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "16px",
-                    color: "#8080B0",
-                    lineHeight: 1.7,
-                    marginBottom: "24px",
-                  }}
-                >
-                  A creator with Partner status can now say: <em style={{ color: "#A0A0C0" }}>"I use Senota Vault. Join through me and protect your brand."</em>
-                </p>
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "15px",
-                    color: "#6060A0",
-                    lineHeight: 1.7,
-                    marginBottom: "32px",
-                  }}
-                >
-                  They aren't selling a coupon. They're building a protection network.
-                </p>
-
-                {/* Revenue model table */}
-                <div
-                  className="overflow-hidden"
-                  style={{
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <div
-                    className="px-4 py-3"
-                    style={{
-                      background: "rgba(124,58,237,0.1)",
-                      borderBottom: "1px solid rgba(124,58,237,0.2)",
-                    }}
-                  >
-                    <p
+                <table style={{ width: "100%" }}>
+                  <thead>
+                    <tr
                       style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "10px",
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "#A78BFA",
+                        borderBottom: "1px solid rgba(124,58,237,0.2)",
+                        background: "rgba(124,58,237,0.05)",
                       }}
                     >
-                      Revenue Model Summary
-                    </p>
-                  </div>
-                  <table className="w-full">
-                    <thead>
-                      <tr style={{ borderBottom: "1px solid rgba(124,58,237,0.15)" }}>
-                        {["Revenue Stream", "Predictability", "Purpose"].map((h) => (
-                          <th
-                            key={h}
-                            className="text-left px-4 py-3"
-                            style={{
-                              fontFamily: "'Space Mono', monospace",
-                              fontSize: "9px",
-                              letterSpacing: "0.12em",
-                              textTransform: "uppercase",
-                              color: "#4040A0",
-                            }}
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {REVENUE_ROWS.map((row, i) => (
-                        <tr
-                          key={row.stream}
+                      <th
+                        style={{
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        Revenue Stream
+                      </th>
+                      <th
+                        style={{
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        Predictability
+                      </th>
+                      <th
+                        style={{
+                          padding: "12px 16px",
+                          textAlign: "left",
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        Purpose
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {REVENUE_ROWS.map((row, i) => (
+                      <tr
+                        key={row.stream}
+                        style={{
+                          borderBottom: i < REVENUE_ROWS.length - 1 ? "1px solid rgba(124,58,237,0.1)" : "none",
+                        }}
+                      >
+                        <td
                           style={{
-                            borderBottom:
-                              i < REVENUE_ROWS.length - 1
-                                ? "1px solid rgba(124,58,237,0.1)"
-                                : "none",
+                            padding: "12px 16px",
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color: "#FFFFFF",
                           }}
                         >
-                          <td
-                            className="px-4 py-3"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: "12px",
-                              fontWeight: 600,
-                              color: "#FFFFFF",
-                            }}
-                          >
-                            {row.stream}
-                          </td>
-                          <td
-                            className="px-4 py-3"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: "12px",
-                              color: "#8080B0",
-                            }}
-                          >
-                            {row.predictability}
-                          </td>
-                          <td
-                            className="px-4 py-3"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: "12px",
-                              color: "#6060A0",
-                            }}
-                          >
-                            {row.purpose}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          {row.stream}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "12px",
+                            color: "#8080B0",
+                          }}
+                        >
+                          {row.predictability}
+                        </td>
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: "12px",
+                            color: "#6060A0",
+                          }}
+                        >
+                          {row.purpose}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── FAQ ───────────────────────────────────────────────────── */}
+        {/* FAQ Section */}
         <section
           style={{
-            background: "linear-gradient(180deg, #0D0D2B 0%, #0A0A1A 100%)",
-            padding: "100px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(180deg, #0A0A1A 0%, #000000 100%)",
           }}
         >
-          <div className="container px-6 max-w-3xl mx-auto">
-            <div className="text-center mb-12">
+          <div className="container max-w-3xl mx-auto">
+            <div className="text-center mb-16">
               <h2
                 style={{
-                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(32px, 4vw, 48px)",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 48px)",
                   fontWeight: 700,
-                  color: "#FFFFFF",
-                  letterSpacing: "-0.02em",
-                  marginBottom: "12px",
+                  marginBottom: "16px",
                 }}
               >
                 Frequently Asked Questions
               </h2>
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "15px",
-                  color: "#6060A0",
-                }}
-              >
-                Everything you need to know about Senota Vault.
-              </p>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {FAQS.map((faq, i) => (
                 <div
                   key={i}
                   ref={(el) => observe(`faq-${i}`, el)}
+                  className="transition-all duration-300"
                   style={{
-                    border: "1px solid rgba(124,58,237,0.25)",
-                    borderRadius: "6px",
-                    overflow: "hidden",
                     opacity: visibleElements.has(`faq-${i}`) ? 1 : 0,
-                    transform: visibleElements.has(`faq-${i}`)
-                      ? "translateY(0)"
-                      : "translateY(20px)",
-                    transition: "all 0.6s ease-out",
+                    transform: visibleElements.has(`faq-${i}`) ? "translateY(0)" : "translateY(40px)",
                     transitionDelay: `${i * 50}ms`,
                   }}
                 >
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between px-6 py-5 text-left transition-colors"
                     style={{
-                      background:
-                        openFaq === i
-                          ? "rgba(124,58,237,0.1)"
-                          : "rgba(255,255,255,0.02)",
-                      border: "none",
+                      width: "100%",
+                      padding: "16px",
+                      background: openFaq === i ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.02)",
+                      border: openFaq === i ? "1px solid rgba(124,58,237,0.4)" : "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       cursor: "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (openFaq !== i) {
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.4)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (openFaq !== i) {
+                        (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.2)";
+                      }
                     }}
                   >
                     <span
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "15px",
+                        fontSize: "14px",
                         fontWeight: 600,
                         color: "#FFFFFF",
+                        textAlign: "left",
                       }}
                     >
                       {faq.q}
                     </span>
                     <ChevronDown
-                      size={18}
+                      size={20}
                       style={{
                         color: "#A78BFA",
-                        flexShrink: 0,
-                        transition: "transform 0.2s",
                         transform: openFaq === i ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.2s ease",
+                        flexShrink: 0,
                       }}
                     />
                   </button>
+
                   {openFaq === i && (
                     <div
-                      className="px-6 py-5"
                       style={{
+                        padding: "16px",
                         background: "rgba(124,58,237,0.05)",
-                        borderTop: "1px solid rgba(124,58,237,0.15)",
+                        borderLeft: "2px solid rgba(124,58,237,0.3)",
+                        borderRadius: "0 0 8px 8px",
                       }}
                     >
                       <p
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "14px",
+                          fontSize: "13px",
                           color: "#8080B0",
                           lineHeight: 1.7,
                         }}
@@ -1739,37 +1331,24 @@ export default function SenotaVaultPage() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ─────────────────────────────────────────────── */}
+        {/* Final CTA Section */}
         <section
-          className="relative overflow-hidden"
           style={{
-            background:
-              "linear-gradient(135deg, #0A0A1A 0%, #12003A 50%, #0A0A1A 100%)",
-            padding: "120px 0",
+            padding: "80px 24px",
+            background: "linear-gradient(135deg, #0A0A1A 0%, #12003A 50%, #0A0A1A 100%)",
+            textAlign: "center",
           }}
         >
-          {/* Background glow */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(124,58,237,0.2) 0%, transparent 70%)",
-            }}
-          />
-
-          <div className="relative z-10 container px-6 text-center">
+          <div className="container max-w-3xl mx-auto">
             <h2
               style={{
-                fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                fontSize: "clamp(40px, 6vw, 80px)",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "clamp(32px, 5vw, 48px)",
                 fontWeight: 700,
-                color: "#FFFFFF",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-                marginBottom: "24px",
+                marginBottom: "16px",
               }}
             >
-              Ready to Protect
+              Ready to Protect Your Content?
               <br />
               <span
                 style={{
@@ -1810,13 +1389,11 @@ export default function SenotaVaultPage() {
                   boxShadow: "0 0 40px rgba(124,58,237,0.5)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow =
-                    "0 0 70px rgba(124,58,237,0.8)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 70px rgba(124,58,237,0.8)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow =
-                    "0 0 40px rgba(124,58,237,0.5)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.5)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                 }}
               >
@@ -1838,16 +1415,12 @@ export default function SenotaVaultPage() {
                   background: "rgba(124,58,237,0.05)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor =
-                    "rgba(167,139,250,0.8)";
-                  (e.currentTarget as HTMLElement).style.background =
-                    "rgba(124,58,237,0.12)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.8)";
+                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor =
-                    "rgba(167,139,250,0.4)";
-                  (e.currentTarget as HTMLElement).style.background =
-                    "rgba(124,58,237,0.05)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.4)";
+                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
                 }}
               >
                 View Pricing
@@ -1861,7 +1434,11 @@ export default function SenotaVaultPage() {
 
       {/* AI Chat Button - Fixed bottom-right corner */}
       <button
-        onClick={() => setChatOpen(true)}
+        onClick={() => {
+          setChatOpen(true);
+          setMessages([]);
+          setDisplayedQAs([]);
+        }}
         className="fixed bottom-6 right-6 z-40 flex items-center justify-center transition-all duration-300"
         style={{
           width: "60px",
@@ -1886,24 +1463,25 @@ export default function SenotaVaultPage() {
       {/* Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
         <DialogContent
-          className="fixed bottom-24 right-6 top-auto max-w-sm w-full max-h-96 flex flex-col"
+          className="fixed inset-0 md:bottom-24 md:right-6 md:top-auto md:max-w-sm md:w-full md:max-h-96 w-full h-full md:h-auto flex flex-col md:rounded-lg rounded-none"
           style={{
             background: "linear-gradient(135deg, #0A0A1A, #0D0D2B)",
             border: "1px solid rgba(124,58,237,0.3)",
-            borderRadius: "12px",
+            borderRadius: "0px",
             boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            padding: "0px",
           }}
         >
           <DialogHeader
             style={{
               borderBottom: "1px solid rgba(124,58,237,0.2)",
-              paddingBottom: "12px",
+              padding: "16px",
             }}
           >
             <DialogTitle
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: "16px",
+                fontSize: "18px",
                 fontWeight: 600,
                 color: "#FFFFFF",
               }}
@@ -1911,21 +1489,227 @@ export default function SenotaVaultPage() {
               Senota Vault Support
             </DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden">
-            <AIChatBox
-              messages={messages}
-              onSendMessage={handleSendMessage}
-              isLoading={isLoading}
-              placeholder="Ask about Senota Vault..."
-              suggestedPrompts={[
-                "How does Vault Fingerprinting work?",
-                "What's included in Vault Pro?",
-                "Tell me about the referral program",
-              ]}
-            />
+
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {/* Messages area */}
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full gap-4">
+                  <div
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "14px",
+                      color: "#8080B0",
+                      textAlign: "center",
+                    }}
+                  >
+                    <p style={{ marginBottom: "8px", fontWeight: 600, color: "#FFFFFF" }}>How can we help?</p>
+                    <p>Click a question below or ask us anything about Senota Vault.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className="flex gap-2 animate-fadeIn"
+                      style={{
+                        justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                        animation: "fadeIn 0.3s ease-out",
+                      }}
+                    >
+                      <div
+                        style={{
+                          maxWidth: "85%",
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          background: msg.role === "user" ? "linear-gradient(135deg, #7C3AED, #5B21B6)" : "rgba(255,255,255,0.08)",
+                          border: msg.role === "user" ? "none" : "1px solid rgba(124,58,237,0.3)",
+                          color: "#FFFFFF",
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "13px",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex gap-2">
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: "12px",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(124,58,237,0.3)",
+                        }}
+                      >
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              style={{
+                                width: "6px",
+                                height: "6px",
+                                borderRadius: "50%",
+                                background: "#A78BFA",
+                                animation: `bounce 1.4s infinite ${i * 0.2}s`,
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Q&A Buttons */}
+            <div
+              style={{
+                borderTop: "1px solid rgba(124,58,237,0.2)",
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+              }}
+            >
+              {displayedQAs.map((qa, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleQuestionClick(qa)}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    background: "rgba(124,58,237,0.1)",
+                    border: "1px solid rgba(124,58,237,0.3)",
+                    color: "#A78BFA",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "12px",
+                    fontWeight: 500,
+                    textAlign: "left",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    animation: `slideIn 0.4s ease-out ${idx * 0.1}s both`,
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.6)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
+                  }}
+                >
+                  ❓ {qa.question}
+                </button>
+              ))}
+            </div>
+
+            {/* Text input area */}
+            <div
+              style={{
+                borderTop: "1px solid rgba(124,58,237,0.2)",
+                padding: "12px",
+                display: "flex",
+                gap: "8px",
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Ask a question..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
+                    handleSendMessage((e.target as HTMLInputElement).value);
+                    (e.target as HTMLInputElement).value = "";
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  padding: "10px 12px",
+                  borderRadius: "6px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  color: "#FFFFFF",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "13px",
+                  outline: "none",
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLElement).style.borderColor = "rgba(124,58,237,0.5)";
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLElement).style.borderColor = "rgba(124,58,237,0.2)";
+                }}
+              />
+              <button
+                onClick={(e) => {
+                  const input = (e.currentTarget as HTMLElement).previousElementSibling as HTMLInputElement;
+                  if (input.value.trim()) {
+                    handleSendMessage(input.value);
+                    input.value = "";
+                  }
+                }}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+                  border: "none",
+                  color: "#FFFFFF",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(124,58,237,0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                }}
+              >
+                Send
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes bounce {
+          0%, 80%, 100% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          40% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
