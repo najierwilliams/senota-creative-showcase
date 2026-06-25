@@ -336,19 +336,19 @@ export default function SenotaVaultPage() {
             }}
           />
 
-          {/* Mobile shield icon - centered */}
+          {/* Mobile shield icon - centered and enlarged */}
           <div
             className="absolute pointer-events-none lg:hidden flex items-center justify-center"
             style={{
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: "100px",
-              height: "100px",
+              width: "120px",
+              height: "120px",
               animation: "scale-in 1s ease-out 0.3s both",
             }}
           >
-            <Shield size={50} style={{ color: "#A78BFA" }} strokeWidth={1} />
+            <Shield size={70} style={{ color: "#A78BFA" }} strokeWidth={1} />
           </div>
 
           {/* Grid overlay */}
