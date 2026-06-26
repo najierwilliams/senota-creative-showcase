@@ -1,10 +1,10 @@
 /**
  * SENOTA — Vault Member Dashboard
- * Aegis-inspired aesthetic: command center with global threat map, safety gauge, detection trends
- * Sidebar navigation, high-end purple/neon-green color scheme, real-time data visualization
+ * Aegis-inspired aesthetic with full interactivity
+ * 3D rotating globe, expandable threat stickers, and multi-tab command center
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Shield,
   AlertTriangle,
@@ -27,6 +27,8 @@ import {
   Activity,
   Settings,
   Bell,
+  Home,
+  X,
 } from "lucide-react";
 
 /* ── Mock Data ────────────────────────────────────────────────── */
@@ -97,25 +99,419 @@ const TOP_LEAK_SOURCES = [
   { name: "Websites", percentage: 13 },
 ];
 
+// Stolen content data for globe
+const STOLEN_CONTENT_MARKERS = [
+  {
+    id: 1,
+    lat: 40.7128,
+    lng: -74.006,
+    city: "New York, USA",
+    content: "Product Campaign Image",
+    platform: "Pinterest",
+    date: "2 hours ago",
+    confidence: 98,
+    status: "Protected",
+  },
+  {
+    id: 2,
+    lat: 51.5074,
+    lng: -0.1278,
+    city: "London, UK",
+    content: "Brand Logo Misuse",
+    platform: "Twitter",
+    date: "4 hours ago",
+    confidence: 92,
+    status: "Takedown Sent",
+  },
+  {
+    id: 3,
+    lat: 35.6762,
+    lng: 139.6503,
+    city: "Tokyo, Japan",
+    content: "Lifestyle Photography",
+    platform: "Instagram",
+    date: "6 hours ago",
+    confidence: 87,
+    status: "Reviewing",
+  },
+  {
+    id: 4,
+    lat: -33.8688,
+    lng: 151.2093,
+    city: "Sydney, Australia",
+    content: "Product Mockup",
+    platform: "Shopify Store",
+    date: "8 hours ago",
+    confidence: 95,
+    status: "Protected",
+  },
+  {
+    id: 5,
+    lat: 48.8566,
+    lng: 2.3522,
+    city: "Paris, France",
+    content: "Campaign Video Clip",
+    platform: "YouTube",
+    date: "12 hours ago",
+    confidence: 89,
+    status: "Resolved",
+  },
+];
+
+/* ── Interactive Globe Component ────────────────────────────────── */
+function InteractiveGlobe() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [rotation, setRotation] = useState({ x: 0.5, y: 0 });
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [expandedMarkerId, setExpandedMarkerId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isHovered || isDragging) return;
+
+    const interval = setInterval(() => {
+      setRotation((prev) => ({ ...prev, y: prev.y + 0.002 }));
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [isHovered, isDragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    setRotation((prev) => ({
+      x: prev.x + dy * 0.01,
+      y: prev.y + dx * 0.01,
+    }));
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Convert lat/lng to 3D coordinates
+  const latLngTo3D = (lat: number, lng: number, radius: number) => {
+    const phi = ((90 - lat) * Math.PI) / 180;
+    const theta = ((lng + 180) * Math.PI) / 180;
+    return {
+      x: radius * Math.sin(phi) * Math.cos(theta),
+      y: radius * Math.cos(phi),
+      z: radius * Math.sin(phi) * Math.sin(theta),
+    };
+  };
+
+  // Simple 3D projection
+  const project3D = (point: { x: number; y: number; z: number }, scale: number) => {
+    const rotX = (p: { x: number; y: number; z: number }) => ({
+      x: p.x,
+      y: p.y * Math.cos(rotation.x) - p.z * Math.sin(rotation.x),
+      z: p.y * Math.sin(rotation.x) + p.z * Math.cos(rotation.x),
+    });
+
+    const rotY = (p: { x: number; y: number; z: number }) => ({
+      x: p.x * Math.cos(rotation.y) + p.z * Math.sin(rotation.y),
+      y: p.y,
+      z: -p.x * Math.sin(rotation.y) + p.z * Math.cos(rotation.y),
+    });
+
+    const p1 = rotX(point);
+    const p2 = rotY(p1);
+
+    const distance = 200;
+    const scale2d = distance / (distance + p2.z);
+
+    return {
+      x: p2.x * scale2d + scale,
+      y: p2.y * scale2d + scale,
+      z: p2.z,
+    };
+  };
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "400px",
+        background: "linear-gradient(135deg, rgba(30,20,80,0.4), rgba(50,30,100,0.3))",
+        border: "1px solid rgba(124,58,237,0.3)",
+        borderRadius: "12px",
+        overflow: "hidden",
+        cursor: isDragging ? "grabbing" : isHovered ? "grab" : "default",
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <canvas
+        ref={canvasRef}
+        width={800}
+        height={400}
+        style={{
+          display: "block",
+          width: "100%",
+          height: "100%",
+        }}
+      />
+
+      {/* Threat markers overlay */}
+      <div style={{ position: "absolute", inset: 0 }}>
+        {STOLEN_CONTENT_MARKERS.map((marker) => {
+          const pos3d = latLngTo3D(marker.lat, marker.lng, 100);
+          const pos2d = project3D(pos3d, 400);
+
+          // Only show if in front of globe
+          if (pos2d.z < 0) return null;
+
+          const isExpanded = expandedMarkerId === marker.id;
+
+          return (
+            <div
+              key={marker.id}
+              style={{
+                position: "absolute",
+                left: `${(pos2d.x / 800) * 100}%`,
+                top: `${(pos2d.y / 400) * 100}%`,
+                transform: "translate(-50%, -50%)",
+                zIndex: pos2d.z > 0 ? 10 : 1,
+              }}
+            >
+              {/* Marker dot */}
+              <div
+                style={{
+                  width: "12px",
+                  height: "12px",
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  boxShadow: "0 0 15px rgba(239,68,68,0.8)",
+                  cursor: "pointer",
+                }}
+              />
+
+              {/* Sticker */}
+              <div
+                onMouseEnter={() => setExpandedMarkerId(marker.id)}
+                onMouseLeave={() => setExpandedMarkerId(null)}
+                style={{
+                  position: "absolute",
+                  left: "20px",
+                  top: "-10px",
+                  background: "rgba(20,10,50,0.95)",
+                  border: "1px solid rgba(239,68,68,0.5)",
+                  borderRadius: "8px",
+                  padding: isExpanded ? "16px" : "8px 12px",
+                  minWidth: isExpanded ? "280px" : "auto",
+                  maxWidth: "300px",
+                  backdropFilter: "blur(10px)",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  zIndex: 20,
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: isExpanded ? "12px" : "10px",
+                    fontWeight: 700,
+                    color: "#EF4444",
+                    margin: 0,
+                    marginBottom: isExpanded ? "8px" : 0,
+                  }}
+                >
+                  {marker.city}
+                </p>
+
+                {isExpanded && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "11px",
+                          color: "#A78BFA",
+                          margin: 0,
+                          marginBottom: "2px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Content
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "10px",
+                          color: "#C0C0E0",
+                          margin: 0,
+                        }}
+                      >
+                        {marker.content}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "11px",
+                          color: "#A78BFA",
+                          margin: 0,
+                          marginBottom: "2px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Platform
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "10px",
+                          color: "#C0C0E0",
+                          margin: 0,
+                        }}
+                      >
+                        {marker.platform}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "11px",
+                          color: "#A78BFA",
+                          margin: 0,
+                          marginBottom: "2px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Confidence
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            flex: 1,
+                            height: "4px",
+                            background: "rgba(255,255,255,0.1)",
+                            borderRadius: "2px",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: "100%",
+                              width: `${marker.confidence}%`,
+                              background: "linear-gradient(90deg, #A78BFA, #10B981)",
+                            }}
+                          />
+                        </div>
+                        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#A78BFA" }}>
+                          {marker.confidence}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "11px",
+                          color: "#A78BFA",
+                          margin: 0,
+                          marginBottom: "2px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Status
+                      </p>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          padding: "3px 8px",
+                          background: "rgba(16,185,129,0.1)",
+                          color: "#10B981",
+                          fontFamily: "'Space Mono', monospace",
+                          fontSize: "8px",
+                          borderRadius: "4px",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {marker.status}
+                      </span>
+                    </div>
+
+                    <p
+                      style={{
+                        fontFamily: "'Space Mono', monospace",
+                        fontSize: "8px",
+                        color: "#4040A0",
+                        margin: 0,
+                        marginTop: "4px",
+                      }}
+                    >
+                      {marker.date}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Instructions */}
+      {!isDragging && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "12px",
+            left: "12px",
+            fontFamily: "'Space Mono', monospace",
+            fontSize: "9px",
+            color: "#4040A0",
+          }}
+        >
+          {isHovered ? "Click & drag to rotate" : "Hover to interact"}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Animated Circular Gauge ────────────────────────────────────── */
 function SafetyGauge() {
   const score = 98;
-  const circumference = 2 * Math.PI * 45;
+  const circumference = 2 * Math.PI * 60;
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div style={{ position: "relative", width: "160px", height: "160px", margin: "0 auto" }}>
-      <svg width="160" height="160" style={{ transform: "rotate(-90deg)" }}>
-        {/* Background circle */}
-        <circle cx="80" cy="80" r="45" fill="none" stroke="rgba(124,58,237,0.2)" strokeWidth="8" />
-        {/* Progress circle */}
+    <div style={{ position: "relative", width: "200px", height: "200px", margin: "0 auto" }}>
+      <svg width="200" height="200" style={{ transform: "rotate(-90deg)" }}>
+        <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(124,58,237,0.2)" strokeWidth="10" />
         <circle
-          cx="80"
-          cy="80"
-          r="45"
+          cx="100"
+          cy="100"
+          r="60"
           fill="none"
           stroke="#10B981"
-          strokeWidth="8"
+          strokeWidth="10"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
@@ -132,155 +528,12 @@ function SafetyGauge() {
           justifyContent: "center",
         }}
       >
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "36px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "48px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
           {score}%
         </p>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", color: "#10B981", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#10B981", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
           Safety Score
         </p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Global Threat Map ────────────────────────────────────────── */
-function GlobalThreatMap() {
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "280px",
-        background: "linear-gradient(135deg, rgba(30,20,80,0.4), rgba(50,30,100,0.3))",
-        border: "1px solid rgba(124,58,237,0.3)",
-        borderRadius: "12px",
-        overflow: "hidden",
-      }}
-    >
-      {/* World map background (simplified) */}
-      <svg width="100%" height="100%" style={{ position: "absolute", inset: 0 }} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-        <defs>
-          <pattern id="grid" width="5" height="5" patternUnits="userSpaceOnUse">
-            <path d="M 5 0 L 0 0 0 5" fill="none" stroke="rgba(124,58,237,0.1)" strokeWidth="0.3" />
-          </pattern>
-        </defs>
-        <rect width="100" height="100" fill="url(#grid)" />
-        {/* Simplified continents outline */}
-        <path d="M 15 20 L 25 15 L 30 25 L 20 35 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-        <path d="M 40 10 L 55 5 L 60 20 L 50 30 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-        <path d="M 65 25 L 85 20 L 90 40 L 75 45 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-        <path d="M 20 50 L 40 45 L 45 65 L 25 70 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-        <path d="M 60 55 L 80 50 L 85 70 L 70 75 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-
-        {/* Threat hotspots */}
-        {THREAT_LOCATIONS.map((loc, i) => {
-          const radius = loc.intensity === "high" ? 3 : loc.intensity === "medium" ? 2 : 1.5;
-          const color = loc.intensity === "high" ? "#EF4444" : loc.intensity === "medium" ? "#F59E0B" : "#A78BFA";
-          return (
-            <g key={i}>
-              {/* Outer glow */}
-              <circle cx={loc.x} cy={loc.y} r={radius * 1.8} fill={color} opacity="0.3" />
-              {/* Core */}
-              <circle cx={loc.x} cy={loc.y} r={radius} fill={color} opacity="0.9" />
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* Map controls */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "16px",
-          right: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-          zIndex: 10,
-        }}
-      >
-        <button
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "6px",
-            background: "rgba(124,58,237,0.2)",
-            border: "1px solid rgba(124,58,237,0.4)",
-            color: "#A78BFA",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.4)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
-          }}
-        >
-          <Plus size={16} />
-        </button>
-        <button
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "6px",
-            background: "rgba(124,58,237,0.2)",
-            border: "1px solid rgba(124,58,237,0.4)",
-            color: "#A78BFA",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.4)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
-          }}
-        >
-          <Minus size={16} />
-        </button>
-      </div>
-
-      {/* Legend */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "16px",
-          left: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "6px",
-          zIndex: 10,
-        }}
-      >
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "10px", color: "#A78BFA", margin: 0, fontWeight: 600 }}>
-          Leak Activity
-        </p>
-        {[
-          { label: "High", color: "#EF4444" },
-          { label: "Medium", color: "#F59E0B" },
-          { label: "Low", color: "#A78BFA" },
-        ].map((item, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <div
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: item.color,
-              }}
-            />
-            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "9px", color: "#6060A0" }}>
-              {item.label}
-            </span>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -358,7 +611,7 @@ function DonutChart() {
               d={pathData}
               fill={colors[i]}
               opacity="0.8"
-              style={{ transition: "opacity 0.2s ease" }}
+              style={{ transition: "opacity 0.2s ease", cursor: "pointer" }}
               onMouseEnter={(e) => {
                 (e.currentTarget as SVGElement).style.opacity = "1";
               }}
@@ -368,7 +621,6 @@ function DonutChart() {
             />
           );
         })}
-        {/* Inner circle for donut effect */}
         <circle cx="70" cy="70" r="30" fill="#000000" />
       </svg>
     </div>
@@ -377,7 +629,52 @@ function DonutChart() {
 
 /* ── Main Dashboard ──────────────────────────────────────────── */
 export default function VaultMemberDashboard() {
+  const [activeTab, setActiveTab] = useState<"threat_intelligence" | "fingerprinting" | "monitoring" | "response" | "analytics">("threat_intelligence");
   const [timeRange, setTimeRange] = useState("7days");
+  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: "New threat detected", time: "2 min ago", read: false },
+    { id: 2, title: "Takedown completed", time: "1 hour ago", read: false },
+    { id: 3, title: "Weekly report ready", time: "3 hours ago", read: true },
+  ]);
+
+  const generateRandomData = () => ({
+    threats: Math.floor(Math.random() * 50) + 10,
+    assets: Math.floor(Math.random() * 5000) + 1000,
+    detections: Math.floor(Math.random() * 100) + 20,
+    takedowns: Math.floor(Math.random() * 200) + 50,
+    score: Math.floor(Math.random() * 20) + 80,
+  });
+
+  const [tabData, setTabData] = useState({
+    threat_intelligence: generateRandomData(),
+    fingerprinting: generateRandomData(),
+    monitoring: generateRandomData(),
+    response: generateRandomData(),
+    analytics: generateRandomData(),
+  });
+
+  const markNotificationsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const timeRangeOptions = [
+    { label: "Last 24 Hours", value: "24h" },
+    { label: "Last 7 Days", value: "7days" },
+    { label: "Last 30 Days", value: "30days" },
+    { label: "Last 90 Days", value: "90days" },
+  ];
+
+  const tabLabels = {
+    threat_intelligence: "Threat Intelligence",
+    fingerprinting: "Fingerprinting",
+    monitoring: "Monitoring",
+    response: "Response",
+    analytics: "Analytics",
+  };
+
+  const currentData = tabData[activeTab];
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#000000", color: "#FFFFFF" }}>
@@ -385,10 +682,6 @@ export default function VaultMemberDashboard() {
         @keyframes float-up {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.4); }
-          50% { box-shadow: 0 0 50px rgba(124,58,237,0.7); }
         }
       `}</style>
 
@@ -405,7 +698,8 @@ export default function VaultMemberDashboard() {
         }}
       >
         {/* Logo */}
-        <div
+        <a
+          href="https://senotastudios.com"
           style={{
             display: "flex",
             alignItems: "center",
@@ -414,6 +708,15 @@ export default function VaultMemberDashboard() {
             background: "rgba(124,58,237,0.1)",
             borderRadius: "10px",
             marginBottom: "8px",
+            textDecoration: "none",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
           }}
         >
           <Shield size={24} style={{ color: "#A78BFA" }} />
@@ -422,46 +725,48 @@ export default function VaultMemberDashboard() {
               VAULT
             </p>
             <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", color: "#6060A0", margin: 0 }}>
-              SENTINEL
+              SENOTA
             </p>
           </div>
-        </div>
+        </a>
 
         {/* Navigation */}
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {[
-            { icon: AlertTriangle, label: "Threat Intelligence", active: true },
-            { icon: Fingerprint, label: "Fingerprinting", active: false },
-            { icon: Eye, label: "Monitoring", active: false },
-            { icon: Zap, label: "Response", active: false },
-            { icon: BarChart3, label: "Analytics", active: false },
-          ].map((item, i) => {
+            { icon: AlertTriangle, label: "Threat Intelligence", id: "threat_intelligence" },
+            { icon: Fingerprint, label: "Fingerprinting", id: "fingerprinting" },
+            { icon: Eye, label: "Monitoring", id: "monitoring" },
+            { icon: Zap, label: "Response", id: "response" },
+            { icon: BarChart3, label: "Analytics", id: "analytics" },
+          ].map((item) => {
             const Icon = item.icon;
+            const isActive = activeTab === item.id;
             return (
               <button
-                key={i}
+                key={item.id}
+                onClick={() => setActiveTab(item.id as any)}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "12px",
                   padding: "12px 14px",
-                  background: item.active ? "rgba(124,58,237,0.2)" : "transparent",
-                  border: item.active ? "1px solid rgba(124,58,237,0.4)" : "1px solid transparent",
+                  background: isActive ? "rgba(124,58,237,0.2)" : "transparent",
+                  border: isActive ? "1px solid rgba(124,58,237,0.4)" : "1px solid transparent",
                   borderRadius: "8px",
-                  color: item.active ? "#A78BFA" : "#6060A0",
+                  color: isActive ? "#A78BFA" : "#6060A0",
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "12px",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  if (!item.active) {
+                  if (!isActive) {
                     (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)";
                     (e.currentTarget as HTMLElement).style.color = "#A78BFA";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (!item.active) {
+                  if (!isActive) {
                     (e.currentTarget as HTMLElement).style.background = "transparent";
                     (e.currentTarget as HTMLElement).style.color = "#6060A0";
                   }
@@ -529,6 +834,7 @@ export default function VaultMemberDashboard() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            cursor: "pointer",
           }}
         >
           <div>
@@ -567,7 +873,7 @@ export default function VaultMemberDashboard() {
                 marginBottom: "4px",
               }}
             >
-              Threat Intelligence
+              {tabLabels[activeTab]}
             </h1>
             <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0", margin: 0 }}>
               Real-time monitoring of unauthorized content leaks and brand risks across the digital landscape.
@@ -575,9 +881,11 @@ export default function VaultMemberDashboard() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button
+            {/* Home Button */}
+            <a
+              href="https://senotastudios.com"
               style={{
-                padding: "8px 16px",
+                padding: "10px 14px",
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(124,58,237,0.2)",
                 borderRadius: "6px",
@@ -589,6 +897,7 @@ export default function VaultMemberDashboard() {
                 alignItems: "center",
                 gap: "6px",
                 transition: "all 0.2s ease",
+                textDecoration: "none",
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
@@ -597,456 +906,622 @@ export default function VaultMemberDashboard() {
                 (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
               }}
             >
-              <Bell size={14} />
-              Notifications
-            </button>
+              <Home size={14} />
+              Home
+            </a>
 
-            <div
-              style={{
-                padding: "8px 16px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "6px",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#A78BFA" }}>Last 7 Days</span>
-              <ChevronDown size={14} style={{ color: "#6060A0" }} />
+            {/* Notifications */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  markNotificationsRead();
+                }}
+                style={{
+                  padding: "10px 14px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  borderRadius: "6px",
+                  color: "#A78BFA",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  transition: "all 0.2s ease",
+                  position: "relative",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
+                }}
+              >
+                <Bell size={14} />
+                Notifications
+                {notifications.some((n) => !n.read) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "6px",
+                      right: "6px",
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      background: "#EF4444",
+                    }}
+                  />
+                )}
+              </button>
+
+              {showNotifications && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: "8px",
+                    background: "rgba(20,10,50,0.95)",
+                    border: "1px solid rgba(124,58,237,0.3)",
+                    borderRadius: "8px",
+                    minWidth: "280px",
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                    zIndex: 1000,
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      style={{
+                        padding: "12px 16px",
+                        borderBottom: "1px solid rgba(124,58,237,0.15)",
+                        cursor: "pointer",
+                        transition: "background 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = "transparent";
+                      }}
+                    >
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", margin: 0, marginBottom: "4px" }}>
+                        {notif.title}
+                      </p>
+                      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#6060A0", margin: 0 }}>
+                        {notif.time}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Time Range Dropdown */}
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowTimeDropdown(!showTimeDropdown)}
+                style={{
+                  padding: "8px 16px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  color: "#A78BFA",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
+                }}
+              >
+                <span>{timeRangeOptions.find((o) => o.value === timeRange)?.label}</span>
+                <ChevronDown size={14} />
+              </button>
+
+              {showTimeDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: "8px",
+                    background: "rgba(20,10,50,0.95)",
+                    border: "1px solid rgba(124,58,237,0.3)",
+                    borderRadius: "8px",
+                    minWidth: "180px",
+                    zIndex: 1000,
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  {timeRangeOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setTimeRange(option.value);
+                        setShowTimeDropdown(false);
+                      }}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: timeRange === option.value ? "rgba(124,58,237,0.2)" : "transparent",
+                        border: "none",
+                        color: timeRange === option.value ? "#A78BFA" : "#C0C0E0",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        if (timeRange !== option.value) {
+                          (e.currentTarget as HTMLElement).style.background = "transparent";
+                        }
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Content Grid */}
-        <div style={{ padding: "32px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-          {/* Left Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {/* Global Threat Map */}
-            <div
-              style={{
-                padding: "20px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "12px",
-                animation: "float-up 0.6s ease-out",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                <Globe size={16} style={{ color: "#A78BFA" }} />
-                <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                  Global Threat Map
-                </h3>
-              </div>
-              <GlobalThreatMap />
-            </div>
-
-            {/* Recent Detections Table */}
-            <div
-              style={{
-                padding: "20px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "12px",
-                animation: "float-up 0.6s ease-out 0.1s both",
-              }}
-            >
-              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "16px" }}>
-                Recent Detections
-              </h3>
-
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid rgba(124,58,237,0.15)" }}>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Detected Content
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Source
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Location
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Match Confidence
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Detected At
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 8px",
-                          textAlign: "left",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "10px",
-                          color: "#6060A0",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {RECENT_DETECTIONS.map((detection, i) => {
-                      const statusColors = {
-                        protected: { bg: "rgba(16,185,129,0.1)", text: "#10B981", label: "Protected" },
-                        reviewing: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Reviewing" },
-                        takedown_initiated: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Takedown Initiated" },
-                        pending_review: { bg: "rgba(245,158,11,0.1)", text: "#F59E0B", label: "Pending Review" },
-                      };
-                      const sc = statusColors[detection.status as keyof typeof statusColors];
-
-                      return (
-                        <tr
-                          key={i}
-                          style={{
-                            borderBottom: "1px solid rgba(124,58,237,0.1)",
-                            transition: "background 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLElement).style.background = "transparent";
-                          }}
-                        >
-                          <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#C0C0E0" }}>
-                            {detection.title}
-                          </td>
-                          <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#A78BFA" }}>
-                            {detection.source}
-                          </td>
-                          <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#C0C0E0" }}>
-                            {detection.location}
-                          </td>
-                          <td style={{ padding: "10px 8px" }}>
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "6px",
-                              }}
-                            >
-                              <div
-                                style={{
-                                  flex: 1,
-                                  height: "4px",
-                                  background: "rgba(255,255,255,0.1)",
-                                  borderRadius: "2px",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    height: "100%",
-                                    width: `${detection.confidence}%`,
-                                    background: "linear-gradient(90deg, #A78BFA, #10B981)",
-                                  }}
-                                />
-                              </div>
-                              <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#A78BFA", minWidth: "30px" }}>
-                                {detection.confidence}%
-                              </span>
-                            </div>
-                          </td>
-                          <td style={{ padding: "10px 8px", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0" }}>
-                            {detection.detected}
-                          </td>
-                          <td style={{ padding: "10px 8px" }}>
-                            <span
-                              style={{
-                                display: "inline-block",
-                                padding: "4px 10px",
-                                background: sc.bg,
-                                color: sc.text,
-                                fontFamily: "'Space Mono', monospace",
-                                fontSize: "9px",
-                                borderRadius: "4px",
-                                fontWeight: 600,
-                                textTransform: "uppercase",
-                              }}
-                            >
-                              {sc.label}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              <button
-                style={{
-                  marginTop: "16px",
-                  padding: "10px 16px",
-                  background: "transparent",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  borderRadius: "6px",
-                  color: "#A78BFA",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.6)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
-                }}
-              >
-                View All Detections →
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-            {/* Active Protection Status */}
-            <div
-              style={{
-                padding: "20px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(16,185,129,0.3)",
-                borderRadius: "12px",
-                animation: "float-up 0.6s ease-out 0.2s both",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <CheckCircle size={16} style={{ color: "#10B981" }} />
-                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                    Active Protection Status
-                  </h3>
-                </div>
-                <a
-                  href="#"
+        <div style={{ padding: "32px" }}>
+          {activeTab === "threat_intelligence" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {/* Left Column */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                {/* Global Threat Map */}
+                <div
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "11px",
-                    color: "#A78BFA",
-                    textDecoration: "none",
-                    cursor: "pointer",
+                    padding: "20px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(124,58,237,0.2)",
+                    borderRadius: "12px",
+                    animation: "float-up 0.6s ease-out",
                   }}
                 >
-                  View Protection Rules →
-                </a>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                    <Globe size={16} style={{ color: "#A78BFA" }} />
+                    <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                      Global Threat Map
+                    </h3>
+                  </div>
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: "280px",
+                      background: "linear-gradient(135deg, rgba(30,20,80,0.4), rgba(50,30,100,0.3))",
+                      border: "1px solid rgba(124,58,237,0.3)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <svg width="100%" height="100%" style={{ position: "absolute", inset: 0 }} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+                      <defs>
+                        <pattern id="grid" width="5" height="5" patternUnits="userSpaceOnUse">
+                          <path d="M 5 0 L 0 0 0 5" fill="none" stroke="rgba(124,58,237,0.1)" strokeWidth="0.3" />
+                        </pattern>
+                      </defs>
+                      <rect width="100" height="100" fill="url(#grid)" />
+                      <path d="M 15 20 L 25 15 L 30 25 L 20 35 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
+                      <path d="M 40 10 L 55 5 L 60 20 L 50 30 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
+                      <path d="M 65 25 L 85 20 L 90 40 L 75 45 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
+                      <path d="M 20 50 L 40 45 L 45 65 L 25 70 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
+                      <path d="M 60 55 L 80 50 L 85 70 L 70 75 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
+                      {THREAT_LOCATIONS.map((loc, i) => {
+                        const radius = loc.intensity === "high" ? 3 : loc.intensity === "medium" ? 2 : 1.5;
+                        const color = loc.intensity === "high" ? "#EF4444" : loc.intensity === "medium" ? "#F59E0B" : "#A78BFA";
+                        return (
+                          <g key={i}>
+                            <circle cx={loc.x} cy={loc.y} r={radius * 1.8} fill={color} opacity="0.3" />
+                            <circle cx={loc.x} cy={loc.y} r={radius} fill={color} opacity="0.9" />
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Recent Detections Table */}
+                <div
+                  style={{
+                    padding: "20px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(124,58,237,0.2)",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "16px" }}>
+                    Recent Detections
+                  </h3>
+
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                      <thead>
+                        <tr style={{ borderBottom: "1px solid rgba(124,58,237,0.15)" }}>
+                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
+                            Content
+                          </th>
+                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
+                            Source
+                          </th>
+                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
+                            Confidence
+                          </th>
+                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {RECENT_DETECTIONS.map((detection, i) => {
+                          const statusColors = {
+                            protected: { bg: "rgba(16,185,129,0.1)", text: "#10B981", label: "Protected" },
+                            reviewing: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Reviewing" },
+                            takedown_initiated: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Takedown" },
+                            pending_review: { bg: "rgba(245,158,11,0.1)", text: "#F59E0B", label: "Pending" },
+                          };
+                          const sc = statusColors[detection.status as keyof typeof statusColors];
+
+                          return (
+                            <tr key={i} style={{ borderBottom: "1px solid rgba(124,58,237,0.1)" }}>
+                              <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#C0C0E0" }}>
+                                {detection.title.substring(0, 20)}...
+                              </td>
+                              <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#A78BFA" }}>
+                                {detection.source}
+                              </td>
+                              <td style={{ padding: "10px 8px" }}>
+                                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#A78BFA" }}>
+                                  {detection.confidence}%
+                                </span>
+                              </td>
+                              <td style={{ padding: "10px 8px" }}>
+                                <span
+                                  style={{
+                                    display: "inline-block",
+                                    padding: "4px 10px",
+                                    background: sc.bg,
+                                    color: sc.text,
+                                    fontFamily: "'Space Mono', monospace",
+                                    fontSize: "9px",
+                                    borderRadius: "4px",
+                                    fontWeight: 600,
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {sc.label}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
 
-              <SafetyGauge />
-
-              <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                {[
-                  { icon: Lock, label: "Monitored Assets", value: "1,247" },
-                  { icon: AlertTriangle, label: "Active Detections", value: "23" },
-                  { icon: Shield, label: "Protected Images", value: "18,956" },
-                  { icon: Zap, label: "Takedown Requests", value: "156" },
-                ].map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <Icon size={14} style={{ color: "#A78BFA" }} />
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
-                          {item.label}
-                        </span>
-                      </div>
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                        {item.value}
-                      </span>
+              {/* Right Column */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+                {/* Active Protection Status */}
+                <div
+                  style={{
+                    padding: "20px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(16,185,129,0.3)",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <CheckCircle size={16} style={{ color: "#10B981" }} />
+                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                        Active Protection
+                      </h3>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
 
+                  <SafetyGauge />
+
+                  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                    {[
+                      { icon: Lock, label: "Monitored Assets", value: currentData.assets },
+                      { icon: AlertTriangle, label: "Active Detections", value: currentData.detections },
+                      { icon: Shield, label: "Protected Images", value: currentData.threats * 100 },
+                      { icon: Zap, label: "Takedown Requests", value: currentData.takedowns },
+                    ].map((item, i) => {
+                      const Icon = item.icon;
+                      return (
+                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <Icon size={14} style={{ color: "#A78BFA" }} />
+                            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
+                              {item.label}
+                            </span>
+                          </div>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
+                            {item.value.toLocaleString()}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "16px",
+                      padding: "10px",
+                      background: "rgba(16,185,129,0.08)",
+                      border: "1px solid rgba(16,185,129,0.2)",
+                      borderRadius: "6px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#10B981" }}>
+                      All systems operational
+                    </span>
+                  </div>
+                </div>
+
+                {/* Detection Trend */}
+                <div
+                  style={{
+                    padding: "20px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(124,58,237,0.2)",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                    <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                      Detection Trend
+                    </h3>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6060A0" }}>7 Days</span>
+                  </div>
+
+                  <DetectionTrendChart />
+
+                  <div style={{ marginTop: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <TrendingUp size={14} style={{ color: "#10B981" }} />
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
+                      {currentData.detections * 10}
+                    </span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#8080B0" }}>
+                      Total Detections
+                    </span>
+                  </div>
+
+                  <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+                    <TrendingUp size={12} style={{ color: "#10B981" }} />
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", color: "#10B981", fontWeight: 600 }}>
+                      +18.2%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Top Leak Sources */}
+                <div
+                  style={{
+                    padding: "20px",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(124,58,237,0.2)",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "20px" }}>
+                    Top Leak Sources
+                  </h3>
+
+                  <DonutChart />
+
+                  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {TOP_LEAK_SOURCES.map((source, i) => {
+                      const colors = ["#A78BFA", "#60A5FA", "#10B981", "#F59E0B"];
+                      return (
+                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <div
+                              style={{
+                                width: "8px",
+                                height: "8px",
+                                borderRadius: "50%",
+                                background: colors[i],
+                              }}
+                            />
+                            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
+                              {source.name}
+                            </span>
+                          </div>
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
+                            {source.percentage}%
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "monitoring" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
               <div
                 style={{
-                  marginTop: "16px",
-                  padding: "10px",
-                  background: "rgba(16,185,129,0.08)",
-                  border: "1px solid rgba(16,185,129,0.2)",
-                  borderRadius: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
+                  padding: "20px",
+                  background: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(124,58,237,0.2)",
+                  borderRadius: "12px",
                 }}
               >
-                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#10B981" }}>
-                  All systems operational
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                  <Globe size={16} style={{ color: "#A78BFA" }} />
+                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                    Live Global Threat Monitor
+                  </h3>
+                </div>
+                <InteractiveGlobe />
               </div>
 
-              <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#4040A0", marginTop: "8px", margin: 0 }}>
-                Last updated: 2 min ago
-              </p>
-            </div>
-
-            {/* Detection Trend */}
-            <div
-              style={{
-                padding: "20px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "12px",
-                animation: "float-up 0.6s ease-out 0.3s both",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                  Detection Trend
-                </h3>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6060A0" }}>7 Days</span>
-              </div>
-
-              <DetectionTrendChart />
-
-              <div style={{ marginTop: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <TrendingUp size={14} style={{ color: "#10B981" }} />
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                  1,247
-                </span>
-                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#8080B0" }}>
-                  Total Detections
-                </span>
-              </div>
-
-              <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-                <TrendingUp size={12} style={{ color: "#10B981" }} />
-                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", color: "#10B981", fontWeight: 600 }}>
-                  +18.2%
-                </span>
-              </div>
-            </div>
-
-            {/* Top Leak Sources */}
-            <div
-              style={{
-                padding: "20px",
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "12px",
-                animation: "float-up 0.6s ease-out 0.4s both",
-              }}
-            >
-              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "20px" }}>
-                Top Leak Sources
-              </h3>
-
-              <DonutChart />
-
-              <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                {TOP_LEAK_SOURCES.map((source, i) => {
-                  const colors = ["#A78BFA", "#60A5FA", "#10B981", "#F59E0B"];
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
+                {[
+                  { label: "Active Monitors", value: currentData.assets, icon: Eye },
+                  { label: "Threats Detected", value: currentData.detections, icon: AlertTriangle },
+                  { label: "Response Time", value: "< 2 min", icon: Clock },
+                  { label: "Coverage", value: "178 countries", icon: Globe },
+                ].map((stat, i) => {
+                  const Icon = stat.icon;
                   return (
-                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <div
-                          style={{
-                            width: "8px",
-                            height: "8px",
-                            borderRadius: "50%",
-                            background: colors[i],
-                          }}
-                        />
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
-                          {source.name}
+                    <div
+                      key={i}
+                      style={{
+                        padding: "16px",
+                        background: "rgba(255,255,255,0.02)",
+                        border: "1px solid rgba(124,58,237,0.2)",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <Icon size={14} style={{ color: "#A78BFA" }} />
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6060A0", textTransform: "uppercase" }}>
+                          {stat.label}
                         </span>
                       </div>
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                        {source.percentage}%
-                      </span>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "24px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                        {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
+                      </p>
                     </div>
                   );
                 })}
               </div>
-
-              <a
-                href="#"
-                style={{
-                  display: "block",
-                  marginTop: "16px",
-                  padding: "10px 16px",
-                  background: "transparent",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  borderRadius: "6px",
-                  color: "#A78BFA",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  textAlign: "center",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.6)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(124,58,237,0.3)";
-                }}
-              >
-                View Full Analytics →
-              </a>
             </div>
-          </div>
+          )}
+
+          {activeTab === "fingerprinting" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {[
+                { title: "Assets Fingerprinted", value: currentData.assets, icon: Fingerprint },
+                { title: "Unique Signatures", value: currentData.assets * 2, icon: Lock },
+                { title: "Detection Rate", value: "99.7%", icon: CheckCircle },
+                { title: "Processing Speed", value: "< 1s", icon: Zap },
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "24px",
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Icon size={16} style={{ color: "#A78BFA" }} />
+                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                        {stat.title}
+                      </h3>
+                    </div>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeTab === "response" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {[
+                { title: "Takedowns Sent", value: currentData.takedowns, icon: Zap, color: "#EF4444" },
+                { title: "Success Rate", value: "94%", icon: CheckCircle, color: "#10B981" },
+                { title: "Avg Response Time", value: "2.3 hrs", icon: Clock, color: "#F59E0B" },
+                { title: "Active Cases", value: currentData.threats, icon: AlertTriangle, color: "#A78BFA" },
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "24px",
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Icon size={16} style={{ color: stat.color }} />
+                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                        {stat.title}
+                      </h3>
+                    </div>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeTab === "analytics" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+              {[
+                { title: "Total Threats Analyzed", value: currentData.threats * 100, icon: BarChart3 },
+                { title: "Avg Confidence Score", value: "94%", icon: CheckCircle },
+                { title: "Trend (7 Days)", value: "+24%", icon: TrendingUp },
+                { title: "Data Sources", value: "500M+", icon: Globe },
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      padding: "24px",
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(124,58,237,0.2)",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Icon size={16} style={{ color: "#A78BFA" }} />
+                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
+                        {stat.title}
+                      </h3>
+                    </div>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
