@@ -29,6 +29,7 @@ import {
   ChevronDown,
   MessageCircle,
   X,
+  Play,
 } from "lucide-react";
 
 /* ── Q&A Data for Interactive Chat ──────────────────────────────────── */
