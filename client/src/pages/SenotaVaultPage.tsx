@@ -476,82 +476,38 @@ export default function SenotaVaultPage() {
 
             {/* Right: Shield with cosmic sphere */}
             <div
-              className="flex-1 flex items-center justify-center"
+              className="flex-1 flex items-center justify-center relative"
               style={{
-                animation: "float-up 0.8s ease-out 0.2s both",
+                animation: "scale-in 1s ease-out 0.2s both",
               }}
             >
               <div
                 style={{
                   position: "relative",
                   width: "100%",
-                  maxWidth: "400px",
+                  maxWidth: "550px",
                   aspectRatio: "1",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                {/* Outer glow rings */}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    borderRadius: "50%",
-                    border: "2px solid rgba(124,58,237,0.3)",
-                    animation: "rotate-slow 20s linear infinite",
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: "20px",
-                    borderRadius: "50%",
-                    border: "1px solid rgba(59,130,246,0.2)",
-                    animation: "rotate-slow 30s linear infinite reverse",
-                  }}
-                />
+                {/* Background glow effects */}
+                <div className="absolute w-[150%] h-[150%] bg-purple-600/10 blur-[120px] rounded-full -z-10" />
+                <div className="absolute w-[100%] h-[100%] bg-blue-600/10 blur-[100px] rounded-full -z-10" />
 
-                {/* Shield container */}
-                <div
-                  style={{
-                    position: "relative",
-                    width: "280px",
-                    height: "300px",
-                    background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(59,130,246,0.1))",
-                    border: "2px solid rgba(124,58,237,0.4)",
-                    borderRadius: "20px 20px 40px 40px",
-                    boxShadow: "0 0 60px rgba(124,58,237,0.4), inset 0 0 40px rgba(124,58,237,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                    animation: "pulse-glow 3s ease-in-out infinite",
-                  }}
-                >
-                  {/* Cosmic sphere inside shield */}
-                  <div
+                {/* Shield asset */}
+                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                  <img 
+                    src="/aegis-shield.png" 
+                    alt="Aegis Shield" 
                     style={{
-                      position: "relative",
-                      width: "200px",
-                      height: "200px",
-                      borderRadius: "50%",
-                      background: "radial-gradient(circle at 30% 30%, rgba(59,130,246,0.8), rgba(124,58,237,0.4) 30%, rgba(139,92,246,0.2) 60%, transparent 100%)",
-                      boxShadow: "0 0 80px rgba(59,130,246,0.6), 0 0 120px rgba(124,58,237,0.3), inset -20px -20px 60px rgba(0,0,0,0.3)",
-                      animation: "rotate-slow 15s linear infinite",
+                      width: "100%",
+                      height: "auto",
+                      filter: "drop-shadow(0 0 50px rgba(124,58,237,0.4))",
+                      animation: "pulse-glow 4s ease-in-out infinite"
                     }}
-                  >
-                    {/* Inner glow */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: "20px",
-                        borderRadius: "50%",
-                        background: "radial-gradient(circle at 40% 40%, rgba(167,139,250,0.6), transparent 70%)",
-                        filter: "blur(10px)",
-                      }}
-                    />
-                  </div>
+                  />
                 </div>
               </div>
             </div>
@@ -561,65 +517,51 @@ export default function SenotaVaultPage() {
           <div
             style={{
               position: "absolute",
-              right: "60px",
+              right: "40px",
               top: "50%",
               transform: "translateY(-50%)",
               display: "flex",
               flexDirection: "column",
               gap: "24px",
-              animation: "float-up 0.8s ease-out 0.4s both",
-              zIndex: 5,
+              animation: "slideIn 1s ease-out 0.6s both",
+              zIndex: 20,
             }}
             className="hidden lg:flex"
           >
             {[
-              { value: "14.2M+", label: "Threats Detected" },
-              { value: "2.8M+", label: "Pieces Protected" },
-              { value: "99.7%", label: "Enforcement Success" },
+              { label: "Threats Detected", value: "14.2M+", icon: TrendingUp },
+              { label: "Pieces Protected", value: "2.8M+", icon: Lock },
+              { label: "Enforcement Success", value: "99.7%", icon: CheckCircle },
             ].map((stat, i) => (
               <div
                 key={i}
+                className="flex items-center gap-4 p-5 transition-all hover:translate-x-[-8px]"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "12px 16px",
-                  background: "rgba(124,58,237,0.1)",
-                  border: "1px solid rgba(124,58,237,0.3)",
-                  borderRadius: "8px",
-                  backdropFilter: "blur(10px)",
+                  background: "rgba(255,255,255,0.02)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "16px",
+                  width: "240px",
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
                 }}
               >
                 <div
                   style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: i === 0 ? "#EF4444" : i === 1 ? "#7C3AED" : "#10B981",
+                    width: "44px",
+                    height: "44px",
+                    borderRadius: "12px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.1)",
                   }}
-                />
+                >
+                  <stat.icon size={20} style={{ color: "#7C3AED" }} />
+                </div>
                 <div>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "12px",
-                      color: "#A78BFA",
-                      margin: 0,
-                      fontWeight: 600,
-                    }}
-                  >
-                    {stat.value}
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "10px",
-                      color: "#6060A0",
-                      margin: 0,
-                    }}
-                  >
-                    {stat.label}
-                  </p>
+                  <p style={{ fontSize: "20px", fontWeight: 700, margin: 0, color: "#FFFFFF", letterSpacing: "-0.01em" }}>{stat.value}</p>
+                  <p style={{ fontSize: "11px", color: "#8080A0", margin: 0, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -629,21 +571,24 @@ export default function SenotaVaultPage() {
           <div
             style={{
               position: "absolute",
-              bottom: "60px",
+              bottom: "40px",
               left: 0,
               right: 0,
-              padding: "24px",
+              padding: "32px",
               textAlign: "center",
-              borderTop: "1px solid rgba(124,58,237,0.2)",
+              borderTop: "1px solid rgba(255,255,255,0.05)",
+              background: "linear-gradient(to bottom, transparent, rgba(124,58,237,0.02))",
             }}
           >
             <p
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: "12px",
-                color: "#6060A0",
-                marginBottom: "16px",
-                letterSpacing: "0.04em",
+                fontSize: "11px",
+                color: "#606080",
+                marginBottom: "20px",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                fontWeight: 600,
               }}
             >
               Trusted by creators and brands worldwide
@@ -653,19 +598,19 @@ export default function SenotaVaultPage() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: "32px",
+                gap: "60px",
                 flexWrap: "wrap",
-                opacity: 0.6,
+                opacity: 0.4,
               }}
             >
               {["UNIVERSAL", "SONY", "WARNER BROS.", "ADOBE", "DISNEY", "BBC", "NETFLIX"].map((brand, i) => (
                 <span
                   key={i}
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    color: "#A0A0C0",
+                    fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#FFFFFF",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
