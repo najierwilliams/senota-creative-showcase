@@ -30,6 +30,7 @@ import {
   Home,
   X,
 } from "lucide-react";
+import { ThreeDGlobe } from "../components/ThreeDGlobe";
 
 /* ── Mock Data ────────────────────────────────────────────────── */
 const RECENT_DETECTIONS = [
@@ -1384,7 +1385,7 @@ export default function VaultMemberDashboard() {
                     Live Global Threat Monitor
                   </h3>
                 </div>
-                <InteractiveGlobe />
+                <ThreeDGlobe markers={STOLEN_CONTENT_MARKERS} />
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
