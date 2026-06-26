@@ -628,6 +628,57 @@ export default function SenotaVaultPage() {
             ))}
           </div>
 
+          {/* Trust Bar with Brand Logos */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: "60px",
+              left: 0,
+              right: 0,
+              padding: "24px",
+              textAlign: "center",
+              borderTop: "1px solid rgba(124,58,237,0.2)",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: "12px",
+                color: "#6060A0",
+                marginBottom: "16px",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Trusted by creators and brands worldwide
+            </p>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "32px",
+                flexWrap: "wrap",
+                opacity: 0.6,
+              }}
+            >
+              {["UNIVERSAL", "SONY", "WARNER BROS.", "ADOBE", "DISNEY", "BBC", "NETFLIX"].map((brand, i) => (
+                <span
+                  key={i}
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    color: "#A0A0C0",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {brand}
+                </span>
+              ))}
+            </div>
+          </div>
+
           {/* Scroll indicator */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
             <span
