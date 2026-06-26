@@ -184,6 +184,7 @@ export default function SenotaVaultPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { visibleElements, observe } = useScrollReveal();
   const [scrollY, setScrollY] = useState(0);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: "user" | "assistant" | "system"; content: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -360,7 +361,7 @@ export default function SenotaVaultPage() {
 
           <div className="relative z-10 container px-6 py-20 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
             {/* Left: text */}
-            <div className="flex-1 max-w-2xl">
+            <div className="flex-1 max-w-2xl flex flex-col items-center lg:items-start">
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
                 style={{
@@ -386,12 +387,13 @@ export default function SenotaVaultPage() {
               <h1
                 style={{
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(56px, 9vw, 80px)",
+                  fontSize: isMobile ? "clamp(40px, 12vw, 56px)" : "clamp(56px, 9vw, 80px)",
                   fontWeight: 700,
-                  lineHeight: 1.15,
+                  lineHeight: 1.1,
                   marginBottom: "24px",
                   animation: "float-up 0.8s ease-out 0.1s both",
                   color: "#FFFFFF",
+                  textAlign: isMobile ? "center" : "left",
                 }}
               >
                 Your Content,<br />
@@ -402,21 +404,23 @@ export default function SenotaVaultPage() {
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "15px",
+                  fontSize: isMobile ? "14px" : "15px",
                   color: "#8080A0",
                   maxWidth: "520px",
                   marginBottom: "32px",
                   lineHeight: 1.6,
                   animation: "float-up 0.8s ease-out 0.2s both",
+                  textAlign: isMobile ? "center" : "left",
                 }}
               >
-                Aegis Digital protects your creative work across the web—detecting theft, enforcing rights, and preserving your value.
+                Senota Vault protects your creative work across the web—detecting theft, enforcing rights, and preserving your value.
               </p>
 
               <div
                 className="flex flex-wrap gap-4 mb-12"
                 style={{
                   animation: "float-up 0.8s ease-out 0.3s both",
+                  justifyContent: isMobile ? "center" : "flex-start",
                 }}
               >
                 <a
@@ -491,17 +495,17 @@ export default function SenotaVaultPage() {
                 animation: "scale-in 1s ease-out 0.2s both",
               }}
             >
-              <div
-                style={{
-                  position: "relative",
-                  width: "100%",
-                  maxWidth: "550px",
-                  aspectRatio: "1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    maxWidth: isMobile ? "300px" : "550px",
+                    aspectRatio: "1",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                 {/* Background glow effects */}
                 <div className="absolute w-[150%] h-[150%] bg-purple-600/10 blur-[120px] rounded-full -z-10" />
                 <div className="absolute w-[100%] h-[100%] bg-blue-600/10 blur-[100px] rounded-full -z-10" />
@@ -511,8 +515,8 @@ export default function SenotaVaultPage() {
                   style={{
                     position: "absolute",
                     bottom: "15%",
-                    width: "400px",
-                    height: "100px",
+                    width: isMobile ? "240px" : "400px",
+                    height: isMobile ? "60px" : "100px",
                     background: "radial-gradient(ellipse at center, rgba(124,58,237,0.4) 0%, transparent 70%)",
                     transform: "rotateX(75deg)",
                     zIndex: 5,
@@ -522,8 +526,8 @@ export default function SenotaVaultPage() {
                   style={{
                     position: "absolute",
                     bottom: "18%",
-                    width: "300px",
-                    height: "300px",
+                    width: isMobile ? "180px" : "300px",
+                    height: isMobile ? "180px" : "300px",
                     border: "2px solid rgba(124,58,237,0.3)",
                     borderRadius: "50%",
                     transform: "rotateX(75deg)",
@@ -535,8 +539,8 @@ export default function SenotaVaultPage() {
                   style={{
                     position: "absolute",
                     bottom: "20%",
-                    width: "200px",
-                    height: "200px",
+                    width: isMobile ? "120px" : "200px",
+                    height: isMobile ? "120px" : "200px",
                     border: "1px solid rgba(59,130,246,0.4)",
                     borderRadius: "50%",
                     transform: "rotateX(75deg)",
@@ -647,7 +651,7 @@ export default function SenotaVaultPage() {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: "60px",
+                gap: isMobile ? "24px" : "60px",
                 flexWrap: "wrap",
                 opacity: 0.4,
               }}
@@ -690,7 +694,7 @@ export default function SenotaVaultPage() {
         {/* Features Section */}
         <section
           style={{
-            padding: "80px 24px",
+            padding: isMobile ? "60px 16px" : "80px 24px",
             background: "linear-gradient(180deg, #000000 0%, #0A0A1A 100%)",
           }}
         >
@@ -719,14 +723,14 @@ export default function SenotaVaultPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {FEATURES.map((feature, i) => {
                 const Icon = feature.icon;
                 return (
                   <div
                     key={i}
                     ref={(el) => observe(`feature-${i}`, el)}
-                    className="p-8 transition-all duration-300"
+                    className="p-6 md:p-8 transition-all duration-300"
                     style={{
                       background: "rgba(255,255,255,0.03)",
                       border: "1px solid rgba(124,58,237,0.2)",
@@ -744,11 +748,11 @@ export default function SenotaVaultPage() {
                       (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
                     }}
                   >
-                    <Icon size={32} style={{ color: "#A78BFA", marginBottom: "16px" }} />
+                    <Icon size={isMobile ? 28 : 32} style={{ color: "#A78BFA", marginBottom: "16px" }} />
                     <h3
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "18px",
+                        fontSize: isMobile ? "16px" : "18px",
                         fontWeight: 600,
                         marginBottom: "8px",
                       }}
@@ -758,7 +762,7 @@ export default function SenotaVaultPage() {
                     <p
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "14px",
+                        fontSize: isMobile ? "13px" : "14px",
                         color: "#8080B0",
                         lineHeight: 1.6,
                       }}
@@ -776,7 +780,7 @@ export default function SenotaVaultPage() {
         <section
           id="pricing"
           style={{
-            padding: "80px 24px",
+            padding: isMobile ? "60px 16px" : "80px 24px",
             background: "linear-gradient(180deg, #0A0A1A 0%, #000000 100%)",
           }}
         >
@@ -805,7 +809,7 @@ export default function SenotaVaultPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               {TIERS.map((tier, i) => (
                 <div
                   key={tier.id}
@@ -840,7 +844,7 @@ export default function SenotaVaultPage() {
                   )}
 
                   <div
-                    className="p-8 h-full transition-all"
+                    className="p-6 md:p-8 h-full transition-all"
                     style={{
                       background: tier.recommended ? "rgba(124,58,237,0.1)" : "rgba(255,255,255,0.03)",
                       border: tier.recommended ? "2px solid rgba(124,58,237,0.5)" : "1px solid rgba(124,58,237,0.2)",
@@ -858,7 +862,7 @@ export default function SenotaVaultPage() {
                     <h3
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "18px",
+                        fontSize: isMobile ? "16px" : "18px",
                         fontWeight: 600,
                         marginBottom: "8px",
                       }}
@@ -868,7 +872,7 @@ export default function SenotaVaultPage() {
                     <p
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "13px",
+                        fontSize: isMobile ? "12px" : "13px",
                         color: "#8080B0",
                         marginBottom: "20px",
                       }}
@@ -1311,7 +1315,8 @@ export default function SenotaVaultPage() {
                   overflow: "hidden",
                 }}
               >
-                <table style={{ width: "100%" }}>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", minWidth: isMobile ? "500px" : "auto" }}>
                   <thead>
                     <tr
                       style={{
@@ -1399,7 +1404,8 @@ export default function SenotaVaultPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

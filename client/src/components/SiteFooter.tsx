@@ -75,8 +75,8 @@ export default function SiteFooter() {
         className="px-6 md:px-10 py-8"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-          <div>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-6 justify-between">
+          <div className="text-center sm:text-left">
             <p
               style={{
                 fontFamily: "'Cormorant Garamond', serif",
@@ -105,12 +105,13 @@ export default function SiteFooter() {
                 fontSize: "13px",
                 color: "#CC0000",
                 letterSpacing: "0.05em",
+                textAlign: "center",
               }}
             >
               You're on the list.
             </p>
           ) : (
-            <form onSubmit={handleSubscribe} className="flex gap-0" style={{ minWidth: "280px" }}>
+            <form onSubmit={handleSubscribe} className="flex gap-0 w-full sm:w-auto" style={{ maxWidth: "400px", margin: "0 auto" }}>
               <input
                 type="email"
                 value={email}
