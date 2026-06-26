@@ -583,7 +583,7 @@ export default function SenotaVaultPage() {
           >
             {[
               { label: "Threats Detected", value: "14.2M+", icon: TrendingUp },
-              { label: "Pieces Protected", value: "2.8M+", icon: Lock },
+              { label: "Content Protected", value: "2.8M+", icon: Lock },
               { label: "Enforcement Success", value: "99.7%", icon: CheckCircle },
             ].map((stat, i) => (
               <div
