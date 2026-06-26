@@ -269,7 +269,7 @@ export default function SenotaVaultPage() {
             minHeight: "100vh",
             position: "relative",
             overflow: "hidden",
-            background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
+            background: "#000000",
           }}
         >
           {/* Starfield background */}
@@ -420,21 +420,20 @@ export default function SenotaVaultPage() {
               >
                 <a
                   href="/vault/get-started"
-                  className="inline-flex items-center gap-2 px-8 py-3 transition-all"
+                  className="inline-flex items-center gap-3 px-10 py-4 transition-all relative group"
                   style={{
-                    background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+                    background: "linear-gradient(to right, #7C3AED, #3B82F6)",
                     color: "#FFFFFF",
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "14px",
+                    fontSize: "15px",
                     fontWeight: 600,
-                    letterSpacing: "0.04em",
                     textDecoration: "none",
-                    borderRadius: "8px",
-                    border: "1px solid rgba(124,58,237,0.6)",
+                    borderRadius: "12px",
                     boxShadow: "0 0 30px rgba(124,58,237,0.4)",
+                    overflow: "hidden",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.6)";
                     (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
@@ -442,33 +441,43 @@ export default function SenotaVaultPage() {
                     (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                   }}
                 >
+                  {/* Button Shine/Glare Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                  <style>{`
+                    @keyframes shimmer {
+                      100% { transform: translateX(100%); }
+                    }
+                  `}</style>
                   Protect My Content
-                  <ArrowRight size={16} />
+                  <ArrowRight size={18} />
                 </a>
                 <a
                   href="/vault/learn-more"
-                  className="inline-flex items-center gap-2 px-8 py-3 transition-all"
+                  className="inline-flex items-center gap-3 px-10 py-4 transition-all"
                   style={{
-                    border: "1px solid rgba(167,139,250,0.3)",
-                    color: "#A78BFA",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "#FFFFFF",
                     fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "14px",
+                    fontSize: "15px",
                     fontWeight: 500,
-                    letterSpacing: "0.04em",
                     textDecoration: "none",
-                    borderRadius: "8px",
-                    background: "transparent",
+                    borderRadius: "12px",
+                    background: "rgba(255,255,255,0.03)",
+                    backdropFilter: "blur(10px)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.6)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.2)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.3)";
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
                   }}
                 >
                   See How It Works
+                  <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+                    <Play size={12} fill="currentColor" />
+                  </div>
                 </a>
               </div>
 
@@ -496,15 +505,54 @@ export default function SenotaVaultPage() {
                 <div className="absolute w-[150%] h-[150%] bg-purple-600/10 blur-[120px] rounded-full -z-10" />
                 <div className="absolute w-[100%] h-[100%] bg-blue-600/10 blur-[100px] rounded-full -z-10" />
 
+                {/* Digital Halo Pedestal */}
+                <div 
+                  style={{
+                    position: "absolute",
+                    bottom: "15%",
+                    width: "400px",
+                    height: "100px",
+                    background: "radial-gradient(ellipse at center, rgba(124,58,237,0.4) 0%, transparent 70%)",
+                    transform: "rotateX(75deg)",
+                    zIndex: 5,
+                  }}
+                />
+                <div 
+                  style={{
+                    position: "absolute",
+                    bottom: "18%",
+                    width: "300px",
+                    height: "300px",
+                    border: "2px solid rgba(124,58,237,0.3)",
+                    borderRadius: "50%",
+                    transform: "rotateX(75deg)",
+                    boxShadow: "0 0 40px rgba(124,58,237,0.4), inset 0 0 40px rgba(124,58,237,0.2)",
+                    zIndex: 5,
+                  }}
+                />
+                <div 
+                  style={{
+                    position: "absolute",
+                    bottom: "20%",
+                    width: "200px",
+                    height: "200px",
+                    border: "1px solid rgba(59,130,246,0.4)",
+                    borderRadius: "50%",
+                    transform: "rotateX(75deg)",
+                    animation: "rotate-slow 10s linear infinite",
+                    zIndex: 5,
+                  }}
+                />
+
                 {/* Shield asset */}
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                <div className="relative z-10 w-full h-full flex items-center justify-center" style={{ transform: "translateY(-20px)" }}>
                   <img 
-                    src="/aegis-shield.png" 
+                    src="/aegis-shield-v2.png" 
                     alt="Aegis Shield" 
                     style={{
-                      width: "100%",
+                      width: "110%",
                       height: "auto",
-                      filter: "drop-shadow(0 0 50px rgba(124,58,237,0.4))",
+                      filter: "drop-shadow(0 0 60px rgba(124,58,237,0.5))",
                       animation: "pulse-glow 4s ease-in-out infinite"
                     }}
                   />
