@@ -385,34 +385,31 @@ export default function SenotaVaultPage() {
               <h1
                 style={{
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(48px, 8vw, 72px)",
+                  fontSize: "clamp(56px, 9vw, 80px)",
                   fontWeight: 700,
-                  lineHeight: 1.1,
+                  lineHeight: 1.15,
                   marginBottom: "24px",
                   animation: "float-up 0.8s ease-out 0.1s both",
-                  background: "linear-gradient(to right, #FFFFFF 0%, #FFFFFF 60%, #7C3AED 100%)",
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
+                  color: "#FFFFFF",
                 }}
               >
                 Your Content,<br />
-                <span style={{ background: "linear-gradient(to right, #7C3AED, #3B82F6)", backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Guarded by</span><br />
-                <span style={{ background: "linear-gradient(to right, #3B82F6, #06B6D4)", backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Intelligence.</span>
+                <span style={{ color: "#7C3AED" }}>Guarded by</span><br />
+                <span style={{ color: "#3B82F6" }}>Intelligence.</span>
               </h1>
 
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "16px",
-                  color: "#A0A0C0",
-                  maxWidth: "500px",
+                  fontSize: "15px",
+                  color: "#8080A0",
+                  maxWidth: "520px",
                   marginBottom: "32px",
-                  lineHeight: 1.7,
+                  lineHeight: 1.6,
                   animation: "float-up 0.8s ease-out 0.2s both",
                 }}
               >
-                Senota Vault protects your creative work across the web—detecting theft, enforcing rights, and preserving your value.
+                Aegis Digital protects your creative work across the web—detecting theft, enforcing rights, and preserving your value.
               </p>
 
               <div
@@ -423,25 +420,25 @@ export default function SenotaVaultPage() {
               >
                 <a
                   href="/vault/get-started"
-                  className="inline-flex items-center gap-2 px-8 py-4 transition-all"
+                  className="inline-flex items-center gap-2 px-8 py-3 transition-all"
                   style={{
                     background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
                     color: "#FFFFFF",
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: "14px",
                     fontWeight: 600,
-                    letterSpacing: "0.06em",
+                    letterSpacing: "0.04em",
                     textDecoration: "none",
-                    borderRadius: "50px",
-                    border: "1px solid rgba(124,58,237,0.5)",
-                    boxShadow: "0 0 40px rgba(124,58,237,0.5)",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(124,58,237,0.6)",
+                    boxShadow: "0 0 30px rgba(124,58,237,0.4)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 70px rgba(124,58,237,0.8)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
                     (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.5)";
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
                     (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                   }}
                 >
@@ -450,25 +447,25 @@ export default function SenotaVaultPage() {
                 </a>
                 <a
                   href="/vault/learn-more"
-                  className="inline-flex items-center gap-2 px-8 py-4 transition-all"
+                  className="inline-flex items-center gap-2 px-8 py-3 transition-all"
                   style={{
-                    border: "1px solid rgba(167,139,250,0.4)",
+                    border: "1px solid rgba(167,139,250,0.3)",
                     color: "#A78BFA",
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: "14px",
                     fontWeight: 500,
                     letterSpacing: "0.04em",
                     textDecoration: "none",
-                    borderRadius: "50px",
-                    background: "rgba(124,58,237,0.05)",
+                    borderRadius: "8px",
+                    background: "transparent",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.8)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.6)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.4)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.3)";
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
                   }}
                 >
                   See How It Works
