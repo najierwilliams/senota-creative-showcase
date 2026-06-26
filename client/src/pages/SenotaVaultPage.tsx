@@ -272,12 +272,11 @@ export default function SenotaVaultPage() {
             background: "linear-gradient(135deg, #0A0A1A 0%, #0D0D2B 40%, #12003A 70%, #0A0A1A 100%)",
           }}
         >
-          {/* Grid overlay */}
+          {/* Starfield background */}
           <div
-            className="absolute inset-0 pointer-events-none opacity-5"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: "linear-gradient(0deg, transparent 24%, rgba(124,58,237,0.05) 25%, rgba(124,58,237,0.05) 26%, transparent 27%, transparent 74%, rgba(124,58,237,0.05) 75%, rgba(124,58,237,0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(124,58,237,0.05) 25%, rgba(124,58,237,0.05) 26%, transparent 27%, transparent 74%, rgba(124,58,237,0.05) 75%, rgba(124,58,237,0.05) 76%, transparent 77%, transparent)",
-              backgroundSize: "60px 60px",
+              background: "radial-gradient(circle at 20% 50%, rgba(124,58,237,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59,130,246,0.1) 0%, transparent 50%)",
             }}
           />
 
@@ -340,11 +339,27 @@ export default function SenotaVaultPage() {
                 opacity: 1;
               }
             }
+            @keyframes rotate-slow {
+              from {
+                transform: rotateZ(0deg);
+              }
+              to {
+                transform: rotateZ(360deg);
+              }
+            }
+            @keyframes pulse-glow {
+              0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(124,58,237,0.6)) drop-shadow(0 0 40px rgba(59,130,246,0.3));
+              }
+              50% {
+                filter: drop-shadow(0 0 40px rgba(124,58,237,0.8)) drop-shadow(0 0 80px rgba(59,130,246,0.5));
+              }
+            }
           `}</style>
 
-          <div className="relative z-10 container px-6 py-24 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
+          <div className="relative z-10 container px-6 py-20 flex flex-col lg:flex-row items-center gap-8 lg:gap-16">
             {/* Left: text */}
-            <div className="flex-1 max-w-2xl lg:pr-12">
+            <div className="flex-1 max-w-2xl">
               <div
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
                 style={{
@@ -370,28 +385,34 @@ export default function SenotaVaultPage() {
               <h1
                 style={{
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                  fontSize: "clamp(36px, 8vw, 72px)",
+                  fontSize: "clamp(48px, 8vw, 72px)",
                   fontWeight: 700,
                   lineHeight: 1.1,
                   marginBottom: "24px",
                   animation: "float-up 0.8s ease-out 0.1s both",
+                  background: "linear-gradient(to right, #FFFFFF 0%, #FFFFFF 60%, #7C3AED 100%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
                 }}
               >
-                SENOTA VAULT
+                Your Content,<br />
+                <span style={{ background: "linear-gradient(to right, #7C3AED, #3B82F6)", backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Guarded by</span><br />
+                <span style={{ background: "linear-gradient(to right, #3B82F6, #06B6D4)", backgroundClip: "text", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Intelligence.</span>
               </h1>
 
               <p
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "clamp(16px, 2vw, 20px)",
-                  color: "#8080B0",
+                  fontSize: "16px",
+                  color: "#A0A0C0",
                   maxWidth: "500px",
                   marginBottom: "32px",
                   lineHeight: 1.7,
                   animation: "float-up 0.8s ease-out 0.2s both",
                 }}
               >
-                The all-in-one content protection platform built for creators. <span style={{ color: "#A78BFA", fontWeight: 600 }}>Powered by AI.</span> <span style={{ color: "#6060A0" }}>Backed by trust.</span>
+                Senota Vault protects your creative work across the web—detecting theft, enforcing rights, and preserving your value.
               </p>
 
               <div
@@ -411,7 +432,8 @@ export default function SenotaVaultPage() {
                     fontWeight: 600,
                     letterSpacing: "0.06em",
                     textDecoration: "none",
-                    borderRadius: "4px",
+                    borderRadius: "50px",
+                    border: "1px solid rgba(124,58,237,0.5)",
                     boxShadow: "0 0 40px rgba(124,58,237,0.5)",
                   }}
                   onMouseEnter={(e) => {
@@ -423,7 +445,7 @@ export default function SenotaVaultPage() {
                     (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                   }}
                 >
-                  Get Started
+                  Protect My Content
                   <ArrowRight size={16} />
                 </a>
                 <a
@@ -437,7 +459,7 @@ export default function SenotaVaultPage() {
                     fontWeight: 500,
                     letterSpacing: "0.04em",
                     textDecoration: "none",
-                    borderRadius: "4px",
+                    borderRadius: "50px",
                     background: "rgba(124,58,237,0.05)",
                   }}
                   onMouseEnter={(e) => {
@@ -449,47 +471,161 @@ export default function SenotaVaultPage() {
                     (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
                   }}
                 >
-                  Learn More
+                  See How It Works
                 </a>
               </div>
 
+            </div>
+
+            {/* Right: Shield with cosmic sphere */}
+            <div
+              className="flex-1 flex items-center justify-center"
+              style={{
+                animation: "float-up 0.8s ease-out 0.2s both",
+              }}
+            >
               <div
-                className="grid grid-cols-3 gap-6"
                 style={{
-                  animation: "float-up 0.8s ease-out 0.4s both",
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "400px",
+                  aspectRatio: "1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {[
-                  { stat: "14.2M+", label: "Threats detected & blocked" },
-                  { stat: "99.7%", label: "Accuracy rate across all detections" },
-                  { stat: "50K+", label: "Creators protected" },
-                ].map((item, i) => (
-                  <div key={i}>
-                    <p
+                {/* Outer glow rings */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "50%",
+                    border: "2px solid rgba(124,58,237,0.3)",
+                    animation: "rotate-slow 20s linear infinite",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: "20px",
+                    borderRadius: "50%",
+                    border: "1px solid rgba(59,130,246,0.2)",
+                    animation: "rotate-slow 30s linear infinite reverse",
+                  }}
+                />
+
+                {/* Shield container */}
+                <div
+                  style={{
+                    position: "relative",
+                    width: "280px",
+                    height: "300px",
+                    background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(59,130,246,0.1))",
+                    border: "2px solid rgba(124,58,237,0.4)",
+                    borderRadius: "20px 20px 40px 40px",
+                    boxShadow: "0 0 60px rgba(124,58,237,0.4), inset 0 0 40px rgba(124,58,237,0.1)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
+                    animation: "pulse-glow 3s ease-in-out infinite",
+                  }}
+                >
+                  {/* Cosmic sphere inside shield */}
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "200px",
+                      height: "200px",
+                      borderRadius: "50%",
+                      background: "radial-gradient(circle at 30% 30%, rgba(59,130,246,0.8), rgba(124,58,237,0.4) 30%, rgba(139,92,246,0.2) 60%, transparent 100%)",
+                      boxShadow: "0 0 80px rgba(59,130,246,0.6), 0 0 120px rgba(124,58,237,0.3), inset -20px -20px 60px rgba(0,0,0,0.3)",
+                      animation: "rotate-slow 15s linear infinite",
+                    }}
+                  >
+                    {/* Inner glow */}
+                    <div
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "clamp(18px, 4vw, 28px)",
-                        fontWeight: 700,
-                        color: "#FFFFFF",
-                        marginBottom: "4px",
+                        position: "absolute",
+                        inset: "20px",
+                        borderRadius: "50%",
+                        background: "radial-gradient(circle at 40% 40%, rgba(167,139,250,0.6), transparent 70%)",
+                        filter: "blur(10px)",
                       }}
-                    >
-                      {item.stat}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "12px",
-                        color: "#6060A0",
-                        letterSpacing: "0.04em",
-                      }}
-                    >
-                      {item.label}
-                    </p>
+                    />
                   </div>
-                ))}
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Right side stats */}
+          <div
+            style={{
+              position: "absolute",
+              right: "60px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "24px",
+              animation: "float-up 0.8s ease-out 0.4s both",
+              zIndex: 5,
+            }}
+            className="hidden lg:flex"
+          >
+            {[
+              { value: "14.2M+", label: "Threats Detected" },
+              { value: "2.8M+", label: "Pieces Protected" },
+              { value: "99.7%", label: "Enforcement Success" },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "12px 16px",
+                  background: "rgba(124,58,237,0.1)",
+                  border: "1px solid rgba(124,58,237,0.3)",
+                  borderRadius: "8px",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "50%",
+                    background: i === 0 ? "#EF4444" : i === 1 ? "#7C3AED" : "#10B981",
+                  }}
+                />
+                <div>
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "12px",
+                      color: "#A78BFA",
+                      margin: 0,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {stat.value}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: "10px",
+                      color: "#6060A0",
+                      margin: 0,
+                    }}
+                  >
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Scroll indicator */}
