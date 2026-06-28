@@ -72,7 +72,9 @@ export default function BetaWhitepaperPage() {
             A comprehensive deep-dive into the neural encryption protocols, distributed ledger architecture, and quantum-resistant cryptography powering the next generation of creator protection.
           </p>
 
-          <button
+          <a
+            href="/Senota_Vault_Whitepaper.pdf"
+            download="Senota_Vault_Whitepaper.pdf"
             style={{
               backgroundColor: "#00D9FF",
               color: "#000000",
@@ -86,7 +88,8 @@ export default function BetaWhitepaperPage() {
               alignItems: "center",
               gap: "10px",
               transition: "all 0.3s ease",
-              boxShadow: "0 0 30px rgba(0, 217, 255, 0.4)"
+              boxShadow: "0 0 30px rgba(0, 217, 255, 0.4)",
+              textDecoration: "none"
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "scale(1.05)";
@@ -99,7 +102,7 @@ export default function BetaWhitepaperPage() {
           >
             <Download size={16} />
             DOWNLOAD PDF
-          </button>
+          </a>
         </div>
 
         {/* Content Sections */}

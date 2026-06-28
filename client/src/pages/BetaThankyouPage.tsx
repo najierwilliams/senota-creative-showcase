@@ -95,7 +95,7 @@ export default function BetaThankyouPage() {
             color: "#FFFFFF",
             textShadow: "0 0 20px rgba(0, 217, 255, 0.5)"
           }}>
-            Welcome to the <span style={{ color: "#00D9FF" }}>Inner Circle</span>
+            Welcome to the <span style={{ color: "#00D9FF" }}>Vault</span>
           </h1>
           
           <p style={{ 
