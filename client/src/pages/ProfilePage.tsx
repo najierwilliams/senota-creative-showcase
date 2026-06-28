@@ -2,23 +2,16 @@ import { useEffect, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuth } from "@/_core/hooks/useSupabaseAuth";
-import { useLocation } from "wouter";
 import { User, Mail, Shield, Settings, LogOut, Loader2, Copy, CheckCircle, Award, Zap, Heart } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { user, isAuthenticated, loading, logout } = useAuth();
-  const [, navigate] = useLocation();
   const [copied, setCopied] = useState(false);
 
-  // The header and global state will handle redirection if needed.
-  // We'll just show the loading state or the content based on auth.
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      // Use replace to avoid back-button loops
-      window.location.replace("/login");
-    }
-  }, [isAuthenticated, loading]);
+  // Note: We removed the auth guard here to prevent redirect loops.
+  // The page will show a loading state while auth is being checked.
+  // If not authenticated, the page will show a message instead of redirecting.
 
   // If we're loading the session, show a spinner
   if (loading) {
@@ -29,8 +22,31 @@ export default function ProfilePage() {
     );
   }
 
-  // If not authenticated, we'll be redirected by the useEffect above
-  if (!isAuthenticated) return null;
+  // If not authenticated, show a message instead of redirecting
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#F7F7F7" }}>
+        <SiteHeader />
+        <main className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center max-w-md">
+            <h1 className="text-2xl font-serif uppercase tracking-widest text-[#1A1A1A] mb-4">
+              Access Denied
+            </h1>
+            <p className="text-sm text-[#8A8A8A] mb-8">
+              You need to be signed in to view your profile. Please sign in first.
+            </p>
+            <a
+              href="/login"
+              className="inline-block px-6 py-3 bg-[#1A1A1A] text-white text-xs uppercase tracking-widest font-bold hover:bg-black transition-all rounded"
+            >
+              Sign In
+            </a>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   const handleCopyEmail = () => {
     if (user?.email) {
@@ -42,7 +58,6 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await logout();
-    window.location.href = "/";
   };
 
   return (
@@ -86,14 +101,6 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-3 border-t border-[#E5E7EB] pt-6">
-                    <button
-                      onClick={() => navigate("/account")}
-                      className="w-full py-3 flex items-center justify-center gap-2 border border-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs uppercase tracking-widest font-bold rounded"
-                    >
-                      <Settings size={14} />
-                      Settings
-                    </button>
-
                     <button
                       onClick={handleLogout}
                       className="w-full py-3 flex items-center justify-center gap-2 border border-[#CC0000] text-[#CC0000] hover:bg-[#CC0000] hover:text-white transition-all text-xs uppercase tracking-widest font-bold rounded"
