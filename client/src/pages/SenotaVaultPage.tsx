@@ -270,7 +270,7 @@ export default function SenotaVaultPage() {
           style={{
             minHeight: "100vh",
             position: "relative",
-            overflow: "hidden",
+            overflowX: "hidden",
             background: "#000000",
           }}
         >
@@ -675,7 +675,10 @@ export default function SenotaVaultPage() {
           </div>
 
           {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <div
+            className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+            style={{ bottom: isMobile ? "32px" : "-64px" }}
+          >
             <span
               style={{
                 fontFamily: "'Space Mono', monospace",
