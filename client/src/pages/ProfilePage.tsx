@@ -12,11 +12,13 @@ export default function ProfilePage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    // Only redirect to login if we're sure the user is NOT authenticated
     if (!loading && !isAuthenticated) {
       navigate("/login");
     }
   }, [isAuthenticated, loading, navigate]);
 
+  // If we're loading the session, show a spinner
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7]">
@@ -25,6 +27,7 @@ export default function ProfilePage() {
     );
   }
 
+  // If not authenticated, we'll be redirected by the useEffect above
   if (!isAuthenticated) return null;
 
   const handleCopyEmail = () => {
