@@ -693,7 +693,6 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                 </button>
               </div>
             )}
-            </div>
           </div>
         </div>
 
