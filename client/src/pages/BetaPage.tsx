@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Home, Shield, Cpu, Zap, Lock, Terminal, ArrowRight, ChevronRight } from "lucide-react";
-import { Link } from "wouter";
+import { Cpu, Zap, Lock, ArrowRight } from "lucide-react";
+import BetaHeader from "@/components/BetaHeader";
 
 export default function BetaPage() {
   const [glitchText, setGlitchText] = useState("SECURE ACCESS GRANTED");
@@ -12,8 +12,7 @@ export default function BetaPage() {
       "> Initializing Senota Neural Link...",
       "> decrypting_vault_v2.0.4.bin",
       "> connection established via node_0x442",
-      "> status: early_access_authorized",
-      "> warning: beta_environment_unstable",
+      "> status: early_access_pending",
     ];
     
     let i = 0;
@@ -48,54 +47,7 @@ export default function BetaPage() {
         zIndex: 0
       }} />
 
-      {/* Custom Header */}
-      <header style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: "64px",
-        padding: "0 24px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottom: "1px solid rgba(0, 217, 255, 0.1)",
-        backgroundColor: "rgba(5, 5, 5, 0.8)",
-        backdropFilter: "blur(10px)",
-        zIndex: 100
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Shield size={20} color="#00D9FF" />
-          <span style={{ fontWeight: 700, letterSpacing: "0.2em", fontSize: "14px" }}>SENOTA // BETA</span>
-        </div>
-        
-        <a 
-          href="https://senotastudios.com" 
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            color: "#00D9FF",
-            textDecoration: "none",
-            fontSize: "12px",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            border: "1px solid rgba(0, 217, 255, 0.3)",
-            transition: "all 0.3s ease"
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "rgba(0, 217, 255, 0.1)";
-            e.currentTarget.style.borderColor = "#00D9FF";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-            e.currentTarget.style.borderColor = "rgba(0, 217, 255, 0.3)";
-          }}
-        >
-          <Home size={14} />
-          RETURN HOME
-        </a>
-      </header>
+      <BetaHeader />
 
       <main style={{ 
         paddingTop: "120px", 
@@ -118,7 +70,7 @@ export default function BetaPage() {
             marginBottom: "24px",
             border: "1px solid rgba(0, 217, 255, 0.3)"
           }}>
-            PROTOCOL v2.0-BETA
+            PROTOCOL v1.0-BETA
           </div>
           
           <h1 style={{ 
@@ -179,7 +131,8 @@ export default function BetaPage() {
 
           {/* Action Buttons */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
-            <button 
+            <a
+              href="/beta/signup"
               style={{
                 backgroundColor: "#00D9FF",
                 color: "#000000",
@@ -193,7 +146,8 @@ export default function BetaPage() {
                 alignItems: "center",
                 gap: "10px",
                 transition: "all 0.3s ease",
-                boxShadow: "0 0 30px rgba(0, 217, 255, 0.4)"
+                boxShadow: "0 0 30px rgba(0, 217, 255, 0.4)",
+                textDecoration: "none"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
@@ -206,9 +160,10 @@ export default function BetaPage() {
             >
               INITIALIZE BETA ACCESS
               <ArrowRight size={18} />
-            </button>
+            </a>
             
-            <button 
+            <a
+              href="/beta/whitepaper"
               style={{
                 backgroundColor: "transparent",
                 color: "#FFFFFF",
@@ -218,7 +173,9 @@ export default function BetaPage() {
                 fontWeight: 700,
                 fontSize: "14px",
                 cursor: "pointer",
-                transition: "all 0.3s ease"
+                transition: "all 0.3s ease",
+                textDecoration: "none",
+                display: "inline-block"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
@@ -230,7 +187,7 @@ export default function BetaPage() {
               }}
             >
               READ WHITEPAPER
-            </button>
+            </a>
           </div>
         </div>
 
