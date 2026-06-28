@@ -65,10 +65,12 @@ export function useAuth() {
     }
 
     // Full state resolved
+    // isAuthenticated should depend on the session, not the profile data,
+    // to prevent flickering if the profile load fails or is slow.
     return {
       user: meQuery.data ?? null,
       loading: false,
-      isAuthenticated: !!meQuery.data,
+      isAuthenticated: true,
       error: meQuery.error
     };
   }, [loading, session, meQuery.isLoading, meQuery.data, meQuery.error]);
