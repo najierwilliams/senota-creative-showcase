@@ -393,6 +393,25 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                           {user.role === "circle" ? "The Circle" : user.role === "employee" ? "Employee" : user.role === "admin" ? "Admin" : "Customer"}
                         </p>
                       </div>
+                      {/* Profile link */}
+                      <button
+                        onClick={() => { setAccountOpen(false); navigate("/profile"); }}
+                        className="w-full text-left px-4 py-3 transition-colors"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: "12px",
+                          color: "#D0D0D0",
+                          letterSpacing: "0.06em",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          borderBottom: "1px solid #2A2A2A",
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
+                      >
+                        My Profile
+                      </button>
                       {/* Dashboard link */}
                       <button
                         onClick={() => { setAccountOpen(false); navigate(getDashboardPath(user.role)); }}

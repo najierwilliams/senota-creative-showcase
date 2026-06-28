@@ -36,9 +36,9 @@ export default function LoginPage() {
         if (error) throw error;
         
         toast.success("Welcome back!");
-        // Force hard redirect to homepage to ensure all states are clean
+        // Redirect to profile page
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = "/profile";
         }, 500);
       }
     } catch (error: any) {
