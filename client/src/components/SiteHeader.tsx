@@ -18,7 +18,7 @@ import { getLoginUrl } from "@/const";
 const COVER_URL =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663669938069/R2tmVQHg3mxoijLEDBNh7f/senota-issue-01-cover-FPHewCEVPfJ9k2ps7aYQuT.webp";
 
-const NAV_LINKS = [
+const BASE_NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Magazine", href: "/magazine" },
   { label: "Fashion", href: "/fashion" },
@@ -61,6 +61,9 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
   const { user, isAuthenticated, loading, logout, supabaseUser } = useAuth();
+  
+  // Dynamically add "My Profile" to nav links if authenticated
+  const NAV_LINKS = isAuthenticated ? [...BASE_NAV_LINKS, { label: "My Profile", href: "/profile" }] : BASE_NAV_LINKS;
   
   // Check role from our DB, fallback to Supabase user metadata if available
   const supabaseRole = (supabaseUser?.user_metadata as any)?.role?.toLowerCase();
@@ -348,137 +351,26 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               <BookOpen size={17} strokeWidth={1.5} color="#1A1A1A" />
             </button>
 
-            {/* Account / Login button — desktop only; mobile users access via drawer */}
-            <div ref={accountRef} className="relative hidden md:block">
-              {loading ? (
-                <div className="px-4 py-1 animate-pulse bg-gray-200 rounded w-20 h-6"></div>
-              ) : isAuthenticated ? (
-                <>
-                  <button
-                    onClick={() => setAccountOpen((v) => !v)}
-                    className="flex items-center gap-1 px-2 py-1 transition-opacity hover:opacity-70"
-                    aria-label="Account"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "11px",
-                      color: "#1A1A1A",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {user?.role === "circle" ? (
-                      <Crown size={16} strokeWidth={1.5} style={{ color: "#CC0000" }} />
-                    ) : user?.role === "employee" || user?.role === "admin" ? (
-                      <Briefcase size={16} strokeWidth={1.5} />
-                    ) : (
-                      <UserCircle size={16} strokeWidth={1.5} />
-                    )}
-                    <span className="hidden sm:inline max-w-[80px] truncate">
-                      {user ? "Dashboard" : "Loading..."}
-                    </span>
-                    <ChevronDown size={12} />
-                  </button>
-
-                  {accountOpen && (
-                    <div
-                      className="absolute right-0 top-full mt-1 z-50"
-                      style={{
-                        backgroundColor: "#1A1A1A",
-                        minWidth: "180px",
-                        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-                      }}
-                    >
-                      {/* User info */}
-                      <div className="px-4 py-3" style={{ borderBottom: "1px solid #2A2A2A" }}>
-                        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "13px", fontWeight: 600, color: "#F7F7F7", marginBottom: "2px" }}>
-                          {user?.name || "Loading..."}
-                        </p>
-                        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#8A8A8A", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                          {user?.role === "circle" ? "The Circle" : user?.role === "employee" ? "Employee" : user?.role === "admin" ? "Admin" : "Customer"}
-                        </p>
-                      </div>
-                      {/* Profile link */}
-                      <button
-                        onClick={() => { setAccountOpen(false); navigate("/profile"); }}
-                        className="w-full text-left px-4 py-3 transition-colors"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#D0D0D0",
-                          letterSpacing: "0.06em",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          borderBottom: "1px solid #2A2A2A",
-                        }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
-                      >
-                        My Profile
-                      </button>
-                      {/* Dashboard link */}
-                      <button
-                        onClick={() => { setAccountOpen(false); navigate(getDashboardPath(user?.role)); }}
-                        className="w-full text-left px-4 py-3 transition-colors"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#D0D0D0",
-                          letterSpacing: "0.06em",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          borderBottom: "1px solid #2A2A2A",
-                        }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
-                      >
-                        My Dashboard
-                      </button>
-                      {/* Sign out */}
-                      <button
-                        onClick={() => { setAccountOpen(false); logout(); }}
-                        className="w-full text-left px-4 py-3 flex items-center gap-2 transition-colors"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "12px",
-                          color: "#8A8A8A",
-                          letterSpacing: "0.06em",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "#2A2A2A"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}
-                      >
-                        <LogOut size={12} />
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <button
-                  onClick={handleSignIn}
-                  className="flex items-center gap-1.5 px-3 py-1 transition-opacity hover:opacity-70"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "11px",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "#1A1A1A",
-                    border: "1px solid #1A1A1A",
-                    background: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <UserCircle size={14} strokeWidth={1.5} />
-                  <span className="hidden sm:inline">Sign In</span>
-                </button>
-              )}
-            </div>
+            {/* Sign In button — desktop only; only show for unauthenticated users */}
+            {!loading && !isAuthenticated && (
+              <button
+                onClick={handleSignIn}
+                className="flex items-center gap-1.5 px-3 py-1 transition-opacity hover:opacity-70"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "11px",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#1A1A1A",
+                  border: "1px solid #1A1A1A",
+                  background: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <UserCircle size={14} strokeWidth={1.5} />
+                <span className="hidden sm:inline">Sign In</span>
+              </button>
+            )}
 
             {/* Search icon / input — desktop: inline expand; mobile: full-screen overlay */}
             {/* Desktop inline search */}
@@ -734,48 +626,9 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
               </div>
             </div>
 
-            {/* Mobile Account / Login section */}
-            <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {loading ? (
-                <div className="w-full py-3 animate-pulse bg-gray-200 rounded"></div>
-              ) : isAuthenticated ? (
-                <>
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
-                    className="flex items-center gap-2 w-full justify-center py-3"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "12px",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: "#F7F7F7",
-                      backgroundColor: "#CC0000",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <ShieldAlert size={15} />
-                    Employee Portal
-                  </button>
-                  <button
-                    onClick={() => { setMobileMenuOpen(false); navigate("/profile"); }}
-                    className="flex items-center gap-2 w-full justify-center py-3"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: "12px",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: "#F7F7F7",
-                      backgroundColor: "#1A1A1A",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <UserCircle size={15} />
-                    MY PROFILE
-                  </button>
-                </>
-              ) : (
+            {/* Mobile Sign In button — only show for unauthenticated users */}
+            {!loading && !isAuthenticated && (
+              <div className="mt-6 pt-6" style={{ borderTop: "1px solid #E5E7EB" }}>
                 <button
                   onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
@@ -793,7 +646,53 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                   <UserCircle size={15} />
                   SIGN IN
                 </button>
-              )}
+              </div>
+            )}
+            
+            {/* Mobile Employee Portal button — only show for authenticated users */}
+            {!loading && isAuthenticated && (
+              <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
+                  className="flex items-center gap-2 w-full justify-center py-3"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "12px",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#F7F7F7",
+                    backgroundColor: "#CC0000",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <ShieldAlert size={15} />
+                  Employee Portal
+                </button>
+              </div>
+            )}
+            
+            {/* Mobile Sign Out button — only show for authenticated users */}
+            {!loading && isAuthenticated && (
+              <div className="mt-4 pt-4" style={{ borderTop: "1px solid #E5E7EB" }}>
+                <button
+                  onClick={() => { setMobileMenuOpen(false); logout(); }}
+                  className="flex items-center gap-2 w-full justify-center py-3 text-[#CC0000]"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "12px",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    border: "1px solid #CC0000",
+                    background: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <LogOut size={15} />
+                  SIGN OUT
+                </button>
+              </div>
+            )}
             </div>
           </div>
         </div>
