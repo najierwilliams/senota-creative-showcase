@@ -249,11 +249,13 @@ function InteractiveGlobe() {
         cursor: isDragging ? "grabbing" : isHovered ? "grab" : "default",
       }}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        handleMouseUp();
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
     >
       <canvas
         ref={canvasRef}

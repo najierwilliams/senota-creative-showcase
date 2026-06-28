@@ -166,7 +166,7 @@ export default function BetaPage() {
                 </div>
               ))}
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span>></span>
+                <span>&gt;</span>
                 <span style={{ 
                   width: "8px", 
                   height: "14px", 
