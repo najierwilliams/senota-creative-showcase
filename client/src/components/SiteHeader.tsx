@@ -352,7 +352,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
             <div ref={accountRef} className="relative hidden md:block">
               {loading ? (
                 <div className="px-4 py-1 animate-pulse bg-gray-200 rounded w-20 h-6"></div>
-              ) : isAuthenticated && user ? (
+              ) : isAuthenticated ? (
                 <>
                   <button
                     onClick={() => setAccountOpen((v) => !v)}
@@ -368,14 +368,16 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                       letterSpacing: "0.04em",
                     }}
                   >
-                    {user.role === "circle" ? (
+                    {user?.role === "circle" ? (
                       <Crown size={16} strokeWidth={1.5} style={{ color: "#CC0000" }} />
-                    ) : user.role === "employee" || user.role === "admin" ? (
+                    ) : user?.role === "employee" || user?.role === "admin" ? (
                       <Briefcase size={16} strokeWidth={1.5} />
                     ) : (
                       <UserCircle size={16} strokeWidth={1.5} />
                     )}
-                    <span className="hidden sm:inline max-w-[80px] truncate">Dashboard</span>
+                    <span className="hidden sm:inline max-w-[80px] truncate">
+                      {user ? "Dashboard" : "Loading..."}
+                    </span>
                     <ChevronDown size={12} />
                   </button>
 
@@ -390,9 +392,11 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     >
                       {/* User info */}
                       <div className="px-4 py-3" style={{ borderBottom: "1px solid #2A2A2A" }}>
-                        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "13px", fontWeight: 600, color: "#F7F7F7", marginBottom: "2px" }}>{user.name}</p>
+                        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "13px", fontWeight: 600, color: "#F7F7F7", marginBottom: "2px" }}>
+                          {user?.name || "Loading..."}
+                        </p>
                         <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#8A8A8A", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                          {user.role === "circle" ? "The Circle" : user.role === "employee" ? "Employee" : user.role === "admin" ? "Admin" : "Customer"}
+                          {user?.role === "circle" ? "The Circle" : user?.role === "employee" ? "Employee" : user?.role === "admin" ? "Admin" : "Customer"}
                         </p>
                       </div>
                       {/* Profile link */}
@@ -416,7 +420,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                       </button>
                       {/* Dashboard link */}
                       <button
-                        onClick={() => { setAccountOpen(false); navigate(getDashboardPath(user.role)); }}
+                        onClick={() => { setAccountOpen(false); navigate(getDashboardPath(user?.role)); }}
                         className="w-full text-left px-4 py-3 transition-colors"
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
