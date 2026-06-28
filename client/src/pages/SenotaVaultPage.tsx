@@ -1618,7 +1618,7 @@ export default function SenotaVaultPage() {
                 </a>
               </div>
               <a
-                href="#beta"
+                href="/beta"
                 className="inline-flex items-center gap-3 px-10 py-5 transition-all relative"
                 style={{
                   border: "1.5px solid transparent",

@@ -24,6 +24,7 @@ import EmployeeDashboard from "./pages/EmployeeDashboard";
 import EmployeePortal from "./pages/EmployeePortal";
 import CircleDashboard from "./pages/CircleDashboard";
 import SenotaVaultPage from "./pages/SenotaVaultPage";
+import BetaPage from "./pages/BetaPage";
 import VaultGetStartedPage from "./pages/VaultGetStartedPage";
 import VaultContactSalesPage from "./pages/VaultContactSalesPage";
 import VaultLearnMorePage from "./pages/VaultLearnMorePage";
@@ -87,6 +88,7 @@ function Router() {
 
       {/* Senota Vault */}
       <Route path={"/vault"} component={SenotaVaultPage} />
+      <Route path={"/beta"} component={BetaPage} />
       <Route path={"/vault/get-started"} component={VaultGetStartedPage} />
       <Route path={"/vault/contact-sales"} component={VaultContactSalesPage} />
       <Route path={"/vault/learn-more"} component={VaultLearnMorePage} />
