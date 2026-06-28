@@ -15,12 +15,12 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
 
-  // If already authenticated, go to account page
+  // If already authenticated, go to profile page
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      navigate("/account");
+      window.location.replace("/profile");
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();

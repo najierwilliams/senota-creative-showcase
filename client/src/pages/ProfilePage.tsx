@@ -11,12 +11,14 @@ export default function ProfilePage() {
   const [, navigate] = useLocation();
   const [copied, setCopied] = useState(false);
 
+  // The header and global state will handle redirection if needed.
+  // We'll just show the loading state or the content based on auth.
   useEffect(() => {
-    // Only redirect to login if we're sure the user is NOT authenticated
     if (!loading && !isAuthenticated) {
-      navigate("/login");
+      // Use replace to avoid back-button loops
+      window.location.replace("/login");
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading]);
 
   // If we're loading the session, show a spinner
   if (loading) {
