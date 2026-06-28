@@ -60,7 +60,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
   const searchRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [, navigate] = useLocation();
-  const { user, isAuthenticated, logout, supabaseUser } = useAuth();
+  const { user, isAuthenticated, loading, logout, supabaseUser } = useAuth();
   
   // Check role from our DB, fallback to Supabase user metadata if available
   const supabaseRole = (supabaseUser?.user_metadata as any)?.role?.toLowerCase();
@@ -126,7 +126,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
   const handleSignIn = () => {
     if (isAuthenticated) {
-      navigate("/account");
+      navigate("/profile");
     } else {
       navigate("/login");
     }
@@ -136,7 +136,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
     if (user) {
       navigate(getDashboardPath(user.role));
     } else {
-      navigate("/account");
+      navigate("/profile");
     }
   };
 
@@ -350,7 +350,9 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Account / Login button — desktop only; mobile users access via drawer */}
             <div ref={accountRef} className="relative hidden md:block">
-              {isAuthenticated && user ? (
+              {loading ? (
+                <div className="px-4 py-1 animate-pulse bg-gray-200 rounded w-20 h-6"></div>
+              ) : isAuthenticated && user ? (
                 <>
                   <button
                     onClick={() => setAccountOpen((v) => !v)}
@@ -469,7 +471,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                   }}
                 >
                   <UserCircle size={14} strokeWidth={1.5} />
-                  <span className="hidden sm:inline">{isAuthenticated ? "My Account" : "Sign In"}</span>
+                  <span className="hidden sm:inline">Sign In</span>
                 </button>
               )}
             </div>
@@ -730,7 +732,9 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
 
             {/* Mobile Account / Login section */}
             <div className="mt-6 pt-6 flex flex-col gap-3" style={{ borderTop: "1px solid #E5E7EB" }}>
-              {isAuthenticated && (
+              {loading ? (
+                <div className="w-full py-3 animate-pulse bg-gray-200 rounded"></div>
+              ) : isAuthenticated ? (
                 <>
                   <button
                     onClick={() => { setMobileMenuOpen(false); navigate("/employee-portal"); }}
@@ -750,7 +754,7 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     Employee Portal
                   </button>
                   <button
-                    onClick={() => { setMobileMenuOpen(false); navigate("/account"); }}
+                    onClick={() => { setMobileMenuOpen(false); navigate("/profile"); }}
                     className="flex items-center gap-2 w-full justify-center py-3"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
@@ -764,11 +768,10 @@ export default function SiteHeader({ onSearchOpen }: SiteHeaderProps) {
                     }}
                   >
                     <UserCircle size={15} />
-                    MY ACCOUNT
+                    MY PROFILE
                   </button>
                 </>
-              )}
-              {!isAuthenticated && (
+              ) : (
                 <button
                   onClick={() => { setMobileMenuOpen(false); navigate("/login"); }}
                   className="flex items-center gap-2 w-full justify-center py-3"
