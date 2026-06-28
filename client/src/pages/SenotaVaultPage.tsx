@@ -1563,57 +1563,88 @@ export default function SenotaVaultPage() {
             >
               Join thousands of creators who trust Senota Vault to protect their content, identity, and brand.
             </p>
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-wrap gap-4 justify-center">
+                <a
+                  href="/vault/get-started"
+                  className="inline-flex items-center gap-3 px-10 py-5 transition-all hover:shadow-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+                    color: "#FFFFFF",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    letterSpacing: "0.06em",
+                    textDecoration: "none",
+                    borderRadius: "4px",
+                    boxShadow: "0 0 40px rgba(124,58,237,0.5)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 70px rgba(124,58,237,0.8)";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.5)";
+                    (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                  }}
+                >
+                  Get Started Today
+                  <ArrowRight size={18} />
+                </a>
+                <a
+                  href="#pricing"
+                  className="inline-flex items-center gap-3 px-10 py-5 transition-all"
+                  style={{
+                    border: "1px solid rgba(167,139,250,0.4)",
+                    color: "#A78BFA",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "15px",
+                    fontWeight: 500,
+                    letterSpacing: "0.04em",
+                    textDecoration: "none",
+                    borderRadius: "4px",
+                    background: "rgba(124,58,237,0.05)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.8)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.4)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
+                  }}
+                >
+                  View Pricing
+                </a>
+              </div>
               <a
-                href="/vault/get-started"
-                className="inline-flex items-center gap-3 px-10 py-5 transition-all hover:shadow-2xl"
+                href="#beta"
+                className="inline-flex items-center gap-3 px-10 py-5 transition-all relative"
                 style={{
-                  background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
-                  color: "#FFFFFF",
+                  border: "1.5px solid transparent",
+                  background: "linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)) padding-box, linear-gradient(135deg, #00D9FF, #0099FF) border-box",
+                  color: "#00D9FF",
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "15px",
                   fontWeight: 600,
                   letterSpacing: "0.06em",
                   textDecoration: "none",
                   borderRadius: "4px",
-                  boxShadow: "0 0 40px rgba(124,58,237,0.5)",
+                  boxShadow: "0 0 30px rgba(0,217,255,0.4), inset 0 0 20px rgba(0,217,255,0.05)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 70px rgba(124,58,237,0.8)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 60px rgba(0,217,255,0.8), inset 0 0 30px rgba(0,217,255,0.15)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(124,58,237,0.5)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(0,217,255,0.4), inset 0 0 20px rgba(0,217,255,0.05)";
                   (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
                 }}
               >
-                Get Started Today
-                <ArrowRight size={18} />
-              </a>
-              <a
-                href="#pricing"
-                className="inline-flex items-center gap-3 px-10 py-5 transition-all"
-                style={{
-                  border: "1px solid rgba(167,139,250,0.4)",
-                  color: "#A78BFA",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "15px",
-                  fontWeight: 500,
-                  letterSpacing: "0.04em",
-                  textDecoration: "none",
-                  borderRadius: "4px",
-                  background: "rgba(124,58,237,0.05)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.8)";
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.12)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.4)";
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.05)";
-                }}
-              >
-                View Pricing
+                <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "12px", color: "#00D9FF", fontWeight: 700, letterSpacing: "0.1em" }}>BETA</span>
+                  Unlock Early Access
+                </span>
               </a>
             </div>
           </div>
