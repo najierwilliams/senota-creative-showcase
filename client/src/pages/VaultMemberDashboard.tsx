@@ -71,6 +71,8 @@ import {
   Copy,
   Info,
   ChevronUp,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -87,6 +89,60 @@ const COLORS = {
   danger: "#EF4444",
   warning: "#F59E0B",
 };
+
+/* ── Membership tier data ─────────────────────────────────────────── */
+const TIERS = [
+  {
+    id: "basic",
+    name: "Vault Basic",
+    price: "$29",
+    period: "/month",
+    tagline: "Perfect for individuals and solo creators.",
+    recommended: false,
+    features: [
+      "Fake account monitoring",
+      "Impersonation alerts",
+      "Basic reporting assistance",
+      "Creator profile protection",
+      "Monthly security report",
+    ],
+    cta: "Downgrade to Basic",
+  },
+  {
+    id: "pro",
+    name: "Vault Pro",
+    price: "$99",
+    period: "/month",
+    tagline: "For growing teams and serious creators.",
+    recommended: true,
+    features: [
+      "Everything in Basic",
+      "Active content monitoring",
+      "Unlimited case tracking",
+      "Takedown assistance",
+      "Stolen content detection",
+      "Priority support",
+    ],
+    cta: "Downgrade to Pro",
+  },
+  {
+    id: "elite",
+    name: "Vault Elite",
+    price: "$299",
+    period: "/month",
+    tagline: "For enterprises and high-volume creators.",
+    recommended: false,
+    features: [
+      "Everything in Pro",
+      "Advanced monitoring",
+      "Brand protection",
+      "Faster response times",
+      "Dedicated account manager",
+      "Custom integrations",
+    ],
+    cta: "Current Plan",
+  },
+];
 
 /* ── Types ────────────────────────────────────────────────── */
 interface PendingAsset {
@@ -312,26 +368,7 @@ const OverviewView = () => {
           
           <div>
             <h4 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>What your score means:</h4>
-            <p style={{ fontSize: "13px", color: COLORS.textSecondary, lineHeight: 1.6 }}>Your current score reflects a high level of asset integrity. 88/100 indicates that 99.8% of your assets are successfully fingerprinted and monitored across all global nodes.</p>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <h4 style={{ fontSize: "14px", fontWeight: 600 }}>How to reach 100:</h4>
-            {[
-              { label: "Rotate API Keys", desc: "Your current keys expire in 48 hours.", icon: Key },
-              { label: "Verify Pending Signatures", desc: "You have 0 assets awaiting approval.", icon: Fingerprint },
-              { label: "Enable Multi-Geo Backup", desc: "Secure assets across 3+ global regions.", icon: Globe },
-            ].map((item, i) => (
-              <div key={i} style={{ display: "flex", gap: "16px", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
-                <div style={{ padding: "8px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", height: "fit-content" }}>
-                  <item.icon size={16} color={COLORS.accent} />
-                </div>
-                <div>
-                  <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{item.label}</p>
-                  <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: "4px 0 0" }}>{item.desc}</p>
-                </div>
-              </div>
-            ))}
+            <p style={{ fontSize: "13px", color: COLORS.textSecondary, lineHeight: 1.6 }}>Your current security posture is elite. Most assets are protected with valid neural signatures and global monitoring is active across all major platforms. To reach 95+, consider rotating your API keys and enabling 2FA for all administrative accounts.</p>
           </div>
         </div>
       </Modal>
@@ -418,7 +455,9 @@ const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePe
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ width: "50px", height: "50px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                  {asset.preview ? <img src={asset.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <FileText size={20} color={COLORS.textSecondary} />}
+                  {asset.preview ? <img src={asset.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (
+                    asset.type === "Video" ? <Music2 size={20} color={COLORS.textSecondary} /> : <FileText size={20} color={COLORS.textSecondary} />
+                  )}
                 </div>
                 <div>
                   <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
@@ -472,8 +511,7 @@ const GlobalMonitorView = () => {
       <Card title="Global Detection Network" subtitle="High-precision geographic surveillance" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
         <div style={{ height: "500px", background: "#050B15", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}`, boxShadow: "inset 0 0 100px rgba(59,130,246,0.1)" }}>
           {/* High-Detail World Map Image */}
-          <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.2, mixBlendMode: "screen" }} />
-          <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.1, mixBlendMode: "overlay" }} />
+          <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.3, mixBlendMode: "screen" }} />
           
           {/* Grid Lines */}
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -703,101 +741,156 @@ const EnforcementView = () => (
             <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}`, cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}>
               <tool.icon size={20} color={COLORS.accent} style={{ marginBottom: "12px" }} />
               <h4 style={{ fontSize: "13px", margin: "0 0 4px" }}>{tool.title}</h4>
-              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>{tool.desc}</p>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: 0 }}>{tool.desc}</p>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: "24px", padding: "20px", background: "rgba(212,175,55,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accent}30` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-            <ShieldAlert size={20} color={COLORS.accent} />
-            <h4 style={{ fontSize: "14px", margin: 0 }}>Rapid Response Toolkit</h4>
-          </div>
-          <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, marginBottom: "16px" }}>Immediate legal escalation for high-value asset leaks. Automatically generates multi-jurisdictional takedown notices.</p>
-          <button style={{ padding: "10px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Initialize Rapid Response</button>
+      </Card>
+      <Card title="Enforcement Stats" extra={<Shield size={16} color={COLORS.success} />}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {[
+            { label: "Total Takedowns", value: "142", color: COLORS.success },
+            { label: "Success Rate", value: "94.2%", color: COLORS.accentSecondary },
+            { label: "Average Resolution", value: "4.2 hrs", color: COLORS.accent },
+          ].map((stat, i) => (
+            <div key={i}>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "4px" }}>{stat.label}</p>
+              <p style={{ fontSize: "24px", fontWeight: 300, margin: 0, color: stat.color }}>{stat.value}</p>
+            </div>
+          ))}
         </div>
       </Card>
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Enforcement Success" subtitle="Resolution performance">
-          <div style={{ padding: "20px", textAlign: "center" }}>
-            <h2 style={{ fontSize: "48px", fontWeight: 300, margin: "0 0 8px", color: COLORS.success }}>99.7%</h2>
-            <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.2em", margin: 0 }}>Case Resolution Rate</p>
-            <div style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
-                  <span>Compliance Level</span>
-                  <span style={{ color: COLORS.success }}>High</span>
-                </div>
-                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
-                  <div style={{ width: "94%", height: "100%", background: COLORS.success }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
-                  <span>Legal Response Speed</span>
-                  <span style={{ color: COLORS.accentSecondary }}>4.2 Hours</span>
-                </div>
-                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
-                  <div style={{ width: "88%", height: "100%", background: COLORS.accentSecondary }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
     </div>
   </div>
 );
 
-const ProfileView = ({ onDeleteAccount, activeSignaturesCount }: any) => {
+const UpdateView = () => {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "32px", animation: "fadeIn 0.5s ease-out", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <h2 style={{ fontSize: "32px", fontWeight: 700, margin: "0 0 12px" }}>Manage Protection Tiers</h2>
+        <p style={{ fontSize: "16px", color: COLORS.textSecondary }}>Scale your asset protection as your creative portfolio grows.</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
+        {TIERS.map((tier) => (
+          <div 
+            key={tier.id} 
+            style={{ 
+              background: COLORS.surface, 
+              border: tier.id === "elite" ? `2px solid ${COLORS.accent}` : `1px solid ${COLORS.border}`, 
+              borderRadius: "16px", 
+              padding: "40px 32px",
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+              transition: "transform 0.3s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-8px)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          >
+            {tier.id === "elite" && (
+              <div style={{ position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: COLORS.accent, color: "#000", padding: "4px 12px", borderRadius: "20px", fontSize: "10px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                Current Elite Status
+              </div>
+            )}
+            
+            <h3 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 8px" }}>{tier.name}</h3>
+            <p style={{ fontSize: "13px", color: COLORS.textSecondary, margin: "0 0 24px", height: "40px" }}>{tier.tagline}</p>
+            
+            <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "32px" }}>
+              <span style={{ fontSize: "40px", fontWeight: 700 }}>{tier.price}</span>
+              <span style={{ fontSize: "14px", color: COLORS.textSecondary }}>{tier.period}</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "40px", flex: 1 }}>
+              {tier.features.map((feature, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                  <Check size={16} color={COLORS.accent} style={{ marginTop: "2px", flexShrink: 0 }} />
+                  <span style={{ fontSize: "13px", color: COLORS.textSecondary }}>{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              disabled={tier.id === "elite"}
+              style={{ 
+                padding: "16px", 
+                background: tier.id === "elite" ? "rgba(255,255,255,0.05)" : (tier.id === "pro" ? COLORS.accent : "transparent"), 
+                border: tier.id === "basic" ? `1px solid ${COLORS.border}` : "none",
+                borderRadius: "8px", 
+                color: tier.id === "elite" ? COLORS.textSecondary : (tier.id === "pro" ? "#000" : "#FFF"), 
+                fontSize: "14px", 
+                fontWeight: 700, 
+                cursor: tier.id === "elite" ? "default" : "pointer",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={(e) => tier.id !== "elite" && (e.currentTarget.style.opacity = "0.8")}
+              onMouseLeave={(e) => tier.id !== "elite" && (e.currentTarget.style.opacity = "1")}
+            >
+              {tier.cta}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <Card title="Billing Policy" extra={<Info size={16} color={COLORS.accentSecondary} />}>
+        <p style={{ fontSize: "13px", color: COLORS.textSecondary, lineHeight: 1.6, margin: 0 }}>
+          Upgrades take effect immediately with pro-rated billing for the remainder of your cycle. Downgrades will be applied at the start of your next billing period (Aug 08, 2026). All data signatures and monitoring historical data are preserved across all tier changes.
+        </p>
+      </Card>
+    </div>
+  );
+};
+
+const ProfileView = ({ onDeleteAccount, activeSignaturesCount }: { onDeleteAccount: () => void, activeSignaturesCount: number }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmStep, setConfirmStep] = useState(1);
-  const signupYear = 2024;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
-      <Card title="Member Profile" subtitle="Manage your security identity and credentials">
-        <div style={{ display: "flex", flexDirection: "column", gap: "32px", padding: "20px 0" }}>
-          {/* User Info */}
-          <div style={{ display: "flex", alignItems: "center", gap: "24px", padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "16px", border: `1px solid ${COLORS.border}` }}>
-            <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "linear-gradient(45deg, #222, #444)", border: `2px solid ${COLORS.accent}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <User size={40} color={COLORS.accent} />
+    <div style={{ display: "flex", flexDirection: "column", gap: "32px", animation: "fadeIn 0.5s ease-out" }}>
+      <Card title="Account Intelligence" subtitle="Manage your professional identity">
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+          {/* Identity Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+            <div style={{ position: "relative" }}>
+              <div style={{ width: "80px", height: "80px", borderRadius: "20px", background: "linear-gradient(135deg, #1A1A1A 0%, #050505 100%)", border: `1px solid ${COLORS.border}`, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                <User size={40} color={COLORS.textSecondary} />
+              </div>
+              <div style={{ position: "absolute", bottom: "-5px", right: "-5px", width: "24px", height: "24px", background: COLORS.success, borderRadius: "50%", border: `3px solid ${COLORS.surface}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <ShieldCheck size={12} color="#FFF" />
+              </div>
             </div>
             <div>
-              <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Everett Williams</h2>
-              <p style={{ fontSize: "13px", color: COLORS.accent, margin: "4px 0 0" }}>Elite Partner • Member since {signupYear}</p>
-              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
-                <Badge color={COLORS.success}>Identity Verified</Badge>
-                <Badge color={COLORS.accentSecondary}>2FA Active</Badge>
+              <h3 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Everett Williams</h3>
+              <p style={{ fontSize: "12px", color: COLORS.textSecondary, marginTop: "4px" }}>Member ID: SN-992-004-X</p>
+              <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                <Badge color={COLORS.accent}>Elite Partner</Badge>
+                <Badge color={COLORS.success}>Verified Identity</Badge>
               </div>
             </div>
           </div>
 
-          {/* Detailed Profile Sections */}
+          {/* Subscription Tier */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <Key size={18} color={COLORS.accent} />
-                <h4 style={{ fontSize: "14px", margin: 0 }}>Security Credentials</h4>
+            <div style={{ padding: "24px", background: "rgba(212,175,55,0.03)", borderRadius: "16px", border: `1px solid ${COLORS.accent}20` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+                <p style={{ fontSize: "11px", color: COLORS.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Current Plan</p>
+                <TrendingUp size={16} color={COLORS.accent} />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Last Password Change</span>
-                  <span style={{ fontSize: "12px" }}>32 days ago</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Hardware Key</span>
-                  <span style={{ fontSize: "12px", color: COLORS.success }}>Active</span>
-                </div>
-              </div>
+              <h4 style={{ fontSize: "24px", fontWeight: 700, margin: "0 0 4px" }}>Vault Elite</h4>
+              <p style={{ fontSize: "12px", color: COLORS.textSecondary, margin: 0 }}>$299.00 / Month</p>
+              <button style={{ marginTop: "20px", padding: "10px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "8px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Manage Billing</button>
             </div>
-            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                <CreditCard size={18} color={COLORS.accentSecondary} />
-                <h4 style={{ fontSize: "14px", margin: 0 }}>Subscription Tier</h4>
-              </div>
+            <div style={{ padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "16px", border: `1px solid ${COLORS.border}` }}>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>Security Summary</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Current Plan</span>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Protected Assets</span>
+                  <span style={{ fontSize: "12px", fontWeight: 600 }}>{activeSignaturesCount} Assets</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Protection Level</span>
                   <span style={{ fontSize: "12px", fontWeight: 600 }}>Elite Protection</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1026,6 +1119,7 @@ export default function VaultMemberDashboard() {
       case "referrals": return <ReferralsView />;
       case "profile": return <ProfileView onDeleteAccount={handleDeleteAccount} activeSignaturesCount={activeSignatures.length} />;
       case "secure_asset": return <SecureAssetView onUpload={handleFileUpload} />;
+      case "update": return <UpdateView />;
       default: return <OverviewView />;
     }
   };
@@ -1039,6 +1133,7 @@ export default function VaultMemberDashboard() {
       case "referrals": return "Referral Program";
       case "profile": return "Member Profile";
       case "secure_asset": return "Secure New Asset";
+      case "update": return "Tier Management";
       default: return "Dashboard";
     }
   };
@@ -1092,187 +1187,142 @@ export default function VaultMemberDashboard() {
             { icon: Fingerprint, label: "Digital Signatures", id: "signatures" },
             { icon: Globe, label: "Global Monitor", id: "monitoring" },
             { icon: ShieldCheck, label: "Legal Enforcement", id: "enforcement" },
+            { icon: ArrowUpRight, label: "Update Tiers", id: "update" },
             { icon: Gift, label: "Referral Program", id: "referrals" },
             { icon: User, label: "Member Profile", id: "profile" },
-          ].map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className="nav-button"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                  padding: "12px 16px",
-                  background: isActive ? "rgba(212,175,55,0.08)" : "transparent",
-                  border: "none",
-                  borderRadius: "8px",
-                  color: isActive ? COLORS.accent : COLORS.textSecondary,
-                  fontSize: "13px",
-                  fontWeight: isActive ? 600 : 400,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  textAlign: "left",
-                }}
-              >
-                <Icon size={16} strokeWidth={isActive ? 2 : 1.5} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ flex: 1 }} />
-
-        {/* Navigation Footer */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <a
-            href="https://senotastudios.com"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              padding: "12px 16px",
-              color: COLORS.textSecondary,
-              textDecoration: "none",
-              fontSize: "13px",
-              borderRadius: "8px",
-              transition: "all 0.2s ease",
-            }}
-            className="nav-button"
-          >
-            <HomeIcon size={16} />
-            Return Home
-          </a>
-          <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-              <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(45deg, #222, #444)", border: `1px solid ${COLORS.border}` }} />
-              <div>
-                <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>Everett Williams</p>
-                <p style={{ fontSize: "10px", color: COLORS.accent, margin: 0 }}>Elite Partner</p>
-              </div>
-            </div>
+          ].map((item) => (
             <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className="nav-button"
               style={{
-                width: "100%",
-                padding: "8px",
-                background: "transparent",
-                border: `1px solid ${COLORS.border}`,
-                borderRadius: "6px",
-                color: COLORS.textSecondary,
-                fontSize: "11px",
-                cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
+                gap: "12px",
+                padding: "12px 16px",
+                borderRadius: "8px",
+                border: "none",
+                background: activeTab === item.id ? "rgba(212,175,55,0.08)" : "transparent",
+                color: activeTab === item.id ? COLORS.accent : COLORS.textSecondary,
+                fontSize: "13px",
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                textAlign: "left",
               }}
-              className="nav-button"
             >
-              <LogOut size={14} />
-              Sign Out
+              <item.icon size={18} />
+              {item.label}
             </button>
-          </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "auto" }}>
+          <button
+            onClick={() => setActiveTab("secure_asset")}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: COLORS.accent,
+              color: "#000",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              boxShadow: activeTab === "secure_asset" ? `0 0 20px ${COLORS.accent}40` : "none",
+            }}
+          >
+            <Plus size={16} />
+            Secure Asset
+          </button>
         </div>
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div style={{ flex: 1, overflow: "auto", padding: "48px 64px" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "48px" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-              <Badge color={COLORS.accentSecondary}>Security Level: Elite</Badge>
-              <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>ID: VAULT-EX-8821</span>
+        <header
+          style={{
+            height: "80px",
+            borderBottom: `1px solid ${COLORS.border}`,
+            padding: "0 40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "rgba(5,5,5,0.8)",
+            backdropFilter: "blur(12px)",
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <h1 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>{getPageTitle()}</h1>
+            <div style={{ width: "1px", height: "20px", background: COLORS.border }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: COLORS.textSecondary, fontSize: "12px" }}>
+              <Clock size={14} />
+              <span>{new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}</span>
             </div>
-            <h1 style={{ fontSize: "36px", fontWeight: 300, margin: 0, letterSpacing: "-0.02em" }}>{getPageTitle()}</h1>
           </div>
-          
-          {/* Contextual Header Actions */}
-          {activeTab !== "profile" ? (
-            <div style={{ display: "flex", gap: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
-                <Search size={14} color={COLORS.textSecondary} />
-                <input 
-                  placeholder="Global search..." 
-                  style={{ background: "transparent", border: "none", color: "#FFF", fontSize: "13px", outline: "none", width: "180px" }}
-                />
-              </div>
-              <button 
-                onClick={() => setActiveTab("secure_asset")}
-                style={{ 
-                  padding: "10px 24px", 
-                  background: COLORS.accent, 
-                  color: "#000", 
-                  border: "none", 
-                  borderRadius: "8px", 
-                  fontSize: "13px", 
-                  fontWeight: 700, 
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  boxShadow: `0 0 20px ${COLORS.accent}30`,
-                  transition: "all 0.3s ease"
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-              >
-                <Plus size={16} />
-                Secure New Asset
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: "flex", gap: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: "rgba(255,255,255,0.02)", border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
-                <Activity size={14} color={COLORS.accent} />
-                <span style={{ fontSize: "12px", color: COLORS.accent }}>Security Health</span>
-              </div>
-              <div 
-                onClick={() => setShowAlertModal(true)}
-                style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: unreadNotifications > 0 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.02)", border: `1px solid ${unreadNotifications > 0 ? COLORS.danger : COLORS.border}`, borderRadius: "8px", cursor: "pointer", position: "relative" }}
-              >
-                <Bell size={14} color={unreadNotifications > 0 ? COLORS.danger : COLORS.textSecondary} />
-                <span style={{ fontSize: "12px", color: unreadNotifications > 0 ? COLORS.danger : COLORS.textSecondary }}>Live Alerts</span>
-                {unreadNotifications > 0 && (
-                  <span style={{ position: "absolute", top: "-5px", right: "-5px", width: "18px", height: "18px", background: COLORS.danger, borderRadius: "50%", color: "#FFF", fontSize: "10px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadNotifications}</span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
 
-        {/* Dynamic Content */}
-        {renderContent()}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+            <div style={{ position: "relative", cursor: "pointer" }}>
+              <Bell size={20} color={COLORS.textSecondary} />
+              {unreadNotifications > 0 && (
+                <div style={{ position: "absolute", top: "-2px", right: "-2px", width: "8px", height: "8px", background: COLORS.danger, borderRadius: "50%", border: `2px solid ${COLORS.bg}` }} />
+              )}
+            </div>
+            <div 
+              onClick={() => setShowAlertModal(true)}
+              style={{ display: "flex", alignItems: "center", gap: "12px", padding: "6px 12px", background: "rgba(255,255,255,0.03)", borderRadius: "30px", border: `1px solid ${COLORS.border}`, cursor: "pointer" }}
+            >
+              <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 700, color: "#000" }}>EW</div>
+              <span style={{ fontSize: "12px", fontWeight: 500 }}>Everett Williams</span>
+              <ChevronDown size={14} color={COLORS.textSecondary} />
+            </div>
+          </div>
+        </header>
 
-        {/* Profile Alert Modal */}
-        <Modal isOpen={showAlertModal} onClose={() => { setShowAlertModal(false); setUnreadNotifications(0); }} title="Recent Security Notifications">
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {[
-              { title: "High Risk Detection", desc: "Unlicensed distribution detected in RU region.", time: "2m ago", type: "danger" },
-              { title: "Takedown Successful", desc: "Campaign_Video_01 removed from Instagram.", time: "1h ago", type: "success" },
-              { title: "Node Update", desc: "Singapore-01 global node is now active.", time: "5h ago", type: "info" },
-            ].map((alert, i) => (
-              <div key={i} style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", borderLeft: `4px solid ${alert.type === 'danger' ? COLORS.danger : alert.type === 'success' ? COLORS.success : COLORS.accentSecondary}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                  <h4 style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{alert.title}</h4>
-                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{alert.time}</span>
-                </div>
-                <p style={{ fontSize: "12px", color: COLORS.textSecondary, margin: 0 }}>{alert.desc}</p>
-              </div>
-            ))}
+        {/* Viewport */}
+        <main style={{ padding: "40px", overflowY: "auto" }}>
+          {renderContent()}
+        </main>
+      </div>
+
+      {/* Global Alert Modal */}
+      <Modal isOpen={showAlertModal} onClose={() => setShowAlertModal(false)} title="Security Alert System">
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div style={{ padding: "20px", background: "rgba(239,68,68,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.danger}20` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+              <ShieldAlert size={20} color={COLORS.danger} />
+              <h4 style={{ fontSize: "14px", fontWeight: 600, margin: 0 }}>High Severity Threat Detected</h4>
+            </div>
+            <p style={{ fontSize: "12px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>An unauthorized distribution of "Official Campaign Video" has been detected on a high-risk platform. Enforcement nodes have been initialized.</p>
             <button 
-              onClick={() => { setActiveTab("monitoring"); setShowAlertModal(false); }}
-              style={{ width: "100%", marginTop: "12px", padding: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${COLORS.border}`, borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+              onClick={() => { setShowAlertModal(false); setActiveTab("monitoring"); }}
+              style={{ marginTop: "16px", padding: "8px 16px", background: COLORS.danger, color: "#FFF", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}
             >
               Go to Global Monitor
             </button>
           </div>
-        </Modal>
-      </div>
+          <div style={{ padding: "20px", background: "rgba(59,130,246,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accentSecondary}20` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+              <Info size={20} color={COLORS.accentSecondary} />
+              <h4 style={{ fontSize: "14px", fontWeight: 600, margin: 0 }}>System Maintenance</h4>
+            </div>
+            <p style={{ fontSize: "12px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>Scheduled maintenance for the Neural Fingerprint Engine on Jul 10, 2026. Asset processing may experience minor delays.</p>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
+}
+
+function ChevronDown({ size, color }: any) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>;
 }
