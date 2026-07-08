@@ -12,5 +12,8 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
+  stripePriceBasic: process.env.STRIPE_PRICE_BASIC ?? "",
+  stripePricePro: process.env.STRIPE_PRICE_PRO ?? "",
+  stripePriceElite: process.env.STRIPE_PRICE_ELITE ?? "",
   appUrl: process.env.VITE_APP_URL ?? "http://localhost:3000",
 };

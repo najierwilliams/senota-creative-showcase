@@ -5,15 +5,18 @@ export const stripe = new Stripe(ENV.stripeSecretKey, {
   apiVersion: "2025-01-27-ac",
 });
 
-export const TIER_PRICES: Record<string, string> = {
-  basic: "price_basic_id", // Replace with real Stripe Price IDs
-  pro: "price_pro_id",
-  elite: "price_elite_id",
+export const getPriceId = (tierId: string) => {
+  switch (tierId) {
+    case "basic": return ENV.stripePriceBasic;
+    case "pro": return ENV.stripePricePro;
+    case "elite": return ENV.stripePriceElite;
+    default: return null;
+  }
 };
 
 export async function createCheckoutSession(userId: number, email: string, tierId: string) {
-  const priceId = TIER_PRICES[tierId];
-  if (!priceId) throw new Error("Invalid tier ID");
+  const priceId = getPriceId(tierId);
+  if (!priceId) throw new Error(`Invalid or missing Stripe Price ID for tier: ${tierId}`);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
