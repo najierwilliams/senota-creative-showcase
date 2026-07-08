@@ -30,6 +30,7 @@ import {
   Mail,
   Building,
   Check,
+  CreditCard,
 } from "lucide-react";
 
 /* ── Tier Data ─────────────────────────────────────────────────── */
@@ -830,10 +831,12 @@ function StepAccount({
 /* ── Step 3: Payment ────────────────────────────────────────── */
 function StepPayment({
   onBack,
+  onNext,
   selectedTier,
   formData,
 }: {
   onBack: () => void;
+  onNext: () => void;
   selectedTier: string | null;
   formData: Record<string, string>;
 }) {
@@ -1033,7 +1036,7 @@ function StepPayment({
   );
 }
 
-/* ── Step 3: Activate Protection ─────────────────────────────── */
+/* ── Step 4: Activate Protection ─────────────────────────────── */
 function StepActivate({
   onNext,
   onBack,
@@ -1694,6 +1697,7 @@ export default function VaultGetStartedPage() {
             {step === 3 && (
               <StepPayment
                 onBack={goBack}
+                onNext={goNext}
                 selectedTier={selectedTier}
                 formData={formData}
               />
