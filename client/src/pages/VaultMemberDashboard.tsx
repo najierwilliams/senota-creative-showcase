@@ -31,7 +31,6 @@ import {
   Home as HomeIcon,
   Filter,
   Download,
-  Share2,
   Lock,
   Zap,
   Layers,
@@ -60,6 +59,12 @@ import {
   Send,
   Music2,
   Share,
+  Users,
+  Gift,
+  Trophy,
+  Newspaper,
+  History,
+  FileSearch,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -142,12 +147,12 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
   if (!isOpen) return null;
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
-      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "16px", width: "100%", maxWidth: "500px", overflow: "hidden", animation: "fadeIn 0.3s ease-out" }}>
+      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "16px", width: "100%", maxWidth: "600px", overflow: "hidden", animation: "fadeIn 0.3s ease-out" }}>
         <div style={{ padding: "20px 24px", borderBottom: `1px solid ${COLORS.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600 }}>{title}</h3>
           <button onClick={onClose} style={{ background: "transparent", border: "none", color: COLORS.textSecondary, cursor: "pointer" }}><X size={20} /></button>
         </div>
-        <div style={{ padding: "24px" }}>{children}</div>
+        <div style={{ padding: "24px", maxHeight: "80vh", overflowY: "auto" }}>{children}</div>
       </div>
     </div>
   );
@@ -244,6 +249,47 @@ const OverviewView = () => (
         </Card>
       </div>
     </div>
+
+    {/* Expanded News & Updates Section */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+      <Card title="Intelligence Updates" subtitle="Latest global security news" extra={<Newspaper size={16} color={COLORS.accent} />}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {[
+            { title: "New AI Leak Patterns Detected", date: "Jul 08, 2026", desc: "Advanced neural networks are being used to bypass traditional DMCA filters. Vault engine updated to v4.2." },
+            { title: "Platform Security Audit: Meta", date: "Jul 06, 2026", desc: "Instagram's new API changes impact detection speed. Senota nodes optimized for the new architecture." },
+            { title: "Regional Threat Alert: Eastern Europe", date: "Jul 05, 2026", desc: "Significant increase in unlicensed asset distribution from high-risk IP ranges in RU/UA regions." },
+          ].map((news, i) => (
+            <div key={i} style={{ borderBottom: i < 2 ? `1px solid ${COLORS.border}` : "none", paddingBottom: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                <h4 style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{news.title}</h4>
+                <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{news.date}</span>
+              </div>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>{news.desc}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+      <Card title="Vault Activity Log" subtitle="Recent account & security actions" extra={<History size={16} color={COLORS.accentSecondary} />}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {[
+            { action: "Signature Verified", asset: "Campaign_Video_01.mp4", time: "2 hours ago", icon: ShieldCheck, color: COLORS.success },
+            { action: "Login Detected", asset: "San Francisco, CA (MacBook Pro)", time: "5 hours ago", icon: Activity, color: COLORS.accentSecondary },
+            { action: "New Asset Uploaded", asset: "Brand_Logo_2026.svg", time: "Yesterday", icon: Plus, color: COLORS.accent },
+            { action: "Takedown Successful", asset: "Official_Photoshoot_04.jpg", time: "2 days ago", icon: Gavel, color: COLORS.success },
+          ].map((log, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "12px", background: "rgba(255,255,255,0.01)", borderRadius: "8px" }}>
+              <div style={{ padding: "8px", background: `${log.color}10`, borderRadius: "6px" }}>
+                <log.icon size={14} color={log.color} />
+              </div>
+              <div>
+                <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>{log.action}</p>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "2px 0 0" }}>{log.asset} • {log.time}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
   </div>
 );
 
@@ -335,92 +381,221 @@ const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePe
   );
 };
 
-const GlobalMonitorView = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    {/* Real World 2D Map Section - High Detail Aesthetic */}
-    <Card title="Global Detection Network" subtitle="High-precision geographic surveillance" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
-      <div style={{ height: "500px", background: "#050B15", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}`, boxShadow: "inset 0 0 100px rgba(59,130,246,0.1)" }}>
-        {/* High-Detail World Map Simulation */}
-        <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.15, mixBlendMode: "screen" }} />
-        
-        <svg viewBox="0 0 1000 500" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.3 }}>
-          <path fill="#1E3A8A" d="M150,150 L180,140 L220,150 L250,180 L230,220 L190,240 L150,230 Z" />
-          <path fill="#1E3A8A" d="M450,120 L500,110 L550,130 L540,180 L480,190 L440,160 Z" />
-          <path fill="#1E3A8A" d="M700,150 L850,140 L900,200 L850,300 L750,320 L680,250 Z" />
-          <path fill="#1E3A8A" d="M200,300 L250,280 L300,320 L280,400 L220,420 L180,380 Z" />
-          <path fill="#1E3A8A" d="M480,250 L550,240 L600,300 L580,400 L500,420 L450,350 Z" />
-          <path fill="#1E3A8A" d="M750,380 L850,370 L880,420 L820,450 L740,430 Z" />
-        </svg>
+const GlobalMonitorView = () => {
+  const [selectedThreat, setSelectedThreat] = useState<any>(null);
 
-        {/* Glow Effects */}
-        <div style={{ position: "absolute", top: "30%", left: "20%", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)", borderRadius: "50%" }} />
-        <div style={{ position: "absolute", top: "40%", left: "70%", width: "300px", height: "300px", background: "radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)", borderRadius: "50%" }} />
+  const demoThreats = [
+    { id: 1, platform: "X (Twitter)", type: "Copyright Infringement", asset: "Official Campaign Video", source: "@unlicensed_distro", location: "Moscow, RU", severity: "High", timestamp: "14:22 GMT", evidence: "Video matches neural hash 92.4%", status: "Enforcement Pending" },
+    { id: 2, platform: "Instagram", type: "Unlicensed Commercial Use", asset: "Brand_Logo_2026.svg", source: "Commercial_Page_XYZ", location: "Berlin, DE", severity: "Medium", timestamp: "12:05 GMT", evidence: "Logo match detected in paid advertisement", status: "Reviewing" },
+    { id: 3, platform: "TikTok", type: "Audio Extraction", asset: "Campaign_Video_01.mp4", source: "User_Viral_99", location: "Tokyo, JP", severity: "Low", timestamp: "10:30 GMT", evidence: "Extracted audio fingerprint detected", status: "Mitigated" },
+  ];
 
-        {/* City Markers */}
-        {[
-          { top: "35%", left: "18%", city: "San Francisco", status: "Active" },
-          { top: "30%", left: "48%", city: "London", status: "Active" },
-          { top: "60%", left: "78%", city: "Singapore", status: "Alert" },
-          { top: "35%", left: "82%", city: "Tokyo", status: "Active" },
-          { top: "75%", left: "28%", city: "São Paulo", status: "Active" },
-          { top: "38%", left: "25%", city: "New York", status: "Active" },
-          { top: "42%", left: "52%", city: "Berlin", status: "Alert" },
-          { top: "65%", left: "55%", city: "Lagos", status: "Active" },
-        ].map((node, i) => (
-          <div key={i} style={{ position: "absolute", top: node.top, left: node.left, textAlign: "center", transform: "translate(-50%, -50%)" }}>
-            <div style={{ 
-              width: "10px", 
-              height: "10px", 
-              background: node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary, 
-              borderRadius: "50%", 
-              boxShadow: `0 0 15px ${node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary}`, 
-              marginBottom: "6px",
-              animation: "pulse 2s infinite"
-            }} />
-            <span style={{ fontSize: "8px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, textShadow: "0 0 5px rgba(0,0,0,0.5)" }}>{node.city}</span>
-          </div>
-        ))}
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
+      {/* Real World 2D Map Section - Enhanced Aesthetic */}
+      <Card title="Global Detection Network" subtitle="High-precision geographic surveillance" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
+        <div style={{ height: "500px", background: "#050B15", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}`, boxShadow: "inset 0 0 100px rgba(59,130,246,0.1)" }}>
+          {/* High-Detail World Map Image */}
+          <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.2, mixBlendMode: "screen" }} />
+          <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.1, mixBlendMode: "overlay" }} />
+          
+          {/* Grid Lines */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(59,130,246,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.05) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
 
-        {/* Scan Radar */}
-        <div style={{ position: "absolute", top: "50%", left: "50%", width: "800px", height: "800px", background: "conic-gradient(from 0deg, rgba(59,130,246,0.05), transparent 90deg)", borderRadius: "50%", transform: "translate(-50%, -50%)", animation: "rotate 15s linear infinite" }} />
-      </div>
-    </Card>
-
-    {/* Platform Security Matrix - Expanded */}
-    <Card title="Multi-Platform Security Matrix" subtitle="Real-time asset protection across global networks">
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
-        {[
-          { name: "Facebook", icon: Facebook, status: "Secured", alert: false },
-          { name: "Instagram", icon: Instagram, status: "Secured", alert: false },
-          { name: "X (Twitter)", icon: Twitter, status: "Alert Detected", alert: true },
-          { name: "YouTube", icon: Youtube, status: "Secured", alert: false },
-          { name: "TikTok", icon: Music2, status: "Secured", alert: false },
-          { name: "LinkedIn", icon: Linkedin, status: "Secured", alert: false },
-          { name: "Reddit", icon: Share, status: "Review Required", alert: true, warning: true },
-          { name: "Telegram", icon: Send, status: "Secured", alert: false },
-        ].map((platform, i) => (
-          <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${platform.alert ? COLORS.danger + '40' : COLORS.border}`, transition: "all 0.3s ease" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
-              <platform.icon size={24} color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.textSecondary} />
-              {platform.alert ? <AlertCircle size={16} color={COLORS.danger} className="animate-pulse" /> : platform.warning ? <AlertTriangle size={16} color={COLORS.warning} /> : <Check size={16} color={COLORS.success} />}
+          {/* City Markers */}
+          {[
+            { top: "35%", left: "18%", city: "San Francisco", status: "Active" },
+            { top: "30%", left: "48%", city: "London", status: "Active" },
+            { top: "60%", left: "78%", city: "Singapore", status: "Alert" },
+            { top: "35%", left: "82%", city: "Tokyo", status: "Active" },
+            { top: "75%", left: "28%", city: "São Paulo", status: "Active" },
+            { top: "38%", left: "25%", city: "New York", status: "Active" },
+            { top: "42%", left: "52%", city: "Berlin", status: "Alert" },
+            { top: "65%", left: "55%", city: "Lagos", status: "Active" },
+          ].map((node, i) => (
+            <div key={i} style={{ position: "absolute", top: node.top, left: node.left, textAlign: "center", transform: "translate(-50%, -50%)" }}>
+              <div style={{ 
+                width: "10px", 
+                height: "10px", 
+                background: node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary, 
+                borderRadius: "50%", 
+                boxShadow: `0 0 15px ${node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary}`, 
+                marginBottom: "6px",
+                animation: "pulse 2s infinite"
+              }} />
+              <span style={{ fontSize: "8px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, textShadow: "0 0 5px rgba(0,0,0,0.5)" }}>{node.city}</span>
             </div>
-            <p style={{ fontSize: "14px", fontWeight: 600, margin: "0 0 8px" }}>{platform.name}</p>
-            <Badge color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.success}>{platform.status}</Badge>
-            {platform.alert && (
-              <button style={{ width: "100%", marginTop: "16px", padding: "8px", background: "rgba(239,68,68,0.1)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>
-                Analyze Threat
-              </button>
-            )}
+          ))}
+
+          {/* Scan Radar */}
+          <div style={{ position: "absolute", top: "50%", left: "50%", width: "800px", height: "800px", background: "conic-gradient(from 0deg, rgba(59,130,246,0.05), transparent 90deg)", borderRadius: "50%", transform: "translate(-50%, -50%)", animation: "rotate 15s linear infinite" }} />
+        </div>
+      </Card>
+
+      {/* Platform Security Matrix - Expanded */}
+      <Card title="Multi-Platform Security Matrix" subtitle="Real-time asset protection across global networks">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+          {[
+            { name: "Facebook", icon: Facebook, status: "Secured", alert: false },
+            { name: "Instagram", icon: Instagram, status: "Secured", alert: false },
+            { name: "X (Twitter)", icon: Twitter, status: "Alert Detected", alert: true },
+            { name: "YouTube", icon: Youtube, status: "Secured", alert: false },
+            { name: "TikTok", icon: Music2, status: "Secured", alert: false },
+            { name: "LinkedIn", icon: Linkedin, status: "Secured", alert: false },
+            { name: "Reddit", icon: Share, status: "Review Required", alert: true, warning: true },
+            { name: "Telegram", icon: Send, status: "Secured", alert: false },
+          ].map((platform, i) => (
+            <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${platform.alert ? COLORS.danger + '40' : COLORS.border}`, transition: "all 0.3s ease" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+                <platform.icon size={24} color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.textSecondary} />
+                {platform.alert ? <AlertCircle size={16} color={COLORS.danger} className="animate-pulse" /> : platform.warning ? <AlertTriangle size={16} color={COLORS.warning} /> : <Check size={16} color={COLORS.success} />}
+              </div>
+              <p style={{ fontSize: "14px", fontWeight: 600, margin: "0 0 8px" }}>{platform.name}</p>
+              <Badge color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.success}>{platform.status}</Badge>
+              {platform.alert && (
+                <button 
+                  onClick={() => setSelectedThreat(demoThreats.find(t => t.platform === platform.name) || demoThreats[0])}
+                  style={{ width: "100%", marginTop: "16px", padding: "8px", background: "rgba(239,68,68,0.1)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, fontSize: "10px", fontWeight: 700, cursor: "pointer" }}
+                >
+                  Analyze Threat
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* Threat Analysis Modal */}
+      <Modal isOpen={!!selectedThreat} onClose={() => setSelectedThreat(null)} title="Intelligence Deep Dive: Threat Analysis">
+        {selectedThreat && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(239,68,68,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.danger}20` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <ShieldAlert size={24} color={COLORS.danger} />
+                <div>
+                  <h4 style={{ fontSize: "15px", fontWeight: 700, margin: 0 }}>{selectedThreat.type}</h4>
+                  <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: "2px 0 0" }}>Platform: {selectedThreat.platform}</p>
+                </div>
+              </div>
+              <Badge color={COLORS.danger}>{selectedThreat.severity} SEVERITY</Badge>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", marginBottom: "8px" }}>Target Asset</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{selectedThreat.asset}</p>
+              </div>
+              <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", marginBottom: "8px" }}>Source Origin</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{selectedThreat.source}</p>
+              </div>
+              <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", marginBottom: "8px" }}>Location</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{selectedThreat.location}</p>
+              </div>
+              <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", marginBottom: "8px" }}>Timestamp</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{selectedThreat.timestamp}</p>
+              </div>
+            </div>
+
+            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+                <FileSearch size={18} color={COLORS.accentSecondary} />
+                <h4 style={{ fontSize: "14px", margin: 0 }}>Evidence Analysis</h4>
+              </div>
+              <p style={{ fontSize: "12px", color: COLORS.textSecondary, lineHeight: 1.6 }}>{selectedThreat.evidence}</p>
+            </div>
+
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button style={{ flex: 1, padding: "14px", background: "rgba(255,255,255,0.05)", border: "none", borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>Dismiss Alert</button>
+              <button style={{ flex: 1, padding: "14px", background: COLORS.danger, border: "none", borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 700, cursor: "pointer" }}>Initialize Takedown</button>
+            </div>
           </div>
-        ))}
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+const ReferralsView = () => (
+  <div style={{ maxWidth: "1000px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "32px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <Card title="Referral Command" subtitle="Grow the Vault network and earn elite rewards">
+          <div style={{ padding: "20px 0" }}>
+            <div style={{ padding: "32px", background: "linear-gradient(135deg, rgba(212,175,55,0.1) 0%, transparent 100%)", borderRadius: "16px", border: `1px solid ${COLORS.accent}20`, marginBottom: "32px" }}>
+              <h2 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 12px" }}>Invite Elite Partners</h2>
+              <p style={{ fontSize: "14px", color: COLORS.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>Share your exclusive access with other creative professionals. For every successful partner activation, you both receive 3 months of complimentary Elite Protection.</p>
+              <div style={{ display: "flex", gap: "12px" }}>
+                <div style={{ flex: 1, background: COLORS.bg, border: `1px solid ${COLORS.border}`, padding: "14px", borderRadius: "8px", color: COLORS.accent, fontFamily: "monospace", fontSize: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  VAULT-EVERETT-2026
+                  <button style={{ background: "transparent", border: "none", color: COLORS.textSecondary, cursor: "pointer" }}><Share2 size={16} /></button>
+                </div>
+                <button style={{ padding: "14px 24px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>Copy Link</button>
+              </div>
+            </div>
+
+            <h4 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px" }}>Recent Referrals</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[
+                { name: "Julian Pierce", status: "Active", reward: "+90 Days", date: "Jul 02, 2026" },
+                { name: "Sasha Romanov", status: "Pending", reward: "In Progress", date: "Jun 28, 2026" },
+                { name: "Marcus Thorne", status: "Active", reward: "+90 Days", date: "Jun 15, 2026" },
+              ].map((ref, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}><User size={18} color={COLORS.textSecondary} /></div>
+                    <div>
+                      <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{ref.name}</p>
+                      <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "2px 0 0" }}>{ref.date}</p>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <Badge color={ref.status === "Active" ? COLORS.success : COLORS.warning}>{ref.status}</Badge>
+                    <p style={{ fontSize: "11px", color: COLORS.accent, fontWeight: 600, marginTop: "4px" }}>{ref.reward}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
       </div>
-    </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <Card title="Partner Rewards" subtitle="Unlock elite capabilities">
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ width: "80px", height: "80px", background: "rgba(212,175,55,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <Trophy size={40} color={COLORS.accent} />
+              </div>
+              <h3 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 4px" }}>Level 4</h3>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>Network Contributor</p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[
+                { label: "Neural Scan Priority", unlocked: true },
+                { label: "Custom Legal Templates", unlocked: true },
+                { label: "Dedicated Account Lead", unlocked: false },
+                { label: "Advanced Threat Modeling", unlocked: false },
+              ].map((perk, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", opacity: perk.unlocked ? 1 : 0.4 }}>
+                  {perk.unlocked ? <Check size={14} color={COLORS.success} /> : <Lock size={14} color={COLORS.textSecondary} />}
+                  <span style={{ fontSize: "12px" }}>{perk.label}</span>
+                </div>
+              ))}
+            </div>
+            <button style={{ width: "100%", padding: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${COLORS.border}`, borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", marginTop: "12px" }}>View All Rewards</button>
+          </div>
+        </Card>
+      </div>
+    </div>
   </div>
 );
 
-const ProfileView = ({ onDeleteAccount }: any) => {
+const ProfileView = ({ onDeleteAccount, activeSignaturesCount }: any) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmStep, setConfirmStep] = useState(1);
+  const signupYear = 2024; // Static for demo, could be dynamic
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
@@ -433,7 +608,7 @@ const ProfileView = ({ onDeleteAccount }: any) => {
             </div>
             <div>
               <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Everett Williams</h2>
-              <p style={{ fontSize: "13px", color: COLORS.accent, margin: "4px 0 0" }}>Elite Partner • Member since 2024</p>
+              <p style={{ fontSize: "13px", color: COLORS.accent, margin: "4px 0 0" }}>Elite Partner • Member since {signupYear}</p>
               <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
                 <Badge color={COLORS.success}>Identity Verified</Badge>
                 <Badge color={COLORS.accentSecondary}>2FA Active</Badge>
@@ -482,7 +657,7 @@ const ProfileView = ({ onDeleteAccount }: any) => {
             <div style={{ background: "rgba(255,255,255,0.02)", padding: "16px", borderRadius: "8px", marginBottom: "24px" }}>
               <p style={{ fontSize: "12px", fontWeight: 600, marginBottom: "12px" }}>The following will occur:</p>
               <ul style={{ fontSize: "12px", color: COLORS.textSecondary, paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <li>All 2,400+ digital signatures will be permanently deleted.</li>
+                <li>All {activeSignaturesCount} digital signatures will be permanently deleted.</li>
                 <li>Global monitoring for your assets will cease immediately.</li>
                 <li>Your personal information and login credentials will be wiped.</li>
                 <li>You will be removed from all secure mailing lists.</li>
@@ -512,65 +687,6 @@ const ProfileView = ({ onDeleteAccount }: any) => {
     </div>
   );
 };
-
-const EnforcementView = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "24px" }}>
-      <Card title="Legal Command Center" subtitle="Automated legal actions and takedown resources" extra={<Gavel size={18} color={COLORS.accent} />}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-          {[
-            { title: "Takedown Templates", desc: "Standard DMCA and IP notices", icon: FileCode },
-            { title: "Jurisdiction Guides", desc: "Global IP law resources", icon: BookOpen },
-            { title: "Expert Consultation", desc: "Speak with IP attorneys", icon: MessageSquare },
-            { title: "Compliance Portal", desc: "Platform-specific tools", icon: Scale },
-          ].map((tool, i) => (
-            <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}`, cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}>
-              <tool.icon size={20} color={COLORS.accent} style={{ marginBottom: "12px" }} />
-              <h4 style={{ fontSize: "13px", margin: "0 0 4px" }}>{tool.title}</h4>
-              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>{tool.desc}</p>
-            </div>
-          ))}
-        </div>
-        <div style={{ marginTop: "24px", padding: "20px", background: "rgba(212,175,55,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accent}30` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-            <ShieldAlert size={20} color={COLORS.accent} />
-            <h4 style={{ fontSize: "14px", margin: 0 }}>Rapid Response Toolkit</h4>
-          </div>
-          <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, marginBottom: "16px" }}>Immediate legal escalation for high-value asset leaks. Automatically generates multi-jurisdictional takedown notices.</p>
-          <button style={{ padding: "10px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Initialize Rapid Response</button>
-        </div>
-      </Card>
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Enforcement Success" subtitle="Resolution performance">
-          <div style={{ padding: "20px", textAlign: "center" }}>
-            <h2 style={{ fontSize: "48px", fontWeight: 300, margin: "0 0 8px", color: COLORS.success }}>99.7%</h2>
-            <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.2em", margin: 0 }}>Case Resolution Rate</p>
-            <div style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
-                  <span>Compliance Level</span>
-                  <span style={{ color: COLORS.success }}>High</span>
-                </div>
-                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
-                  <div style={{ width: "94%", height: "100%", background: COLORS.success }} />
-                </div>
-              </div>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
-                  <span>Legal Response Speed</span>
-                  <span style={{ color: COLORS.accentSecondary }}>4.2 Hours</span>
-                </div>
-                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
-                  <div style={{ width: "88%", height: "100%", background: COLORS.accentSecondary }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </div>
-    </div>
-  </div>
-);
 
 const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -610,7 +726,7 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
           </div>
 
           <button 
-            onClick={() => alert("Upload complete. Check Digital Signatures for pending approvals.")}
+            onClick={() => alert("Assets initialized. Proceed to Digital Signatures for approval.")}
             style={{ 
               padding: "18px", 
               background: COLORS.accent, 
@@ -711,7 +827,9 @@ export default function VaultMemberDashboard() {
       case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={activeSignatures} onApprove={handleApproveSignature} onDeletePending={handleDeletePending} onDeleteActive={handleDeleteActive} />;
       case "monitoring": return <GlobalMonitorView />;
       case "enforcement": return <EnforcementView />;
-      case "profile": return <ProfileView onDeleteAccount={handleDeleteAccount} />;
+      case "referrals": return <ReferralsView />;
+      case "profile": return <ProfileView onDeleteAccount={handleDeleteAccount} activeSignaturesCount={activeSignatures.length} />;
+      case "secure_asset": return <SecureAssetView onUpload={handleFileUpload} />;
       default: return <OverviewView />;
     }
   };
@@ -722,6 +840,7 @@ export default function VaultMemberDashboard() {
       case "signatures": return "Digital Signatures";
       case "monitoring": return "Global Monitor";
       case "enforcement": return "Legal Enforcement";
+      case "referrals": return "Referral Program";
       case "profile": return "Member Profile";
       case "secure_asset": return "Secure New Asset";
       default: return "Dashboard";
@@ -754,7 +873,7 @@ export default function VaultMemberDashboard() {
           padding: "40px 24px",
           display: "flex",
           flexDirection: "column",
-          gap: "48px",
+          gap: "32px",
           position: "sticky",
           top: 0,
           height: "100vh",
@@ -771,12 +890,13 @@ export default function VaultMemberDashboard() {
         </div>
 
         {/* Navigation */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           {[
             { icon: Activity, label: "Executive Overview", id: "overview" },
             { icon: Fingerprint, label: "Digital Signatures", id: "signatures" },
             { icon: Globe, label: "Global Monitor", id: "monitoring" },
             { icon: ShieldCheck, label: "Legal Enforcement", id: "enforcement" },
+            { icon: Gift, label: "Referral Program", id: "referrals" },
             { icon: User, label: "Member Profile", id: "profile" },
           ].map((item) => {
             const Icon = item.icon;
@@ -790,7 +910,7 @@ export default function VaultMemberDashboard() {
                   display: "flex",
                   alignItems: "center",
                   gap: "14px",
-                  padding: "14px 16px",
+                  padding: "12px 16px",
                   background: isActive ? "rgba(212,175,55,0.08)" : "transparent",
                   border: "none",
                   borderRadius: "8px",
@@ -874,38 +994,53 @@ export default function VaultMemberDashboard() {
             </div>
             <h1 style={{ fontSize: "36px", fontWeight: 300, margin: 0, letterSpacing: "-0.02em" }}>{getPageTitle()}</h1>
           </div>
-          <div style={{ display: "flex", gap: "16px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
-              <Search size={14} color={COLORS.textSecondary} />
-              <input 
-                placeholder="Global search..." 
-                style={{ background: "transparent", border: "none", color: "#FFF", fontSize: "13px", outline: "none", width: "180px" }}
-              />
+          
+          {/* Contextual Header Actions */}
+          {activeTab !== "profile" ? (
+            <div style={{ display: "flex", gap: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
+                <Search size={14} color={COLORS.textSecondary} />
+                <input 
+                  placeholder="Global search..." 
+                  style={{ background: "transparent", border: "none", color: "#FFF", fontSize: "13px", outline: "none", width: "180px" }}
+                />
+              </div>
+              <button 
+                onClick={() => setActiveTab("secure_asset")}
+                style={{ 
+                  padding: "10px 24px", 
+                  background: COLORS.accent, 
+                  color: "#000", 
+                  border: "none", 
+                  borderRadius: "8px", 
+                  fontSize: "13px", 
+                  fontWeight: 700, 
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: `0 0 20px ${COLORS.accent}30`,
+                  transition: "all 0.3s ease"
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+              >
+                <Plus size={16} />
+                Secure New Asset
+              </button>
             </div>
-            <button 
-              onClick={() => setActiveTab("secure_asset")}
-              style={{ 
-                padding: "10px 24px", 
-                background: COLORS.accent, 
-                color: "#000", 
-                border: "none", 
-                borderRadius: "8px", 
-                fontSize: "13px", 
-                fontWeight: 700, 
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                boxShadow: `0 0 20px ${COLORS.accent}30`,
-                transition: "all 0.3s ease"
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
-            >
-              <Plus size={16} />
-              Secure New Asset
-            </button>
-          </div>
+          ) : (
+            <div style={{ display: "flex", gap: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: "rgba(255,255,255,0.02)", border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
+                <Settings size={14} color={COLORS.textSecondary} />
+                <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Account Settings</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: "rgba(255,255,255,0.02)", border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
+                <Bell size={14} color={COLORS.textSecondary} />
+                <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Notifications</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Dynamic Content */}
