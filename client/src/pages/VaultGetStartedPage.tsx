@@ -598,7 +598,7 @@ function StepAccount({
               textTransform: "uppercase",
             }}
           >
-            Step 2 of 3 — Create Your Account
+            Step 2 of 5 — Create Your Account
           </span>
         </div>
         <h2
@@ -791,29 +791,35 @@ function StepAccount({
           </button>
           <button
             onClick={handleNext}
+            disabled={isCreating}
             className="flex-1 inline-flex items-center justify-center gap-3 px-8 py-4 transition-all"
             style={{
-              background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
+              background: isCreating ? "rgba(124,58,237,0.4)" : "linear-gradient(135deg, #7C3AED, #5B21B6)",
               color: "#FFFFFF",
               border: "none",
               borderRadius: "6px",
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "15px",
               fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 0 30px rgba(124,58,237,0.4)",
+              cursor: isCreating ? "not-allowed" : "pointer",
+              boxShadow: isCreating ? "none" : "0 0 30px rgba(124,58,237,0.4)",
+              opacity: isCreating ? 0.7 : 1,
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
-              (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+              if (!isCreating) {
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+              }
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
-              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+              if (!isCreating) {
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+              }
             }}
           >
-            Activate My Vault
-            <ArrowRight size={18} />
+            {isCreating ? "Creating Account..." : "Next: Payment"}
+            {!isCreating && <ArrowRight size={18} />}
           </button>
         </div>
       </div>
