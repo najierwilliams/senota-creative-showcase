@@ -16,7 +16,11 @@ export const getPriceId = (tierId: string) => {
 
 export async function createCheckoutSession(userId: number, email: string, tierId: string) {
   const priceId = getPriceId(tierId);
-  if (!priceId) throw new Error(`Invalid or missing Stripe Price ID for tier: ${tierId}`);
+  console.log(`[Stripe] Creating session for user ${userId}, tier ${tierId}, priceId ${priceId}`);
+  if (!priceId) {
+    console.error(`[Stripe] Error: Missing Price ID for tier ${tierId}. Check your environment variables.`);
+    throw new Error(`Invalid or missing Stripe Price ID for tier: ${tierId}`);
+  }
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],

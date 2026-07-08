@@ -843,8 +843,17 @@ function StepPayment({
   const tier = TIERS.find((t) => t.id === selectedTier);
   const createSession = trpc.stripe.createSession.useMutation({
     onSuccess: (data) => {
+      console.log("Stripe session created, redirecting to:", data.url);
       if (data.url) {
-        window.location.href = data.url;
+        try {
+          // Use window.location.assign for better error handling or just direct href
+          window.location.href = data.url;
+        } catch (e) {
+          console.error("Redirect error:", e);
+          toast.error("Failed to redirect to payment page");
+        }
+      } else {
+        toast.error("No payment URL returned from server");
       }
     },
     onError: (err) => {
@@ -1062,18 +1071,6 @@ function StepActivate({
     "Vault secured.",
   ];
 
-  const createSession = trpc.stripe.createSession.useMutation({
-    onSuccess: (data) => {
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    },
-    onError: (err) => {
-      setActivating(false);
-      toast.error("Failed to initialize payment: " + err.message);
-    },
-  });
-
   const handleActivate = () => {
     if (!selectedTier) return;
     setActivating(true);
@@ -1085,9 +1082,11 @@ function StepActivate({
         step++;
       } else {
         clearInterval(interval);
-        setCurrentTask("Redirecting to secure payment...");
+        setCurrentTask("Vault fully activated.");
         setProgress(100);
-        createSession.mutate({ tierId: selectedTier });
+        setTimeout(() => {
+          onNext();
+        }, 800);
       }
     }, 600);
   };
@@ -1308,7 +1307,7 @@ function StepActivate({
               }
             }}
           >
-            {activating ? "Activating..." : "Launch My Vault"}
+            {activating ? "Activating..." : "Activate Protection"}
             {!activating && <Zap size={18} />}
           </button>
         </div>
