@@ -5,6 +5,8 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { trpc } from "@/_core/trpc";
+import { toast } from "sonner";
 import {
   Shield,
   Fingerprint,
@@ -765,6 +767,25 @@ const EnforcementView = () => (
 );
 
 const UpdateView = () => {
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const createSession = trpc.stripe.createSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (err) => {
+      setLoadingTier(null);
+      toast.error("Failed to initialize payment: " + err.message);
+    },
+  });
+
+  const handleUpdate = (tierId: string) => {
+    setLoadingTier(tierId);
+    createSession.mutate({ tierId });
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "32px", animation: "fadeIn 0.5s ease-out", maxWidth: "1200px", margin: "0 auto", width: "100%" }}>
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
@@ -813,7 +834,8 @@ const UpdateView = () => {
             </div>
 
             <button 
-              disabled={tier.id === "elite"}
+              disabled={tier.id === "elite" || !!loadingTier}
+              onClick={() => handleUpdate(tier.id)}
               style={{ 
                 padding: "16px", 
                 background: tier.id === "elite" ? "rgba(255,255,255,0.05)" : (tier.id === "pro" ? COLORS.accent : "transparent"), 
@@ -822,13 +844,13 @@ const UpdateView = () => {
                 color: tier.id === "elite" ? COLORS.textSecondary : (tier.id === "pro" ? "#000" : "#FFF"), 
                 fontSize: "14px", 
                 fontWeight: 700, 
-                cursor: tier.id === "elite" ? "default" : "pointer",
+                cursor: (tier.id === "elite" || !!loadingTier) ? "default" : "pointer",
                 transition: "all 0.2s"
               }}
-              onMouseEnter={(e) => tier.id !== "elite" && (e.currentTarget.style.opacity = "0.8")}
-              onMouseLeave={(e) => tier.id !== "elite" && (e.currentTarget.style.opacity = "1")}
+              onMouseEnter={(e) => (tier.id !== "elite" && !loadingTier) && (e.currentTarget.style.opacity = "0.8")}
+              onMouseLeave={(e) => (tier.id !== "elite" && !loadingTier) && (e.currentTarget.style.opacity = "1")}
             >
-              {tier.cta}
+              {loadingTier === tier.id ? "Processing..." : tier.cta}
             </button>
           </div>
         ))}

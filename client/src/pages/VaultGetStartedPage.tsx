@@ -7,6 +7,8 @@
 import { useState, useEffect, useRef } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { trpc } from "@/_core/trpc";
+import { toast } from "sonner";
 import {
   Shield,
   Fingerprint,
@@ -814,17 +816,32 @@ function StepActivate({
     "Vault secured.",
   ];
 
+  const createSession = trpc.stripe.createSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (err) => {
+      setActivating(false);
+      toast.error("Failed to initialize payment: " + err.message);
+    },
+  });
+
   const handleActivate = () => {
+    if (!selectedTier) return;
     setActivating(true);
     let step = 0;
     const interval = setInterval(() => {
-      if (step < tasks.length) {
+      if (step < tasks.length - 1) {
         setCurrentTask(tasks[step]);
         setProgress(Math.round((step / (tasks.length - 1)) * 100));
         step++;
       } else {
         clearInterval(interval);
-        setTimeout(onNext, 600);
+        setCurrentTask("Redirecting to secure payment...");
+        setProgress(100);
+        createSession.mutate({ tierId: selectedTier });
       }
     }, 600);
   };

@@ -4,6 +4,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { createCheckoutSession } from "./stripe";
 import {
   createAnnouncement,
   createCircleEvent,
@@ -290,6 +291,20 @@ export const appRouter = router({
         })
       )
       .mutation(({ input }) => addToLaunchList(input)),
+  }),
+
+  // ── Stripe ────────────────────────────────────────────────────────────────
+  stripe: router({
+    createSession: protectedProcedure
+      .input(z.object({ tierId: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        const session = await createCheckoutSession(
+          ctx.user.id,
+          ctx.user.email ?? "",
+          input.tierId
+        );
+        return { url: session.url };
+      }),
   }),
 });
 
