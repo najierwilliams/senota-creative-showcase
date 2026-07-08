@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { trpc } from "@/lib/trpc";
+import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import {
   Shield,
@@ -101,8 +102,9 @@ const PROTECTION_FEATURES = [
 const STEPS = [
   { id: 1, label: "Choose Plan", short: "Plan" },
   { id: 2, label: "Create Account", short: "Account" },
-  { id: 3, label: "Activate Protection", short: "Activate" },
-  { id: 4, label: "You're Protected", short: "Done" },
+  { id: 3, label: "Payment", short: "Payment" },
+  { id: 4, label: "Activate Protection", short: "Activate" },
+  { id: 5, label: "You're Protected", short: "Done" },
 ];
 
 /* ── Particle Background ─────────────────────────────────────── */
@@ -505,6 +507,7 @@ function StepAccount({
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isCreating, setIsCreating] = useState(false);
   const tier = TIERS.find((t) => t.id === selectedTier);
 
   const validate = () => {
@@ -519,8 +522,36 @@ function StepAccount({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = () => {
-    if (validate()) onNext();
+  const handleNext = async () => {
+    if (!validate()) return;
+    setIsCreating(true);
+    try {
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          },
+        },
+      });
+      if (signUpError) {
+        toast.error("Account creation failed: " + signUpError.message);
+        setIsCreating(false);
+        return;
+      }
+      if (!authData.user) {
+        toast.error("Account creation failed: No user returned");
+        setIsCreating(false);
+        return;
+      }
+      toast.success("Account created! Proceeding to payment...");
+      onNext();
+    } catch (err: any) {
+      toast.error("Error creating account: " + err.message);
+      setIsCreating(false);
+    }
   };
 
   const inputStyle = (field: string) => ({
@@ -790,6 +821,212 @@ function StepAccount({
   );
 }
 
+/* ── Step 3: Payment ────────────────────────────────────────── */
+function StepPayment({
+  onBack,
+  selectedTier,
+  formData,
+}: {
+  onBack: () => void;
+  selectedTier: string | null;
+  formData: Record<string, string>;
+}) {
+  const tier = TIERS.find((t) => t.id === selectedTier);
+  const createSession = trpc.stripe.createSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    },
+    onError: (err) => {
+      toast.error("Failed to initialize payment: " + err.message);
+    },
+  });
+
+  const handlePayment = () => {
+    if (!selectedTier) return;
+    createSession.mutate({ tierId: selectedTier });
+  };
+
+  return (
+    <div>
+      <div className="text-center mb-10">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
+          style={{
+            background: "rgba(124,58,237,0.1)",
+            border: "1px solid rgba(167,139,250,0.3)",
+          }}
+        >
+          <Lock size={14} style={{ color: "#A78BFA" }} />
+          <span
+            style={{
+              fontFamily: "'Space Mono', monospace",
+              fontSize: "10px",
+              letterSpacing: "0.1em",
+              color: "#A78BFA",
+              textTransform: "uppercase",
+            }}
+          >
+            Step 3 of 5 — Secure Payment
+          </span>
+        </div>
+        <h2
+          style={{
+            fontFamily: "'Helvetica Neue', Arial, sans-serif",
+            fontSize: "clamp(26px, 4vw, 40px)",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            marginBottom: "8px",
+          }}
+        >
+          Complete Your Payment
+        </h2>
+        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "#8080B0" }}>
+          Secure checkout powered by Stripe. Your first 14 days are free.
+        </p>
+      </div>
+
+      <div className="max-w-lg mx-auto">
+        {/* Summary card */}
+        <div
+          style={{
+            background: "rgba(124,58,237,0.08)",
+            border: "1px solid rgba(124,58,237,0.3)",
+            borderRadius: "12px",
+            padding: "24px",
+            marginBottom: "24px",
+          }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "8px",
+                background: "rgba(124,58,237,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CreditCard size={20} style={{ color: "#A78BFA" }} />
+            </div>
+            <div>
+              <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 600, color: "#FFFFFF", margin: 0 }}>
+                {tier?.name}
+              </h3>
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#6060A0", margin: "4px 0 0" }}>
+                ${tier?.price}{tier?.period}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ borderTop: "1px solid rgba(124,58,237,0.2)", paddingTop: "16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0" }}>
+                Free Trial
+              </span>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#FFFFFF" }}>
+                14 days
+              </span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0" }}>
+                Then billed
+              </span>
+              <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#FFFFFF" }}>
+                ${tier?.price}{tier?.period}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment info */}
+        <div
+          style={{
+            background: "rgba(59,130,246,0.08)",
+            border: "1px solid rgba(59,130,246,0.2)",
+            borderRadius: "8px",
+            padding: "16px",
+            marginBottom: "24px",
+            display: "flex",
+            gap: "12px",
+          }}
+        >
+          <Shield size={16} style={{ color: "#3B82F6", flexShrink: 0, marginTop: "2px" }} />
+          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#8080B0", margin: 0, lineHeight: 1.5 }}>
+            Your payment is secured with Stripe. We never store your card details. Cancel anytime.
+          </p>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={onBack}
+            style={{
+              flex: 1,
+              padding: "14px 24px",
+              background: "rgba(255,255,255,0.05)",
+              color: "#A78BFA",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "14px",
+              fontWeight: 600,
+              border: "1px solid rgba(167,139,250,0.3)",
+              borderRadius: "6px",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.08)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.6)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
+              (e.currentTarget as HTMLElement).style.borderColor = "rgba(167,139,250,0.3)";
+            }}
+          >
+            Back
+          </button>
+          <button
+            onClick={handlePayment}
+            disabled={createSession.isPending}
+            style={{
+              flex: 2,
+              padding: "14px 24px",
+              background: createSession.isPending ? "rgba(124,58,237,0.4)" : "linear-gradient(135deg, #7C3AED, #5B21B6)",
+              color: "#FFFFFF",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "14px",
+              fontWeight: 600,
+              border: "none",
+              borderRadius: "6px",
+              cursor: createSession.isPending ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: createSession.isPending ? "none" : "0 0 30px rgba(124,58,237,0.4)",
+              opacity: createSession.isPending ? 0.6 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (!createSession.isPending) {
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!createSession.isPending) {
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
+                (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+              }
+            }}
+          >
+            {createSession.isPending ? "Redirecting to Stripe..." : "Proceed to Payment"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Step 3: Activate Protection ─────────────────────────────── */
 function StepActivate({
   onNext,
@@ -866,7 +1103,7 @@ function StepActivate({
               textTransform: "uppercase",
             }}
           >
-            Step 3 of 3 — Activate Protection
+            Step 4 of 5 — Activate Protection
           </span>
         </div>
         <h2
@@ -1278,6 +1515,21 @@ export default function VaultGetStartedPage() {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Handle return from Stripe Checkout
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    const stepParam = params.get("step");
+    
+    if (sessionId && stepParam) {
+      const targetStep = parseInt(stepParam);
+      setStep(targetStep);
+      // Clean up URL
+      window.history.replaceState({}, document.title, "/vault/get-started");
+      toast.success("Payment successful! Activating your protection...");
+    }
+  }, []);
+
   const scrollToTop = () => {
     containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -1434,6 +1686,13 @@ export default function VaultGetStartedPage() {
               />
             )}
             {step === 3 && (
+              <StepPayment
+                onBack={goBack}
+                selectedTier={selectedTier}
+                formData={formData}
+              />
+            )}
+            {step === 4 && (
               <StepActivate
                 onNext={goNext}
                 onBack={goBack}
@@ -1441,14 +1700,14 @@ export default function VaultGetStartedPage() {
                 formData={formData}
               />
             )}
-            {step === 4 && (
+            {step === 5 && (
               <StepSuccess selectedTier={selectedTier} formData={formData} />
             )}
           </div>
         </div>
       </main>
 
-      {step < 4 && <SiteFooter />}
+      {step < 5 && <SiteFooter />}
     </div>
   );
 }
