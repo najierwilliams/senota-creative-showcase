@@ -31,6 +31,7 @@ import {
   Home as HomeIcon,
   Filter,
   Download,
+  Share2,
   Lock,
   Zap,
   Layers,
@@ -65,6 +66,8 @@ import {
   Newspaper,
   History,
   FileSearch,
+  Key,
+  CreditCard,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -90,6 +93,7 @@ interface PendingAsset {
   size: string;
   date: string;
   preview?: string;
+  blob?: Blob;
 }
 
 interface ActiveSignature {
@@ -99,6 +103,7 @@ interface ActiveSignature {
   date: string;
   hash: string;
   preview?: string;
+  blob?: Blob;
 }
 
 /* ── Components ────────────────────────────────────────────────── */
@@ -294,8 +299,21 @@ const OverviewView = () => (
 );
 
 const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePending, onDeleteActive }: any) => {
-  const handleDownload = (name: string) => {
-    alert(`Downloading ${name}... (Functional Link Simulation)`);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+
+  const handleDownload = (asset: any) => {
+    if (asset.blob) {
+      const url = URL.createObjectURL(asset.blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = asset.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      alert("Download functionality initialized. Uploaded files will download directly.");
+    }
   };
 
   return (
@@ -319,7 +337,7 @@ const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePe
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: "10px" }}>
-                    <button onClick={() => onDeletePending(asset.id)} style={{ background: "transparent", border: "none", color: COLORS.danger, cursor: "pointer", padding: "4px" }}><Trash2 size={16} /></button>
+                    <button onClick={() => setDeleteTarget({ id: asset.id, type: 'pending' })} style={{ background: "transparent", border: "none", color: COLORS.danger, cursor: "pointer", padding: "4px" }}><Trash2 size={16} /></button>
                     <button onClick={() => onApprove(asset)} style={{ padding: "8px 16px", background: COLORS.warning, color: "#000", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>Approve Fingerprint</button>
                   </div>
                 </div>
@@ -370,13 +388,30 @@ const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePe
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
-                <button onClick={() => handleDownload(asset.name)} style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary, cursor: "pointer" }}><Download size={16} /></button>
-                <button onClick={() => onDeleteActive(asset.id)} style={{ padding: "8px", background: "rgba(239,68,68,0.05)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, cursor: "pointer" }}><Trash2 size={16} /></button>
+                <button onClick={() => handleDownload(asset)} style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary, cursor: "pointer" }}><Download size={16} /></button>
+                <button onClick={() => setDeleteTarget({ id: asset.id, type: 'active' })} style={{ padding: "8px", background: "rgba(239,68,68,0.05)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, cursor: "pointer" }}><Trash2 size={16} /></button>
               </div>
             </div>
           ))}
         </div>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="Confirm Deletion">
+        <div style={{ textAlign: "center" }}>
+          <AlertTriangle size={48} color={COLORS.danger} style={{ marginBottom: "16px" }} />
+          <p style={{ fontSize: "15px", fontWeight: 600, margin: "0 0 8px" }}>Are you sure you want to delete this asset?</p>
+          <p style={{ fontSize: "13px", color: COLORS.textSecondary, marginBottom: "24px" }}>This action cannot be undone. The digital signature and all associated tracking data will be permanently removed.</p>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button onClick={() => setDeleteTarget(null)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.05)", border: "none", borderRadius: "8px", color: "#FFF", cursor: "pointer" }}>Cancel</button>
+            <button onClick={() => { 
+              if (deleteTarget.type === 'pending') onDeletePending(deleteTarget.id);
+              else onDeleteActive(deleteTarget.id);
+              setDeleteTarget(null);
+            }} style={{ flex: 1, padding: "12px", background: COLORS.danger, border: "none", borderRadius: "8px", color: "#FFF", fontWeight: 600, cursor: "pointer" }}>Delete Permanently</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
@@ -592,10 +627,69 @@ const ReferralsView = () => (
   </div>
 );
 
+const EnforcementView = () => (
+  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "24px" }}>
+      <Card title="Legal Command Center" subtitle="Automated legal actions and takedown resources" extra={<Gavel size={18} color={COLORS.accent} />}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          {[
+            { title: "Takedown Templates", desc: "Standard DMCA and IP notices", icon: FileCode },
+            { title: "Jurisdiction Guides", desc: "Global IP law resources", icon: BookOpen },
+            { title: "Expert Consultation", desc: "Speak with IP attorneys", icon: MessageSquare },
+            { title: "Compliance Portal", desc: "Platform-specific tools", icon: Scale },
+          ].map((tool, i) => (
+            <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}`, cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}>
+              <tool.icon size={20} color={COLORS.accent} style={{ marginBottom: "12px" }} />
+              <h4 style={{ fontSize: "13px", margin: "0 0 4px" }}>{tool.title}</h4>
+              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>{tool.desc}</p>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: "24px", padding: "20px", background: "rgba(212,175,55,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accent}30` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+            <ShieldAlert size={20} color={COLORS.accent} />
+            <h4 style={{ fontSize: "14px", margin: 0 }}>Rapid Response Toolkit</h4>
+          </div>
+          <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, marginBottom: "16px" }}>Immediate legal escalation for high-value asset leaks. Automatically generates multi-jurisdictional takedown notices.</p>
+          <button style={{ padding: "10px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Initialize Rapid Response</button>
+        </div>
+      </Card>
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <Card title="Enforcement Success" subtitle="Resolution performance">
+          <div style={{ padding: "20px", textAlign: "center" }}>
+            <h2 style={{ fontSize: "48px", fontWeight: 300, margin: "0 0 8px", color: COLORS.success }}>99.7%</h2>
+            <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.2em", margin: 0 }}>Case Resolution Rate</p>
+            <div style={{ marginTop: "32px", display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
+                  <span>Compliance Level</span>
+                  <span style={{ color: COLORS.success }}>High</span>
+                </div>
+                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
+                  <div style={{ width: "94%", height: "100%", background: COLORS.success }} />
+                </div>
+              </div>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", marginBottom: "8px" }}>
+                  <span>Legal Response Speed</span>
+                  <span style={{ color: COLORS.accentSecondary }}>4.2 Hours</span>
+                </div>
+                <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
+                  <div style={{ width: "88%", height: "100%", background: COLORS.accentSecondary }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  </div>
+);
+
 const ProfileView = ({ onDeleteAccount, activeSignaturesCount }: any) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmStep, setConfirmStep] = useState(1);
-  const signupYear = 2024; // Static for demo, could be dynamic
+  const signupYear = 2024;
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
@@ -612,6 +706,42 @@ const ProfileView = ({ onDeleteAccount, activeSignaturesCount }: any) => {
               <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
                 <Badge color={COLORS.success}>Identity Verified</Badge>
                 <Badge color={COLORS.accentSecondary}>2FA Active</Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed Profile Sections */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                <Key size={18} color={COLORS.accent} />
+                <h4 style={{ fontSize: "14px", margin: 0 }}>Security Credentials</h4>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Last Password Change</span>
+                  <span style={{ fontSize: "12px" }}>32 days ago</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Hardware Key</span>
+                  <span style={{ fontSize: "12px", color: COLORS.success }}>Active</span>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                <CreditCard size={18} color={COLORS.accentSecondary} />
+                <h4 style={{ fontSize: "14px", margin: 0 }}>Subscription Tier</h4>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Current Plan</span>
+                  <span style={{ fontSize: "12px", fontWeight: 600 }}>Elite Protection</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Next Billing</span>
+                  <span style={{ fontSize: "12px" }}>Aug 08, 2026</span>
+                </div>
               </div>
             </div>
           </div>
@@ -756,6 +886,7 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
 /* ── Main Dashboard ──────────────────────────────────────────── */
 export default function VaultMemberDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [unreadNotifications, setUnreadNotifications] = useState(3);
   
   // Persistent Data Logic
   const [pendingAssets, setPendingAssets] = useState<PendingAsset[]>(() => {
@@ -788,7 +919,8 @@ export default function VaultMemberDashboard() {
         type: file.type,
         size: (file.size / 1024 / 1024).toFixed(2) + " MB",
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-        preview: isMedia ? URL.createObjectURL(file) : undefined
+        preview: isMedia ? URL.createObjectURL(file) : undefined,
+        blob: file
       };
     });
     setPendingAssets(prev => [...prev, ...newAssets]);
@@ -802,7 +934,8 @@ export default function VaultMemberDashboard() {
       type: asset.type.split('/')[1]?.toUpperCase() || "Asset",
       date: asset.date,
       hash: Math.random().toString(36).substr(2, 8) + "..." + Math.random().toString(36).substr(2, 4),
-      preview: asset.preview
+      preview: asset.preview,
+      blob: asset.blob
     };
     setActiveSignatures(prev => [newSignature, ...prev]);
     setPendingAssets(prev => prev.filter(a => a.id !== asset.id));
@@ -1032,12 +1165,18 @@ export default function VaultMemberDashboard() {
           ) : (
             <div style={{ display: "flex", gap: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: "rgba(255,255,255,0.02)", border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
-                <Settings size={14} color={COLORS.textSecondary} />
-                <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Account Settings</span>
+                <Activity size={14} color={COLORS.accent} />
+                <span style={{ fontSize: "12px", color: COLORS.accent }}>Security Health</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: "rgba(255,255,255,0.02)", border: `1px solid ${COLORS.border}`, borderRadius: "8px" }}>
-                <Bell size={14} color={COLORS.textSecondary} />
-                <span style={{ fontSize: "12px", color: COLORS.textSecondary }}>Notifications</span>
+              <div 
+                onClick={() => { setActiveTab("monitoring"); setUnreadNotifications(0); }}
+                style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: unreadNotifications > 0 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.02)", border: `1px solid ${unreadNotifications > 0 ? COLORS.danger : COLORS.border}`, borderRadius: "8px", cursor: "pointer", position: "relative" }}
+              >
+                <Bell size={14} color={unreadNotifications > 0 ? COLORS.danger : COLORS.textSecondary} />
+                <span style={{ fontSize: "12px", color: unreadNotifications > 0 ? COLORS.danger : COLORS.textSecondary }}>Live Alerts</span>
+                {unreadNotifications > 0 && (
+                  <span style={{ position: "absolute", top: "-5px", right: "-5px", width: "18px", height: "18px", background: COLORS.danger, borderRadius: "50%", color: "#FFF", fontSize: "10px", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{unreadNotifications}</span>
+                )}
               </div>
             </div>
           )}
