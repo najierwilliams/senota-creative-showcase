@@ -52,7 +52,7 @@ import {
   BookOpen,
   MessageSquare,
   ShieldQuestion,
-  Image as ImageIcon,
+  ImageIcon,
   Trash2,
   X,
   AlertTriangle,
@@ -68,6 +68,9 @@ import {
   FileSearch,
   Key,
   CreditCard,
+  Copy,
+  Info,
+  ChevronUp,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -108,8 +111,9 @@ interface ActiveSignature {
 
 /* ── Components ────────────────────────────────────────────────── */
 
-const Card = ({ children, title, subtitle, extra }: any) => (
+const Card = ({ children, title, subtitle, extra, onClick }: any) => (
   <div
+    onClick={onClick}
     style={{
       background: COLORS.surface,
       border: `1px solid ${COLORS.border}`,
@@ -117,7 +121,10 @@ const Card = ({ children, title, subtitle, extra }: any) => (
       padding: "24px",
       height: "100%",
       transition: "all 0.3s ease",
+      cursor: onClick ? "pointer" : "default",
     }}
+    onMouseEnter={(e) => onClick && (e.currentTarget.style.background = COLORS.surfaceHover)}
+    onMouseLeave={(e) => onClick && (e.currentTarget.style.background = COLORS.surface)}
   >
     {(title || extra) && (
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
@@ -165,138 +172,172 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
 
 /* ── Page Views ────────────────────────────────────────────────── */
 
-const OverviewView = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    {/* High-Level Stats */}
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
-      {[
-        { label: "Asset Integrity", value: "99.8%", trend: "+0.2%", icon: ShieldCheck, color: COLORS.success },
-        { label: "Active Threats", value: "12", trend: "High Risk", icon: ShieldAlert, color: COLORS.danger },
-        { label: "Global Monitoring", value: "24/7", trend: "Operational", icon: Globe, color: COLORS.accentSecondary },
-        { label: "System Uptime", value: "99.99%", trend: "Stable", icon: Activity, color: COLORS.success },
-      ].map((stat, i) => (
-        <Card key={i}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ padding: "8px", borderRadius: "8px", background: "rgba(255,255,255,0.03)" }}>
-              <stat.icon size={18} color={stat.color} />
-            </div>
-            <Badge color={stat.color}>{stat.trend}</Badge>
-          </div>
-          <p style={{ fontSize: "28px", fontWeight: 300, margin: "16px 0 4px" }}>{stat.value}</p>
-          <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>{stat.label}</p>
-        </Card>
-      ))}
-    </div>
+const OverviewView = () => {
+  const [showScoreModal, setShowScoreModal] = useState(false);
 
-    {/* Intelligence Grid */}
-    <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }}>
-      <Card title="Real-Time Threat Intelligence" subtitle="Live stream of global asset detections" extra={<RefreshCw size={14} color={COLORS.textSecondary} className="animate-spin-slow" />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: COLORS.border, borderRadius: "8px", overflow: "hidden" }}>
-          {[
-            { asset: "Senota Brand Assets", location: "Beijing, CN", status: "Mitigated", time: "Just now", severity: "Low" },
-            { asset: "Official Campaign Video", location: "Moscow, RU", status: "Takedown Sent", time: "2m ago", severity: "High" },
-            { asset: "Creative Showcase PDF", location: "Berlin, DE", status: "Reviewing", time: "15m ago", severity: "Medium" },
-            { asset: "Identity Signatures", location: "Lagos, NG", status: "Protected", time: "45m ago", severity: "Low" },
-            { asset: "Commercial Raw Files", location: "Tokyo, JP", status: "Alert Triggered", time: "1h ago", severity: "High" },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 1fr", padding: "16px", background: COLORS.surface, alignItems: "center", transition: "background 0.2s", cursor: "pointer" }} onMouseEnter={(e) => (e.currentTarget.style.background = COLORS.surfaceHover)} onMouseLeave={(e) => (e.currentTarget.style.background = COLORS.surface)}>
-              <div>
-                <p style={{ fontSize: "13px", fontWeight: 500, margin: 0 }}>{item.asset}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" }}>
-                  <MapPin size={10} color={COLORS.textSecondary} />
-                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{item.location}</span>
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
+      {/* High-Level Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+        {[
+          { label: "Asset Integrity", value: "99.8%", trend: "+0.2%", icon: ShieldCheck, color: COLORS.success },
+          { label: "Active Threats", value: "12", trend: "High Risk", icon: ShieldAlert, color: COLORS.danger },
+          { label: "Global Monitoring", value: "24/7", trend: "Operational", icon: Globe, color: COLORS.accentSecondary },
+          { label: "System Uptime", value: "99.99%", trend: "Stable", icon: Activity, color: COLORS.success },
+        ].map((stat, i) => (
+          <Card key={i}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ padding: "8px", borderRadius: "8px", background: "rgba(255,255,255,0.03)" }}>
+                <stat.icon size={18} color={stat.color} />
+              </div>
+              <Badge color={stat.color}>{stat.trend}</Badge>
+            </div>
+            <p style={{ fontSize: "28px", fontWeight: 300, margin: "16px 0 4px" }}>{stat.value}</p>
+            <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>{stat.label}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Intelligence Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px" }}>
+        <Card title="Real-Time Threat Intelligence" subtitle="Live stream of global asset detections" extra={<RefreshCw size={14} color={COLORS.textSecondary} className="animate-spin-slow" />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: COLORS.border, borderRadius: "8px", overflow: "hidden" }}>
+            {[
+              { asset: "Senota Brand Assets", location: "Beijing, CN", status: "Mitigated", time: "Just now", severity: "Low" },
+              { asset: "Official Campaign Video", location: "Moscow, RU", status: "Takedown Sent", time: "2m ago", severity: "High" },
+              { asset: "Creative Showcase PDF", location: "Berlin, DE", status: "Reviewing", time: "15m ago", severity: "Medium" },
+              { asset: "Identity Signatures", location: "Lagos, NG", status: "Protected", time: "45m ago", severity: "Low" },
+              { asset: "Commercial Raw Files", location: "Tokyo, JP", status: "Alert Triggered", time: "1h ago", severity: "High" },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1fr 1fr", padding: "16px", background: COLORS.surface, alignItems: "center", transition: "background 0.2s", cursor: "pointer" }} onMouseEnter={(e) => (e.currentTarget.style.background = COLORS.surfaceHover)} onMouseLeave={(e) => (e.currentTarget.style.background = COLORS.surface)}>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: 500, margin: 0 }}>{item.asset}</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" }}>
+                    <MapPin size={10} color={COLORS.textSecondary} />
+                    <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{item.location}</span>
+                  </div>
+                </div>
+                <Badge color={item.severity === "High" ? COLORS.danger : item.severity === "Medium" ? COLORS.warning : COLORS.success}>{item.status}</Badge>
+                <span style={{ fontSize: "11px", color: COLORS.textSecondary, textAlign: "right" }}>{item.time}</span>
+                <div style={{ textAlign: "right" }}><ChevronRight size={14} color={COLORS.textSecondary} /></div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <Card 
+            title="Security Scorecard" 
+            subtitle="Overall protection health" 
+            onClick={() => setShowScoreModal(true)}
+            extra={<Info size={14} color={COLORS.accent} />}
+          >
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ position: "relative", width: "120px", height: "120px", margin: "0 auto" }}>
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
+                  <circle cx="60" cy="60" r="54" fill="none" stroke={COLORS.accent} strokeWidth="8" strokeDasharray="339" strokeDashoffset="40" strokeLinecap="round" />
+                </svg>
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                  <span style={{ fontSize: "24px", fontWeight: 600 }}>88</span>
+                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>A+ Grade</span>
                 </div>
               </div>
-              <Badge color={item.severity === "High" ? COLORS.danger : item.severity === "Medium" ? COLORS.warning : COLORS.success}>{item.status}</Badge>
-              <span style={{ fontSize: "11px", color: COLORS.textSecondary, textAlign: "right" }}>{item.time}</span>
-              <div style={{ textAlign: "right" }}><ChevronRight size={14} color={COLORS.textSecondary} /></div>
+              <p style={{ fontSize: "10px", color: COLORS.accent, marginTop: "16px", fontWeight: 600 }}>Click to Analyze Score</p>
             </div>
-          ))}
+          </Card>
+          <Card title="System Alerts" extra={<AlertCircle size={14} color={COLORS.warning} />}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ padding: "12px", borderLeft: `2px solid ${COLORS.warning}`, background: "rgba(245,158,11,0.05)" }}>
+                <p style={{ fontSize: "12px", fontWeight: 500, margin: 0 }}>API Key Rotation Due</p>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>Scheduled in 48 hours</p>
+              </div>
+              <div style={{ padding: "12px", borderLeft: `2px solid ${COLORS.accentSecondary}`, background: "rgba(59,130,246,0.05)" }}>
+                <p style={{ fontSize: "12px", fontWeight: 500, margin: 0 }}>New Global Node Active</p>
+                <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>Node: Singapore-01</p>
+              </div>
+            </div>
+          </Card>
         </div>
-      </Card>
+      </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Security Scorecard" subtitle="Overall protection health">
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <div style={{ position: "relative", width: "120px", height: "120px", margin: "0 auto" }}>
-              <svg width="120" height="120" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
-                <circle cx="60" cy="60" r="54" fill="none" stroke={COLORS.accent} strokeWidth="8" strokeDasharray="339" strokeDashoffset="40" strokeLinecap="round" />
-              </svg>
-              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-                <span style={{ fontSize: "24px", fontWeight: 600 }}>88</span>
-                <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>A+ Grade</span>
+      {/* Expanded News & Updates Section */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+        <Card title="Intelligence Updates" subtitle="Latest global security news" extra={<Newspaper size={16} color={COLORS.accent} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {[
+              { title: "New AI Leak Patterns Detected", date: "Jul 08, 2026", desc: "Advanced neural networks are being used to bypass traditional DMCA filters. Vault engine updated to v4.2." },
+              { title: "Platform Security Audit: Meta", date: "Jul 06, 2026", desc: "Instagram's new API changes impact detection speed. Senota nodes optimized for the new architecture." },
+              { title: "Regional Threat Alert: Eastern Europe", date: "Jul 05, 2026", desc: "Significant increase in unlicensed asset distribution from high-risk IP ranges in RU/UA regions." },
+            ].map((news, i) => (
+              <div key={i} style={{ borderBottom: i < 2 ? `1px solid ${COLORS.border}` : "none", paddingBottom: "16px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                  <h4 style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{news.title}</h4>
+                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{news.date}</span>
+                </div>
+                <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>{news.desc}</p>
               </div>
-            </div>
-            <div style={{ marginTop: "24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-              <div style={{ padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px" }}>
-                <p style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>2.4k</p>
-                <p style={{ fontSize: "9px", color: COLORS.textSecondary, margin: 0 }}>Assets</p>
-              </div>
-              <div style={{ padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px" }}>
-                <p style={{ fontSize: "16px", fontWeight: 600, margin: 0 }}>185</p>
-                <p style={{ fontSize: "9px", color: COLORS.textSecondary, margin: 0 }}>Cases</p>
-              </div>
-            </div>
+            ))}
           </div>
         </Card>
-        <Card title="System Alerts" extra={<AlertCircle size={14} color={COLORS.warning} />}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ padding: "12px", borderLeft: `2px solid ${COLORS.warning}`, background: "rgba(245,158,11,0.05)" }}>
-              <p style={{ fontSize: "12px", fontWeight: 500, margin: 0 }}>API Key Rotation Due</p>
-              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>Scheduled in 48 hours</p>
-            </div>
-            <div style={{ padding: "12px", borderLeft: `2px solid ${COLORS.accentSecondary}`, background: "rgba(59,130,246,0.05)" }}>
-              <p style={{ fontSize: "12px", fontWeight: 500, margin: 0 }}>New Global Node Active</p>
-              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>Node: Singapore-01</p>
-            </div>
+        <Card title="Vault Activity Log" subtitle="Recent account & security actions" extra={<History size={16} color={COLORS.accentSecondary} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {[
+              { action: "Signature Verified", asset: "Campaign_Video_01.mp4", time: "2 hours ago", icon: ShieldCheck, color: COLORS.success },
+              { action: "Login Detected", asset: "San Francisco, CA (MacBook Pro)", time: "5 hours ago", icon: Activity, color: COLORS.accentSecondary },
+              { action: "New Asset Uploaded", asset: "Brand_Logo_2026.svg", time: "Yesterday", icon: Plus, color: COLORS.accent },
+              { action: "Takedown Successful", asset: "Official_Photoshoot_04.jpg", time: "2 days ago", icon: Gavel, color: COLORS.success },
+            ].map((log, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "12px", background: "rgba(255,255,255,0.01)", borderRadius: "8px" }}>
+                <div style={{ padding: "8px", background: `${log.color}10`, borderRadius: "6px" }}>
+                  <log.icon size={14} color={log.color} />
+                </div>
+                <div>
+                  <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>{log.action}</p>
+                  <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "2px 0 0" }}>{log.asset} • {log.time}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
       </div>
-    </div>
 
-    {/* Expanded News & Updates Section */}
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-      <Card title="Intelligence Updates" subtitle="Latest global security news" extra={<Newspaper size={16} color={COLORS.accent} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {[
-            { title: "New AI Leak Patterns Detected", date: "Jul 08, 2026", desc: "Advanced neural networks are being used to bypass traditional DMCA filters. Vault engine updated to v4.2." },
-            { title: "Platform Security Audit: Meta", date: "Jul 06, 2026", desc: "Instagram's new API changes impact detection speed. Senota nodes optimized for the new architecture." },
-            { title: "Regional Threat Alert: Eastern Europe", date: "Jul 05, 2026", desc: "Significant increase in unlicensed asset distribution from high-risk IP ranges in RU/UA regions." },
-          ].map((news, i) => (
-            <div key={i} style={{ borderBottom: i < 2 ? `1px solid ${COLORS.border}` : "none", paddingBottom: "16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                <h4 style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{news.title}</h4>
-                <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{news.date}</span>
+      {/* Scorecard Modal */}
+      <Modal isOpen={showScoreModal} onClose={() => setShowScoreModal(false)} title="Security Score Analysis">
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <div style={{ textAlign: "center", padding: "20px", background: "rgba(212,175,55,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accent}20` }}>
+            <h2 style={{ fontSize: "48px", fontWeight: 700, color: COLORS.accent, margin: 0 }}>88</h2>
+            <p style={{ fontSize: "14px", fontWeight: 600, marginTop: "8px" }}>A+ EXECUTIVE GRADE</p>
+          </div>
+          
+          <div>
+            <h4 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>What your score means:</h4>
+            <p style={{ fontSize: "13px", color: COLORS.textSecondary, lineHeight: 1.6 }}>Your current score reflects a high level of asset integrity. 88/100 indicates that 99.8% of your assets are successfully fingerprinted and monitored across all global nodes.</p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <h4 style={{ fontSize: "14px", fontWeight: 600 }}>How to reach 100:</h4>
+            {[
+              { label: "Rotate API Keys", desc: "Your current keys expire in 48 hours.", icon: Key },
+              { label: "Verify Pending Signatures", desc: "You have 0 assets awaiting approval.", icon: Fingerprint },
+              { label: "Enable Multi-Geo Backup", desc: "Secure assets across 3+ global regions.", icon: Globe },
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: "16px", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
+                <div style={{ padding: "8px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", height: "fit-content" }}>
+                  <item.icon size={16} color={COLORS.accent} />
+                </div>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{item.label}</p>
+                  <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: "4px 0 0" }}>{item.desc}</p>
+                </div>
               </div>
-              <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>{news.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </Card>
-      <Card title="Vault Activity Log" subtitle="Recent account & security actions" extra={<History size={16} color={COLORS.accentSecondary} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {[
-            { action: "Signature Verified", asset: "Campaign_Video_01.mp4", time: "2 hours ago", icon: ShieldCheck, color: COLORS.success },
-            { action: "Login Detected", asset: "San Francisco, CA (MacBook Pro)", time: "5 hours ago", icon: Activity, color: COLORS.accentSecondary },
-            { action: "New Asset Uploaded", asset: "Brand_Logo_2026.svg", time: "Yesterday", icon: Plus, color: COLORS.accent },
-            { action: "Takedown Successful", asset: "Official_Photoshoot_04.jpg", time: "2 days ago", icon: Gavel, color: COLORS.success },
-          ].map((log, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: "16px", padding: "12px", background: "rgba(255,255,255,0.01)", borderRadius: "8px" }}>
-              <div style={{ padding: "8px", background: `${log.color}10`, borderRadius: "6px" }}>
-                <log.icon size={14} color={log.color} />
-              </div>
-              <div>
-                <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>{log.action}</p>
-                <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "2px 0 0" }}>{log.asset} • {log.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+      </Modal>
     </div>
-  </div>
-);
+  );
+};
 
 const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePending, onDeleteActive }: any) => {
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
@@ -553,79 +594,100 @@ const GlobalMonitorView = () => {
   );
 };
 
-const ReferralsView = () => (
-  <div style={{ maxWidth: "1000px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "32px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Referral Command" subtitle="Grow the Vault network and earn elite rewards">
-          <div style={{ padding: "20px 0" }}>
-            <div style={{ padding: "32px", background: "linear-gradient(135deg, rgba(212,175,55,0.1) 0%, transparent 100%)", borderRadius: "16px", border: `1px solid ${COLORS.accent}20`, marginBottom: "32px" }}>
-              <h2 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 12px" }}>Invite Elite Partners</h2>
-              <p style={{ fontSize: "14px", color: COLORS.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>Share your exclusive access with other creative professionals. For every successful partner activation, you both receive 3 months of complimentary Elite Protection.</p>
-              <div style={{ display: "flex", gap: "12px" }}>
-                <div style={{ flex: 1, background: COLORS.bg, border: `1px solid ${COLORS.border}`, padding: "14px", borderRadius: "8px", color: COLORS.accent, fontFamily: "monospace", fontSize: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  VAULT-EVERETT-2026
-                  <button style={{ background: "transparent", border: "none", color: COLORS.textSecondary, cursor: "pointer" }}><Share2 size={16} /></button>
-                </div>
-                <button style={{ padding: "14px 24px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>Copy Link</button>
-              </div>
-            </div>
+const ReferralsView = () => {
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
+  const referralCode = "VAULT-EVERETT-2026";
 
-            <h4 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px" }}>Recent Referrals</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[
-                { name: "Julian Pierce", status: "Active", reward: "+90 Days", date: "Jul 02, 2026" },
-                { name: "Sasha Romanov", status: "Pending", reward: "In Progress", date: "Jun 28, 2026" },
-                { name: "Marcus Thorne", status: "Active", reward: "+90 Days", date: "Jun 15, 2026" },
-              ].map((ref, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center" }}><User size={18} color={COLORS.textSecondary} /></div>
-                    <div>
-                      <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{ref.name}</p>
-                      <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "2px 0 0" }}>{ref.date}</p>
-                    </div>
+  const rewards = [
+    { title: "Neural Scan Priority", level: 1, desc: "Accelerated fingerprinting for all new assets. Reduces processing time by 50%." },
+    { title: "Custom Legal Templates", level: 2, desc: "Access to jurisdiction-specific DMCA and IP enforcement templates tailored to your assets." },
+    { title: "Advanced Threat Modeling", level: 3, desc: "Predictive analytics to identify potential leak vectors before they occur." },
+    { title: "Dedicated Account Lead", level: 4, desc: "Direct 24/7 access to a senior security specialist for high-priority enforcement." },
+    { title: "Global IP Litigation Support", level: 5, desc: "Direct legal funding and support for complex international copyright litigation." },
+  ];
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralCode);
+    alert("Referral code copied to clipboard!");
+  };
+
+  return (
+    <div style={{ maxWidth: "1000px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "32px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <Card title="Referral Command" subtitle="Grow the Vault network and earn elite rewards">
+            <div style={{ padding: "20px 0" }}>
+              <div style={{ padding: "32px", background: "linear-gradient(135deg, rgba(212,175,55,0.1) 0%, transparent 100%)", borderRadius: "16px", border: `1px solid ${COLORS.accent}20`, marginBottom: "32px" }}>
+                <h2 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 12px" }}>Invite Elite Partners</h2>
+                <p style={{ fontSize: "14px", color: COLORS.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>Share your exclusive access with other creative professionals. For every successful partner activation, you both receive 3 months of complimentary Elite Protection.</p>
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <div style={{ flex: 1, background: COLORS.bg, border: `1px solid ${COLORS.border}`, padding: "14px", borderRadius: "8px", color: COLORS.accent, fontFamily: "monospace", fontSize: "14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    {referralCode}
+                    <button onClick={handleCopy} style={{ background: "transparent", border: "none", color: COLORS.textSecondary, cursor: "pointer" }}><Copy size={16} /></button>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <Badge color={ref.status === "Active" ? COLORS.success : COLORS.warning}>{ref.status}</Badge>
-                    <p style={{ fontSize: "11px", color: COLORS.accent, fontWeight: 600, marginTop: "4px" }}>{ref.reward}</p>
-                  </div>
+                  <button onClick={handleCopy} style={{ padding: "14px 24px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 700, cursor: "pointer" }}>Copy Code</button>
                 </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Partner Rewards" subtitle="Unlock elite capabilities">
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <div style={{ textAlign: "center", padding: "20px 0" }}>
-              <div style={{ width: "80px", height: "80px", background: "rgba(212,175,55,0.1)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                <Trophy size={40} color={COLORS.accent} />
               </div>
-              <h3 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 4px" }}>Level 4</h3>
-              <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>Network Contributor</p>
+
+              <h4 style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px" }}>Recent Referrals</h4>
+              <div style={{ textAlign: "center", padding: "40px", background: "rgba(255,255,255,0.01)", borderRadius: "12px", border: `1px dashed ${COLORS.border}` }}>
+                <Users size={32} color={COLORS.textSecondary} style={{ marginBottom: "12px", opacity: 0.5 }} />
+                <p style={{ fontSize: "13px", color: COLORS.textSecondary, margin: 0 }}>No referrals yet. Share your code to begin earning rewards.</p>
+              </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[
-                { label: "Neural Scan Priority", unlocked: true },
-                { label: "Custom Legal Templates", unlocked: true },
-                { label: "Dedicated Account Lead", unlocked: false },
-                { label: "Advanced Threat Modeling", unlocked: false },
-              ].map((perk, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", opacity: perk.unlocked ? 1 : 0.4 }}>
-                  {perk.unlocked ? <Check size={14} color={COLORS.success} /> : <Lock size={14} color={COLORS.textSecondary} />}
-                  <span style={{ fontSize: "12px" }}>{perk.label}</span>
+          </Card>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          <Card title="Partner Rewards" subtitle="Unlock elite capabilities">
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ textAlign: "center", padding: "20px 0" }}>
+                <div style={{ width: "80px", height: "80px", background: "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", border: `1px solid ${COLORS.border}` }}>
+                  <Trophy size={40} color={COLORS.textSecondary} style={{ opacity: 0.3 }} />
                 </div>
-              ))}
+                <h3 style={{ fontSize: "24px", fontWeight: 600, margin: "0 0 4px" }}>Level 1</h3>
+                <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>New Contributor</p>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {rewards.slice(0, 4).map((perk, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", opacity: perk.level <= 1 ? 1 : 0.3 }}>
+                    {perk.level <= 1 ? <Check size={14} color={COLORS.success} /> : <Lock size={14} color={COLORS.textSecondary} />}
+                    <span style={{ fontSize: "12px" }}>{perk.title}</span>
+                  </div>
+                ))}
+              </div>
+              <button 
+                onClick={() => setShowRewardsModal(true)}
+                style={{ width: "100%", padding: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${COLORS.border}`, borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", marginTop: "12px" }}
+              >
+                View All Rewards
+              </button>
             </div>
-            <button style={{ width: "100%", padding: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${COLORS.border}`, borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer", marginTop: "12px" }}>View All Rewards</button>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
+
+      {/* Rewards Modal */}
+      <Modal isOpen={showRewardsModal} onClose={() => setShowRewardsModal(false)} title="Vault Partner Rewards">
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          {rewards.map((reward, i) => (
+            <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}`, display: "flex", gap: "20px", alignItems: "center" }}>
+              <div style={{ width: "40px", height: "40px", background: reward.level === 1 ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {reward.level === 1 ? <Check size={20} color={COLORS.success} /> : <Lock size={20} color={COLORS.textSecondary} />}
+              </div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "4px" }}>
+                  <h4 style={{ fontSize: "14px", fontWeight: 600, margin: 0 }}>{reward.title}</h4>
+                  <Badge color={reward.level === 1 ? COLORS.success : COLORS.textSecondary}>LEVEL {reward.level}</Badge>
+                </div>
+                <p style={{ fontSize: "12px", color: COLORS.textSecondary, lineHeight: 1.5, margin: 0 }}>{reward.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Modal>
     </div>
-  </div>
-);
+  );
+};
 
 const EnforcementView = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
@@ -887,6 +949,7 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
 export default function VaultMemberDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const [showAlertModal, setShowAlertModal] = useState(false);
   
   // Persistent Data Logic
   const [pendingAssets, setPendingAssets] = useState<PendingAsset[]>(() => {
@@ -1169,7 +1232,7 @@ export default function VaultMemberDashboard() {
                 <span style={{ fontSize: "12px", color: COLORS.accent }}>Security Health</span>
               </div>
               <div 
-                onClick={() => { setActiveTab("monitoring"); setUnreadNotifications(0); }}
+                onClick={() => setShowAlertModal(true)}
                 style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 20px", background: unreadNotifications > 0 ? "rgba(239,68,68,0.1)" : "rgba(255,255,255,0.02)", border: `1px solid ${unreadNotifications > 0 ? COLORS.danger : COLORS.border}`, borderRadius: "8px", cursor: "pointer", position: "relative" }}
               >
                 <Bell size={14} color={unreadNotifications > 0 ? COLORS.danger : COLORS.textSecondary} />
@@ -1184,6 +1247,31 @@ export default function VaultMemberDashboard() {
 
         {/* Dynamic Content */}
         {renderContent()}
+
+        {/* Profile Alert Modal */}
+        <Modal isOpen={showAlertModal} onClose={() => { setShowAlertModal(false); setUnreadNotifications(0); }} title="Recent Security Notifications">
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {[
+              { title: "High Risk Detection", desc: "Unlicensed distribution detected in RU region.", time: "2m ago", type: "danger" },
+              { title: "Takedown Successful", desc: "Campaign_Video_01 removed from Instagram.", time: "1h ago", type: "success" },
+              { title: "Node Update", desc: "Singapore-01 global node is now active.", time: "5h ago", type: "info" },
+            ].map((alert, i) => (
+              <div key={i} style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", borderLeft: `4px solid ${alert.type === 'danger' ? COLORS.danger : alert.type === 'success' ? COLORS.success : COLORS.accentSecondary}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <h4 style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{alert.title}</h4>
+                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{alert.time}</span>
+                </div>
+                <p style={{ fontSize: "12px", color: COLORS.textSecondary, margin: 0 }}>{alert.desc}</p>
+              </div>
+            ))}
+            <button 
+              onClick={() => { setActiveTab("monitoring"); setShowAlertModal(false); }}
+              style={{ width: "100%", marginTop: "12px", padding: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${COLORS.border}`, borderRadius: "8px", color: "#FFF", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+            >
+              Go to Global Monitor
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   );
