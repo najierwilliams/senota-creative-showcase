@@ -274,13 +274,7 @@ export default function SenotaVaultPage() {
             background: "#000000",
           }}
         >
-          {/* Starfield background */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: "radial-gradient(circle at 20% 50%, rgba(124,58,237,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(59,130,246,0.1) 0%, transparent 50%)",
-            }}
-          />
+
 
           <style>{`
             @keyframes glow-pulse {
@@ -488,82 +482,7 @@ export default function SenotaVaultPage() {
 
             </div>
 
-            {/* Right: Shield with cosmic sphere */}
-            <div
-              className="flex-1 flex items-center justify-center relative"
-              style={{
-                animation: "scale-in 1s ease-out 0.2s both",
-              }}
-            >
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    maxWidth: isMobile ? "300px" : "550px",
-                    aspectRatio: "1",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                {/* Background glow effects */}
-                <div className="absolute w-[150%] h-[150%] bg-purple-600/10 blur-[120px] rounded-full -z-10" />
-                <div className="absolute w-[100%] h-[100%] bg-blue-600/10 blur-[100px] rounded-full -z-10" />
 
-                {/* Digital Halo Pedestal */}
-                <div 
-                  style={{
-                    position: "absolute",
-                    bottom: "15%",
-                    width: isMobile ? "240px" : "400px",
-                    height: isMobile ? "60px" : "100px",
-                    background: "radial-gradient(ellipse at center, rgba(124,58,237,0.4) 0%, transparent 70%)",
-                    transform: "rotateX(75deg)",
-                    zIndex: 5,
-                  }}
-                />
-                <div 
-                  style={{
-                    position: "absolute",
-                    bottom: "18%",
-                    width: isMobile ? "180px" : "300px",
-                    height: isMobile ? "180px" : "300px",
-                    border: "2px solid rgba(124,58,237,0.3)",
-                    borderRadius: "50%",
-                    transform: "rotateX(75deg)",
-                    boxShadow: "0 0 40px rgba(124,58,237,0.4), inset 0 0 40px rgba(124,58,237,0.2)",
-                    zIndex: 5,
-                  }}
-                />
-                <div 
-                  style={{
-                    position: "absolute",
-                    bottom: "20%",
-                    width: isMobile ? "120px" : "200px",
-                    height: isMobile ? "120px" : "200px",
-                    border: "1px solid rgba(59,130,246,0.4)",
-                    borderRadius: "50%",
-                    transform: "rotateX(75deg)",
-                    animation: "rotate-slow 10s linear infinite",
-                    zIndex: 5,
-                  }}
-                />
-
-                {/* Shield asset */}
-                <div className="relative z-10 w-full h-full flex items-center justify-center" style={{ transform: "translateY(-20px)" }}>
-                  <img 
-                    src="/aegis-shield-v2.png" 
-                    alt="Aegis Shield" 
-                    style={{
-                      width: "110%",
-                      height: "auto",
-                      filter: "drop-shadow(0 0 60px rgba(124,58,237,0.5))",
-                      animation: "pulse-glow 4s ease-in-out infinite"
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Right side stats */}
