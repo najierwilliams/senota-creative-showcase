@@ -481,13 +481,6 @@ export default function SenotaVaultPage() {
               </div>
 
             </div>
-
-
-          </div>
-
-
-
-
           </div>
 
           {/* Scroll indicator */}
