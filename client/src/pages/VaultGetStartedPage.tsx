@@ -36,9 +36,27 @@ import {
 /* ── Tier Data ─────────────────────────────────────────────────── */
 const TIERS = [
   {
+    id: "starter",
+    name: "Vault Starter",
+    price: 0.99,
+    period: "/month",
+    tagline: "Entry-level protection for new creators.",
+    badge: "New",
+    color: "#4ADE80",
+    glowColor: "rgba(74,222,128,0.4)",
+    features: [
+      "Basic account monitoring",
+      "Email alerts",
+      "Community support",
+      "3-day free trial",
+    ],
+    icon: Zap,
+    paymentLink: "https://buy.stripe.com/00w3cvafY11e0z73iV4ow00",
+  },
+  {
     id: "basic",
     name: "Vault Basic",
-    price: 29,
+    price: 9.99,
     period: "/month",
     tagline: "Perfect for solo creators just getting started.",
     badge: null,
@@ -52,11 +70,12 @@ const TIERS = [
       "Monthly security report",
     ],
     icon: Shield,
+    paymentLink: "", // TODO: User to provide
   },
   {
     id: "pro",
     name: "Vault Pro",
-    price: 99,
+    price: 19.99,
     period: "/month",
     tagline: "For growing teams and serious creators.",
     badge: "Most Popular",
@@ -71,11 +90,12 @@ const TIERS = [
       "Priority support",
     ],
     icon: Fingerprint,
+    paymentLink: "", // TODO: User to provide
   },
   {
     id: "elite",
     name: "Vault Elite",
-    price: 299,
+    price: 49.99,
     period: "/month",
     tagline: "Enterprise-grade protection for high-volume creators.",
     badge: "Best Value",
@@ -90,6 +110,7 @@ const TIERS = [
       "Custom integrations",
     ],
     icon: Award,
+    paymentLink: "", // TODO: User to provide
   },
 ];
 
@@ -617,7 +638,7 @@ function StepAccount({
           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "#8080B0" }}>
             Creating your{" "}
             <span style={{ color: tier.color, fontWeight: 600 }}>{tier.name}</span>{" "}
-            account — ${tier.price}/month after your free trial
+            account — ${tier.price}/month after your {tier.id === 'starter' ? '3-day' : '14-day'} free trial
           </p>
         )}
       </div>
@@ -841,29 +862,17 @@ function StepPayment({
   formData: Record<string, string>;
 }) {
   const tier = TIERS.find((t) => t.id === selectedTier);
-  const createSession = trpc.stripe.createSession.useMutation({
-    onSuccess: (data) => {
-      console.log("Stripe session created, redirecting to:", data.url);
-      if (data.url) {
-        try {
-          // Use window.location.assign for better error handling or just direct href
-          window.location.href = data.url;
-        } catch (e) {
-          console.error("Redirect error:", e);
-          toast.error("Failed to redirect to payment page");
-        }
-      } else {
-        toast.error("No payment URL returned from server");
-      }
-    },
-    onError: (err) => {
-      toast.error("Failed to initialize payment: " + err.message);
-    },
-  });
+  // Payment links are handled directly without server mutation
 
   const handlePayment = () => {
-    if (!selectedTier) return;
-    createSession.mutate({ tierId: selectedTier });
+    if (!selectedTier || !tier?.paymentLink) {
+      toast.error("Payment link not available for this tier");
+      return;
+    }
+    // Add the return URL as a query parameter to the Stripe payment link
+    const returnUrl = `${window.location.origin}/vault/get-started?step=4&session_id=success`;
+    const paymentUrl = `${tier.paymentLink}?client_reference_id=${selectedTier}&return_url=${encodeURIComponent(returnUrl)}`;
+    window.location.href = paymentUrl;
   };
 
   return (
@@ -946,7 +955,7 @@ function StepPayment({
                 Free Trial
               </span>
               <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 600, color: "#FFFFFF" }}>
-                14 days
+                {tier?.id === 'starter' ? '3 days' : '14 days'}
               </span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1008,36 +1017,30 @@ function StepPayment({
           </button>
           <button
             onClick={handlePayment}
-            disabled={createSession.isPending}
             style={{
               flex: 2,
               padding: "14px 24px",
-              background: createSession.isPending ? "rgba(124,58,237,0.4)" : "linear-gradient(135deg, #7C3AED, #5B21B6)",
+              background: "linear-gradient(135deg, #7C3AED, #5B21B6)",
               color: "#FFFFFF",
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "14px",
               fontWeight: 600,
               border: "none",
               borderRadius: "6px",
-              cursor: createSession.isPending ? "not-allowed" : "pointer",
+              cursor: "pointer",
               transition: "all 0.3s ease",
-              boxShadow: createSession.isPending ? "none" : "0 0 30px rgba(124,58,237,0.4)",
-              opacity: createSession.isPending ? 0.6 : 1,
+              boxShadow: "0 0 30px rgba(124,58,237,0.4)",
             }}
             onMouseEnter={(e) => {
-              if (!createSession.isPending) {
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
-                (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
-              }
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 50px rgba(124,58,237,0.7)";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              if (!createSession.isPending) {
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
-                (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-              }
+              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 30px rgba(124,58,237,0.4)";
+              (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
             }}
           >
-            {createSession.isPending ? "Redirecting to Stripe..." : "Proceed to Payment"}
+            Proceed to Payment
           </button>
         </div>
       </div>
@@ -1523,7 +1526,7 @@ export default function VaultGetStartedPage() {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Handle return from Stripe Checkout
+  // Handle return from Stripe Payment Link
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get("session_id");
@@ -1534,7 +1537,9 @@ export default function VaultGetStartedPage() {
       setStep(targetStep);
       // Clean up URL
       window.history.replaceState({}, document.title, "/vault/get-started");
-      toast.success("Payment successful! Activating your protection...");
+      if (sessionId === "success") {
+        toast.success("Payment successful! Activating your protection...");
+      }
     }
   }, []);
 
