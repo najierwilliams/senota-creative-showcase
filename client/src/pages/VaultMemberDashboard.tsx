@@ -4,7 +4,7 @@
  * High-density intelligence command center
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Shield,
   Fingerprint,
@@ -42,6 +42,17 @@ import {
   Mail,
   Smartphone,
   Check,
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  FileCode,
+  Scale,
+  Gavel,
+  BookOpen,
+  MessageSquare,
+  ShieldQuestion,
+  Image as ImageIcon,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -58,6 +69,24 @@ const COLORS = {
   danger: "#EF4444",
   warning: "#F59E0B",
 };
+
+/* ── Types ────────────────────────────────────────────────── */
+interface PendingAsset {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  date: string;
+  preview?: string;
+}
+
+interface ActiveSignature {
+  id: string;
+  name: string;
+  type: string;
+  date: string;
+  hash: string;
+}
 
 /* ── Components ────────────────────────────────────────────────── */
 
@@ -195,9 +224,39 @@ const OverviewView = () => (
   </div>
 );
 
-const SignaturesView = () => (
+const SignaturesView = ({ pendingAssets, activeSignatures, onApprove }: { pendingAssets: PendingAsset[], activeSignatures: ActiveSignature[], onApprove: (asset: PendingAsset) => void }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "24px" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+      {/* Pending Approval Section */}
+      <Card title="Pending Approval" subtitle="Review assets before fingerprinting" extra={<Badge color={COLORS.warning}>{pendingAssets.length} Pending</Badge>}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {pendingAssets.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px", color: COLORS.textSecondary, fontSize: "13px" }}>No assets awaiting approval</div>
+          ) : (
+            pendingAssets.map((asset) => (
+              <div key={asset.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(245,158,11,0.03)", borderRadius: "12px", border: `1px solid ${COLORS.warning}30` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div style={{ width: "40px", height: "40px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <ImageIcon size={18} color={COLORS.warning} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
+                    <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>{asset.size} • {asset.date}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => onApprove(asset)}
+                  style={{ padding: "8px 16px", background: COLORS.warning, color: "#000", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}
+                >
+                  Approve Fingerprint
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </Card>
+
+      {/* Neural Fingerprint Engine Info */}
       <Card title="Neural Fingerprint Engine" subtitle="AI-Resistant Asset Identity" extra={<Cpu size={16} color={COLORS.accent} />}>
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
@@ -219,107 +278,102 @@ const SignaturesView = () => (
           </div>
         </div>
       </Card>
-      <Card title="Signature Management" subtitle="Manage and verify asset fingerprints" extra={<Filter size={16} color={COLORS.textSecondary} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {[
-            { name: "Brand_Logo_2026.svg", type: "Vector", date: "Jul 08, 2026", hash: "9x2f...1e0a" },
-            { name: "Campaign_Video_01.mp4", type: "Video", date: "Jul 07, 2026", hash: "4a8c...d9f2" },
-            { name: "Product_Shot_A.jpg", type: "Image", date: "Jul 06, 2026", hash: "2b7e...k4l8" },
-            { name: "Whitepaper_Draft.pdf", type: "Document", date: "Jul 05, 2026", hash: "1d3a...p9q0" },
-          ].map((asset, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", border: `1px solid ${COLORS.border}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{ width: "40px", height: "40px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <FileText size={18} color={COLORS.textSecondary} />
-                </div>
-                <div>
-                  <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
-                  <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.type}</span>
-                    <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.hash}</span>
-                  </div>
-                </div>
+    </div>
+
+    {/* Active Signatures Section */}
+    <Card title="Active Asset Signatures" subtitle="Manage and verify live asset fingerprints" extra={<Badge color={COLORS.success}>{activeSignatures.length} Verified</Badge>}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+        {activeSignatures.map((asset, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{ width: "40px", height: "40px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <FileText size={18} color={COLORS.textSecondary} />
               </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button style={{ padding: "6px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "4px", color: COLORS.textSecondary }}><Download size={14} /></button>
-                <button style={{ padding: "6px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "4px", color: COLORS.textSecondary }}><Share2 size={14} /></button>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
+                <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+                  <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.type}</span>
+                  <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.hash}</span>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </Card>
-    </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary }}><Download size={14} /></button>
+              <button style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary }}><Share2 size={14} /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
   </div>
 );
 
 const GlobalMonitorView = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "3fr 1fr", gap: "24px" }}>
-      <Card title="Live Surveillance Network" subtitle="Global asset detection across 400+ data nodes" extra={<Badge color={COLORS.success}>Operational</Badge>}>
-        <div style={{ height: "450px", background: "#080808", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}` }}>
-          {/* Mock Map Background */}
-          <div style={{ position: "absolute", inset: 0, opacity: 0.1, backgroundImage: "radial-gradient(circle at 2px 2px, #444 1px, transparent 0)", backgroundSize: "32px 32px" }} />
-          
-          {/* Mock Data Nodes with Animation */}
-          {[
-            { top: "30%", left: "20%", city: "San Francisco", status: "Active" },
-            { top: "40%", left: "45%", city: "London", status: "Active" },
-            { top: "60%", left: "75%", city: "Singapore", status: "Alert" },
-            { top: "25%", left: "80%", city: "Tokyo", status: "Active" },
-            { top: "70%", left: "30%", city: "São Paulo", status: "Active" },
-          ].map((node, i) => (
-            <div key={i} style={{ position: "absolute", top: node.top, left: node.left, textAlign: "center", transform: "translate(-50%, -50%)" }}>
-              <div style={{ 
-                width: "14px", 
-                height: "14px", 
-                background: node.status === "Alert" ? COLORS.danger : COLORS.accent, 
-                borderRadius: "50%", 
-                boxShadow: `0 0 20px ${node.status === "Alert" ? COLORS.danger : COLORS.accent}`, 
-                marginBottom: "8px",
-                animation: "pulse 2s infinite"
-              }} />
-              <span style={{ fontSize: "9px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>{node.city}</span>
-            </div>
-          ))}
+    {/* Real World 2D Map Section */}
+    <Card title="Global Detection Network" subtitle="Geographically accurate threat tracking" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
+      <div style={{ height: "450px", background: "#0A0A0A", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}` }}>
+        {/* Simplified World Map SVG Background */}
+        <svg viewBox="0 0 1000 500" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }}>
+          <path fill="#333" d="M150,150 L180,140 L220,150 L250,180 L230,220 L190,240 L150,230 Z" /> {/* N. America */}
+          <path fill="#333" d="M450,120 L500,110 L550,130 L540,180 L480,190 L440,160 Z" /> {/* Europe */}
+          <path fill="#333" d="M700,150 L850,140 L900,200 L850,300 L750,320 L680,250 Z" /> {/* Asia */}
+          <path fill="#333" d="M200,300 L250,280 L300,320 L280,400 L220,420 L180,380 Z" /> {/* S. America */}
+          <path fill="#333" d="M480,250 L550,240 L600,300 L580,400 L500,420 L450,350 Z" /> {/* Africa */}
+          <path fill="#333" d="M750,380 L850,370 L880,420 L820,450 L740,430 Z" /> {/* Australia */}
+        </svg>
 
-          {/* Radar Line */}
-          <div style={{ position: "absolute", top: "50%", left: "50%", width: "1000px", height: "1000px", background: "conic-gradient(from 0deg, rgba(212,175,55,0.1), transparent 60deg)", borderRadius: "50%", transformOrigin: "center", transform: "translate(-50%, -50%)", animation: "rotate 10s linear infinite" }} />
-          
-          <style>{`
-            @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
-            @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-          `}</style>
-        </div>
-      </Card>
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-        <Card title="Node Status" extra={<Activity size={16} color={COLORS.success} />}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {[
-              { node: "US-West-01", latency: "24ms", health: "99%" },
-              { node: "EU-Central-02", latency: "48ms", health: "100%" },
-              { node: "AS-South-01", latency: "112ms", health: "98%" },
-              { node: "SA-East-01", latency: "156ms", health: "97%" },
-            ].map((node, i) => (
-              <div key={i} style={{ padding: "12px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", border: `1px solid ${COLORS.border}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "11px", fontWeight: 600 }}>{node.node}</span>
-                  <span style={{ fontSize: "10px", color: COLORS.success }}>{node.health}</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: COLORS.textSecondary }}>
-                  <span>Latency</span>
-                  <span>{node.latency}</span>
-                </div>
-              </div>
-            ))}
+        {/* Accurate City Markers */}
+        {[
+          { top: "35%", left: "18%", city: "San Francisco", status: "Active" },
+          { top: "30%", left: "48%", city: "London", status: "Active" },
+          { top: "60%", left: "78%", city: "Singapore", status: "Alert" },
+          { top: "35%", left: "82%", city: "Tokyo", status: "Active" },
+          { top: "75%", left: "28%", city: "São Paulo", status: "Active" },
+          { top: "38%", left: "25%", city: "New York", status: "Active" },
+          { top: "42%", left: "52%", city: "Berlin", status: "Alert" },
+          { top: "65%", left: "55%", city: "Lagos", status: "Active" },
+        ].map((node, i) => (
+          <div key={i} style={{ position: "absolute", top: node.top, left: node.left, textAlign: "center", transform: "translate(-50%, -50%)" }}>
+            <div style={{ 
+              width: "10px", 
+              height: "10px", 
+              background: node.status === "Alert" ? COLORS.danger : COLORS.accent, 
+              borderRadius: "50%", 
+              boxShadow: `0 0 15px ${node.status === "Alert" ? COLORS.danger : COLORS.accent}`, 
+              marginBottom: "6px",
+              animation: "pulse 2s infinite"
+            }} />
+            <span style={{ fontSize: "8px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>{node.city}</span>
           </div>
-        </Card>
-        <Card title="Scan Frequency" subtitle="Live updates per minute">
-          <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: "36px", fontWeight: 300, margin: 0 }}>14,280</p>
-            <p style={{ fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", marginTop: "4px" }}>Scans / Min</p>
-          </div>
-        </Card>
+        ))}
+
+        {/* Scan Radar */}
+        <div style={{ position: "absolute", top: "50%", left: "50%", width: "800px", height: "800px", background: "conic-gradient(from 0deg, rgba(212,175,55,0.05), transparent 90deg)", borderRadius: "50%", transform: "translate(-50%, -50%)", animation: "rotate 15s linear infinite" }} />
       </div>
+    </Card>
+
+    {/* Platform Security Matrix */}
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+      {[
+        { name: "Meta (FB/IG)", icon: Facebook, status: "Secured", alert: false },
+        { name: "X (Twitter)", icon: Twitter, status: "Alert Detected", alert: true },
+        { name: "YouTube", icon: Youtube, status: "Secured", alert: false },
+        { name: "Instagram", icon: Instagram, status: "Secured", alert: false },
+      ].map((platform, i) => (
+        <Card key={i} extra={platform.alert ? <AlertCircle size={16} color={COLORS.danger} className="animate-pulse" /> : <Check size={16} color={COLORS.success} />}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+            <platform.icon size={20} color={platform.alert ? COLORS.danger : COLORS.textSecondary} />
+            <span style={{ fontSize: "13px", fontWeight: 600 }}>{platform.name}</span>
+          </div>
+          <Badge color={platform.alert ? COLORS.danger : COLORS.success}>{platform.status}</Badge>
+          {platform.alert && (
+            <button style={{ width: "100%", marginTop: "16px", padding: "8px", background: "rgba(239,68,68,0.1)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>
+              View Intelligence
+            </button>
+          )}
+        </Card>
+      ))}
     </div>
   </div>
 );
@@ -327,26 +381,28 @@ const GlobalMonitorView = () => (
 const EnforcementView = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
     <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "24px" }}>
-      <Card title="Active Enforcement Cases" subtitle="Legal actions and takedown status" extra={<ShieldCheck size={18} color={COLORS.success} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1px", background: COLORS.border, borderRadius: "8px", overflow: "hidden" }}>
+      <Card title="Legal Command Center" subtitle="Automated legal actions and takedown resources" extra={<Gavel size={18} color={COLORS.accent} />}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
           {[
-            { id: "C-8821", target: "imposter-site.com", platform: "Domain", status: "Legal Notice Sent", priority: "Critical" },
-            { id: "C-8822", target: "@fake_creator_01", platform: "Instagram", status: "Account Suspended", priority: "High" },
-            { id: "C-8823", target: "leak-forum.net", platform: "Forum", status: "Content Removed", priority: "Medium" },
-            { id: "C-8824", target: "image-scraper.io", platform: "Web", status: "Takedown Pending", priority: "High" },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr 2fr 1.5fr", padding: "16px", background: COLORS.surface, alignItems: "center" }}>
-              <span style={{ fontSize: "11px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{item.id}</span>
-              <div>
-                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{item.target}</p>
-                <p style={{ fontSize: "10px", color: COLORS.textSecondary }}>{item.platform}</p>
-              </div>
-              <Badge color={item.status.includes("Removed") || item.status.includes("Suspended") ? COLORS.success : COLORS.warning}>{item.status}</Badge>
-              <div style={{ textAlign: "right" }}>
-                <span style={{ fontSize: "10px", color: item.priority === "Critical" ? COLORS.danger : COLORS.textSecondary, fontWeight: 700 }}>{item.priority}</span>
-              </div>
+            { title: "Takedown Templates", desc: "Standard DMCA and IP notices", icon: FileCode },
+            { title: "Jurisdiction Guides", desc: "Global IP law resources", icon: BookOpen },
+            { title: "Expert Consultation", desc: "Speak with IP attorneys", icon: MessageSquare },
+            { title: "Compliance Portal", desc: "Platform-specific tools", icon: Scale },
+          ].map((tool, i) => (
+            <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}`, cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")} onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}>
+              <tool.icon size={20} color={COLORS.accent} style={{ marginBottom: "12px" }} />
+              <h4 style={{ fontSize: "13px", margin: "0 0 4px" }}>{tool.title}</h4>
+              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>{tool.desc}</p>
             </div>
           ))}
+        </div>
+        <div style={{ marginTop: "24px", padding: "20px", background: "rgba(212,175,55,0.05)", borderRadius: "12px", border: `1px solid ${COLORS.accent}30` }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+            <ShieldAlert size={20} color={COLORS.accent} />
+            <h4 style={{ fontSize: "14px", margin: 0 }}>Rapid Response Toolkit</h4>
+          </div>
+          <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5, marginBottom: "16px" }}>Immediate legal escalation for high-value asset leaks. Automatically generates multi-jurisdictional takedown notices.</p>
+          <button style={{ padding: "10px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: 700, cursor: "pointer" }}>Initialize Rapid Response</button>
         </div>
       </Card>
       <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -375,14 +431,6 @@ const EnforcementView = () => (
               </div>
             </div>
           </div>
-        </Card>
-        <Card title="Resolution Timeline" extra={<Clock size={16} color={COLORS.textSecondary} />}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", height: "60px", gap: "4px" }}>
-            {[40, 60, 45, 90, 75, 85, 100].map((h, i) => (
-              <div key={i} style={{ flex: 1, height: `${h}%`, background: COLORS.accentSecondary, borderRadius: "2px", opacity: 0.6 }} />
-            ))}
-          </div>
-          <p style={{ fontSize: "10px", color: COLORS.textSecondary, textAlign: "center", marginTop: "12px" }}>Average time to takedown (Last 7 Days)</p>
         </Card>
       </div>
     </div>
@@ -419,136 +467,144 @@ const IntelligenceView = () => (
         </div>
       </div>
     </Card>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-      <Card title="Regional Threat Density" subtitle="Geopolitical risk distribution">
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {[
-            { region: "North America", risk: "Low", value: 15 },
-            { region: "Eastern Europe", risk: "High", value: 85 },
-            { region: "East Asia", risk: "Medium", value: 45 },
-            { region: "Southeast Asia", risk: "High", value: 70 },
-          ].map((item, i) => (
-            <div key={i}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", marginBottom: "8px" }}>
-                <span>{item.region}</span>
-                <span style={{ color: item.risk === "High" ? COLORS.danger : item.risk === "Medium" ? COLORS.warning : COLORS.success }}>{item.risk} Risk</span>
-              </div>
-              <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px" }}>
-                <div style={{ width: `${item.value}%`, height: "100%", background: item.risk === "High" ? COLORS.danger : item.risk === "Medium" ? COLORS.warning : COLORS.success }} />
-              </div>
+  </div>
+);
+
+const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
+      <Card title="Secure New Digital Asset" subtitle="Initiate Vault protection and neural fingerprinting">
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px", padding: "20px 0" }}>
+          {/* Upload Zone */}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: "none" }} 
+            multiple 
+            onChange={(e) => e.target.files && onUpload(e.target.files)}
+          />
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            style={{ 
+              border: `2px dashed ${COLORS.border}`, 
+              borderRadius: "16px", 
+              padding: "60px", 
+              textAlign: "center",
+              background: "rgba(255,255,255,0.01)",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            }} 
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = COLORS.accent)} 
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = COLORS.border)}
+          >
+            <div style={{ width: "64px", height: "64px", background: "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+              <Plus size={32} color={COLORS.accent} />
             </div>
-          ))}
-        </div>
-      </Card>
-      <Card title="Intelligence Feed" extra={<Layers size={16} color={COLORS.textSecondary} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          {[
-            { event: "New Scraper Pattern Identified", time: "2h ago", type: "Security Advisory" },
-            { event: "Major Platform API Update", time: "5h ago", type: "System Notification" },
-            { event: "Coordinated Leak Campaign Detected", time: "8h ago", type: "Critical Alert" },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: item.type.includes("Critical") ? COLORS.danger : COLORS.accentSecondary, marginTop: "4px" }} />
-              <div>
-                <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>{item.event}</p>
-                <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
-                  <span style={{ fontSize: "10px", color: COLORS.textSecondary }}>{item.time}</span>
-                  <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{item.type}</span>
-                </div>
-              </div>
+            <h3 style={{ fontSize: "18px", fontWeight: 500, margin: "0 0 8px" }}>Upload Creative Assets</h3>
+            <p style={{ fontSize: "13px", color: COLORS.textSecondary }}>Click to browse or drag and drop files</p>
+            <p style={{ fontSize: "11px", color: COLORS.textSecondary, marginTop: "20px" }}>Supported: PNG, JPG, TIFF, MP4, MOV (Max 2GB)</p>
+          </div>
+
+          {/* Configuration */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Protection Level</label>
+              <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
+                <option>Standard Vault Protection</option>
+                <option>Enhanced Neural Fingerprinting</option>
+                <option>Real-Time Global Monitoring</option>
+                <option>Elite Legal Enforcement</option>
+              </select>
             </div>
-          ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Category</label>
+              <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
+                <option>Commercial Photography</option>
+                <option>Brand Identity / Logos</option>
+                <option>Cinematic Content</option>
+                <option>Intellectual Property</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Metadata (Optional)</label>
+            <textarea placeholder="Enter asset description, copyright details, or licensing terms..." style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px", minHeight: "100px", resize: "none" }} />
+          </div>
+
+          <button 
+            onClick={() => alert("Upload complete. Check Digital Signatures for pending approvals.")}
+            style={{ 
+              padding: "18px", 
+              background: COLORS.accent, 
+              color: "#000", 
+              border: "none", 
+              borderRadius: "8px", 
+              fontSize: "15px", 
+              fontWeight: 700, 
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "10px",
+              boxShadow: `0 0 30px ${COLORS.accent}40`,
+              transition: "all 0.3s ease"
+            }} 
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")} 
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+          >
+            <ShieldCheck size={20} />
+            Initialize Vault Protection
+          </button>
         </div>
       </Card>
     </div>
-  </div>
-);
-
-const SecureAssetView = () => (
-  <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
-    <Card title="Secure New Digital Asset" subtitle="Initiate Vault protection and neural fingerprinting">
-      <div style={{ display: "flex", flexDirection: "column", gap: "32px", padding: "20px 0" }}>
-        {/* Upload Zone */}
-        <div style={{ 
-          border: `2px dashed ${COLORS.border}`, 
-          borderRadius: "16px", 
-          padding: "60px", 
-          textAlign: "center",
-          background: "rgba(255,255,255,0.01)",
-          cursor: "pointer",
-          transition: "all 0.3s ease",
-        }} onMouseEnter={(e) => (e.currentTarget.style.borderColor = COLORS.accent)} onMouseLeave={(e) => (e.currentTarget.style.borderColor = COLORS.border)}>
-          <div style={{ width: "64px", height: "64px", background: "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-            <Plus size={32} color={COLORS.accent} />
-          </div>
-          <h3 style={{ fontSize: "18px", fontWeight: 500, margin: "0 0 8px" }}>Upload Creative Assets</h3>
-          <p style={{ fontSize: "13px", color: COLORS.textSecondary }}>Drag and drop high-resolution images, videos, or design files</p>
-          <p style={{ fontSize: "11px", color: COLORS.textSecondary, marginTop: "20px" }}>Supported: PNG, JPG, TIFF, MP4, MOV (Max 2GB)</p>
-        </div>
-
-        {/* Configuration */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Protection Level</label>
-            <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
-              <option>Standard Vault Protection</option>
-              <option>Enhanced Neural Fingerprinting</option>
-              <option>Real-Time Global Monitoring</option>
-              <option>Elite Legal Enforcement</option>
-            </select>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Category</label>
-            <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
-              <option>Commercial Photography</option>
-              <option>Brand Identity / Logos</option>
-              <option>Cinematic Content</option>
-              <option>Intellectual Property</option>
-            </select>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Metadata (Optional)</label>
-          <textarea placeholder="Enter asset description, copyright details, or licensing terms..." style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px", minHeight: "100px", resize: "none" }} />
-        </div>
-
-        <button style={{ 
-          padding: "18px", 
-          background: COLORS.accent, 
-          color: "#000", 
-          border: "none", 
-          borderRadius: "8px", 
-          fontSize: "15px", 
-          fontWeight: 700, 
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "10px",
-          boxShadow: `0 0 30px ${COLORS.accent}40`,
-          transition: "all 0.3s ease"
-        }} onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")} onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}>
-          <ShieldCheck size={20} />
-          Initialize Vault Protection
-        </button>
-      </div>
-    </Card>
-  </div>
-);
+  );
+};
 
 /* ── Main Dashboard ──────────────────────────────────────────── */
 export default function VaultMemberDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [pendingAssets, setPendingAssets] = useState<PendingAsset[]>([]);
+  const [activeSignatures, setActiveSignatures] = useState<ActiveSignature[]>([
+    { id: "S-001", name: "Brand_Logo_2026.svg", type: "Vector", date: "Jul 08, 2026", hash: "9x2f...1e0a" },
+    { id: "S-002", name: "Campaign_Video_01.mp4", type: "Video", date: "Jul 07, 2026", hash: "4a8c...d9f2" },
+  ]);
+
+  const handleFileUpload = (files: FileList) => {
+    const newAssets: PendingAsset[] = Array.from(files).map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      name: file.name,
+      type: file.type,
+      size: (file.size / 1024 / 1024).toFixed(2) + " MB",
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    }));
+    setPendingAssets(prev => [...prev, ...newAssets]);
+    setActiveTab("signatures"); // Redirect to signatures to see pending work
+  };
+
+  const handleApproveSignature = (asset: PendingAsset) => {
+    const newSignature: ActiveSignature = {
+      id: "S-" + Math.floor(Math.random() * 1000).toString().padStart(3, '0'),
+      name: asset.name,
+      type: asset.type.split('/')[1]?.toUpperCase() || "Asset",
+      date: asset.date,
+      hash: Math.random().toString(36).substr(2, 8) + "..." + Math.random().toString(36).substr(2, 4)
+    };
+    setActiveSignatures(prev => [newSignature, ...prev]);
+    setPendingAssets(prev => prev.filter(a => a.id !== asset.id));
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case "overview": return <OverviewView />;
-      case "signatures": return <SignaturesView />;
+      case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={activeSignatures} onApprove={handleApproveSignature} />;
       case "monitoring": return <GlobalMonitorView />;
       case "enforcement": return <EnforcementView />;
       case "intelligence": return <IntelligenceView />;
-      case "secure_asset": return <SecureAssetView />;
+      case "secure_asset": return <SecureAssetView onUpload={handleFileUpload} />;
       default: return <OverviewView />;
     }
   };
