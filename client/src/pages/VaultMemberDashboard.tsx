@@ -53,6 +53,13 @@ import {
   MessageSquare,
   ShieldQuestion,
   Image as ImageIcon,
+  Trash2,
+  X,
+  AlertTriangle,
+  Linkedin,
+  Send,
+  Music2,
+  Share,
 } from "lucide-react";
 
 /* ── Sophisticated Theme Constants ────────────────────────────────── */
@@ -86,6 +93,7 @@ interface ActiveSignature {
   type: string;
   date: string;
   hash: string;
+  preview?: string;
 }
 
 /* ── Components ────────────────────────────────────────────────── */
@@ -129,6 +137,21 @@ const Badge = ({ children, color = COLORS.accent }: any) => (
     {children}
   </span>
 );
+
+const Modal = ({ isOpen, onClose, title, children }: any) => {
+  if (!isOpen) return null;
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
+      <div style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "16px", width: "100%", maxWidth: "500px", overflow: "hidden", animation: "fadeIn 0.3s ease-out" }}>
+        <div style={{ padding: "20px 24px", borderBottom: `1px solid ${COLORS.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600 }}>{title}</h3>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: COLORS.textSecondary, cursor: "pointer" }}><X size={20} /></button>
+        </div>
+        <div style={{ padding: "24px" }}>{children}</div>
+      </div>
+    </div>
+  );
+};
 
 /* ── Page Views ────────────────────────────────────────────────── */
 
@@ -224,106 +247,116 @@ const OverviewView = () => (
   </div>
 );
 
-const SignaturesView = ({ pendingAssets, activeSignatures, onApprove }: { pendingAssets: PendingAsset[], activeSignatures: ActiveSignature[], onApprove: (asset: PendingAsset) => void }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-      {/* Pending Approval Section */}
-      <Card title="Pending Approval" subtitle="Review assets before fingerprinting" extra={<Badge color={COLORS.warning}>{pendingAssets.length} Pending</Badge>}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {pendingAssets.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "40px", color: COLORS.textSecondary, fontSize: "13px" }}>No assets awaiting approval</div>
-          ) : (
-            pendingAssets.map((asset) => (
-              <div key={asset.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(245,158,11,0.03)", borderRadius: "12px", border: `1px solid ${COLORS.warning}30` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                  <div style={{ width: "40px", height: "40px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <ImageIcon size={18} color={COLORS.warning} />
+const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePending, onDeleteActive }: any) => {
+  const handleDownload = (name: string) => {
+    alert(`Downloading ${name}... (Functional Link Simulation)`);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+        {/* Pending Approval Section */}
+        <Card title="Pending Approval" subtitle="Review assets before fingerprinting" extra={<Badge color={COLORS.warning}>{pendingAssets.length} Pending</Badge>}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {pendingAssets.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px", color: COLORS.textSecondary, fontSize: "13px" }}>No assets awaiting approval</div>
+            ) : (
+              pendingAssets.map((asset: any) => (
+                <div key={asset.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(245,158,11,0.03)", borderRadius: "12px", border: `1px solid ${COLORS.warning}30` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                    <div style={{ width: "50px", height: "50px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                      {asset.preview ? <img src={asset.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <ImageIcon size={20} color={COLORS.warning} />}
+                    </div>
+                    <div>
+                      <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
+                      <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>{asset.size} • {asset.date}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
-                    <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: "4px 0 0" }}>{asset.size} • {asset.date}</p>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button onClick={() => onDeletePending(asset.id)} style={{ background: "transparent", border: "none", color: COLORS.danger, cursor: "pointer", padding: "4px" }}><Trash2 size={16} /></button>
+                    <button onClick={() => onApprove(asset)} style={{ padding: "8px 16px", background: COLORS.warning, color: "#000", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}>Approve Fingerprint</button>
                   </div>
                 </div>
-                <button 
-                  onClick={() => onApprove(asset)}
-                  style={{ padding: "8px 16px", background: COLORS.warning, color: "#000", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 700, cursor: "pointer" }}
-                >
-                  Approve Fingerprint
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-      </Card>
+              ))
+            )}
+          </div>
+        </Card>
 
-      {/* Neural Fingerprint Engine Info */}
-      <Card title="Neural Fingerprint Engine" subtitle="AI-Resistant Asset Identity" extra={<Cpu size={16} color={COLORS.accent} />}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-              <Zap size={18} color={COLORS.accent} />
-              <h4 style={{ fontSize: "14px", margin: 0 }}>Deep Scan Status</h4>
+        {/* Neural Fingerprint Engine Info */}
+        <Card title="Neural Fingerprint Engine" subtitle="AI-Resistant Asset Identity" extra={<Cpu size={16} color={COLORS.accent} />}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                <Zap size={18} color={COLORS.accent} />
+                <h4 style={{ fontSize: "14px", margin: 0 }}>Deep Scan Status</h4>
+              </div>
+              <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", marginBottom: "8px" }}>
+                <div style={{ width: "85%", height: "100%", background: COLORS.accent }} />
+              </div>
+              <p style={{ fontSize: "10px", color: COLORS.textSecondary }}>Processing neural hash for active assets</p>
             </div>
-            <div style={{ width: "100%", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", marginBottom: "8px" }}>
-              <div style={{ width: "85%", height: "100%", background: COLORS.accent }} />
+            <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                <Lock size={18} color={COLORS.success} />
+                <h4 style={{ fontSize: "14px", margin: 0 }}>Immutable Registry</h4>
+              </div>
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5 }}>All signatures are anchored to the Vault distributed ledger, ensuring non-repudiation of asset ownership.</p>
             </div>
-            <p style={{ fontSize: "10px", color: COLORS.textSecondary }}>Processing neural hash for 1,240 new assets</p>
           </div>
-          <div style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-              <Lock size={18} color={COLORS.success} />
-              <h4 style={{ fontSize: "14px", margin: 0 }}>Immutable Registry</h4>
+        </Card>
+      </div>
+
+      {/* Active Signatures Section */}
+      <Card title="Active Asset Signatures" subtitle="Manage and verify live asset fingerprints" extra={<Badge color={COLORS.success}>{activeSignatures.length} Verified</Badge>}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+          {activeSignatures.map((asset: any, i: number) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div style={{ width: "50px", height: "50px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  {asset.preview ? <img src={asset.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <FileText size={20} color={COLORS.textSecondary} />}
+                </div>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
+                  <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+                    <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.type}</span>
+                    <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.hash}</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button onClick={() => handleDownload(asset.name)} style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary, cursor: "pointer" }}><Download size={16} /></button>
+                <button onClick={() => onDeleteActive(asset.id)} style={{ padding: "8px", background: "rgba(239,68,68,0.05)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, cursor: "pointer" }}><Trash2 size={16} /></button>
+              </div>
             </div>
-            <p style={{ fontSize: "11px", color: COLORS.textSecondary, lineHeight: 1.5 }}>All signatures are anchored to the Vault distributed ledger, ensuring non-repudiation of asset ownership.</p>
-          </div>
+          ))}
         </div>
       </Card>
     </div>
-
-    {/* Active Signatures Section */}
-    <Card title="Active Asset Signatures" subtitle="Manage and verify live asset fingerprints" extra={<Badge color={COLORS.success}>{activeSignatures.length} Verified</Badge>}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-        {activeSignatures.map((asset, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{ width: "40px", height: "40px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <FileText size={18} color={COLORS.textSecondary} />
-              </div>
-              <div>
-                <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
-                <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
-                  <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.type}</span>
-                  <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.hash}</span>
-                </div>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <button style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary }}><Download size={14} /></button>
-              <button style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary }}><Share2 size={14} /></button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
-  </div>
-);
+  );
+};
 
 const GlobalMonitorView = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    {/* Real World 2D Map Section */}
-    <Card title="Global Detection Network" subtitle="Geographically accurate threat tracking" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
-      <div style={{ height: "450px", background: "#0A0A0A", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}` }}>
-        {/* Simplified World Map SVG Background */}
-        <svg viewBox="0 0 1000 500" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.15 }}>
-          <path fill="#333" d="M150,150 L180,140 L220,150 L250,180 L230,220 L190,240 L150,230 Z" /> {/* N. America */}
-          <path fill="#333" d="M450,120 L500,110 L550,130 L540,180 L480,190 L440,160 Z" /> {/* Europe */}
-          <path fill="#333" d="M700,150 L850,140 L900,200 L850,300 L750,320 L680,250 Z" /> {/* Asia */}
-          <path fill="#333" d="M200,300 L250,280 L300,320 L280,400 L220,420 L180,380 Z" /> {/* S. America */}
-          <path fill="#333" d="M480,250 L550,240 L600,300 L580,400 L500,420 L450,350 Z" /> {/* Africa */}
-          <path fill="#333" d="M750,380 L850,370 L880,420 L820,450 L740,430 Z" /> {/* Australia */}
+    {/* Real World 2D Map Section - High Detail Aesthetic */}
+    <Card title="Global Detection Network" subtitle="High-precision geographic surveillance" extra={<Badge color={COLORS.success}>Live Feed</Badge>}>
+      <div style={{ height: "500px", background: "#050B15", borderRadius: "12px", position: "relative", overflow: "hidden", border: `1px solid ${COLORS.border}`, boxShadow: "inset 0 0 100px rgba(59,130,246,0.1)" }}>
+        {/* High-Detail World Map Simulation */}
+        <div style={{ position: "absolute", inset: 0, background: "url('https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?q=80&w=2000&auto=format&fit=crop') center center", backgroundSize: "cover", opacity: 0.15, mixBlendMode: "screen" }} />
+        
+        <svg viewBox="0 0 1000 500" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.3 }}>
+          <path fill="#1E3A8A" d="M150,150 L180,140 L220,150 L250,180 L230,220 L190,240 L150,230 Z" />
+          <path fill="#1E3A8A" d="M450,120 L500,110 L550,130 L540,180 L480,190 L440,160 Z" />
+          <path fill="#1E3A8A" d="M700,150 L850,140 L900,200 L850,300 L750,320 L680,250 Z" />
+          <path fill="#1E3A8A" d="M200,300 L250,280 L300,320 L280,400 L220,420 L180,380 Z" />
+          <path fill="#1E3A8A" d="M480,250 L550,240 L600,300 L580,400 L500,420 L450,350 Z" />
+          <path fill="#1E3A8A" d="M750,380 L850,370 L880,420 L820,450 L740,430 Z" />
         </svg>
 
-        {/* Accurate City Markers */}
+        {/* Glow Effects */}
+        <div style={{ position: "absolute", top: "30%", left: "20%", width: "200px", height: "200px", background: "radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)", borderRadius: "50%" }} />
+        <div style={{ position: "absolute", top: "40%", left: "70%", width: "300px", height: "300px", background: "radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%)", borderRadius: "50%" }} />
+
+        {/* City Markers */}
         {[
           { top: "35%", left: "18%", city: "San Francisco", status: "Active" },
           { top: "30%", left: "48%", city: "London", status: "Active" },
@@ -338,45 +371,147 @@ const GlobalMonitorView = () => (
             <div style={{ 
               width: "10px", 
               height: "10px", 
-              background: node.status === "Alert" ? COLORS.danger : COLORS.accent, 
+              background: node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary, 
               borderRadius: "50%", 
-              boxShadow: `0 0 15px ${node.status === "Alert" ? COLORS.danger : COLORS.accent}`, 
+              boxShadow: `0 0 15px ${node.status === "Alert" ? COLORS.danger : COLORS.accentSecondary}`, 
               marginBottom: "6px",
               animation: "pulse 2s infinite"
             }} />
-            <span style={{ fontSize: "8px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700 }}>{node.city}</span>
+            <span style={{ fontSize: "8px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, textShadow: "0 0 5px rgba(0,0,0,0.5)" }}>{node.city}</span>
           </div>
         ))}
 
         {/* Scan Radar */}
-        <div style={{ position: "absolute", top: "50%", left: "50%", width: "800px", height: "800px", background: "conic-gradient(from 0deg, rgba(212,175,55,0.05), transparent 90deg)", borderRadius: "50%", transform: "translate(-50%, -50%)", animation: "rotate 15s linear infinite" }} />
+        <div style={{ position: "absolute", top: "50%", left: "50%", width: "800px", height: "800px", background: "conic-gradient(from 0deg, rgba(59,130,246,0.05), transparent 90deg)", borderRadius: "50%", transform: "translate(-50%, -50%)", animation: "rotate 15s linear infinite" }} />
       </div>
     </Card>
 
-    {/* Platform Security Matrix */}
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
-      {[
-        { name: "Meta (FB/IG)", icon: Facebook, status: "Secured", alert: false },
-        { name: "X (Twitter)", icon: Twitter, status: "Alert Detected", alert: true },
-        { name: "YouTube", icon: Youtube, status: "Secured", alert: false },
-        { name: "Instagram", icon: Instagram, status: "Secured", alert: false },
-      ].map((platform, i) => (
-        <Card key={i} extra={platform.alert ? <AlertCircle size={16} color={COLORS.danger} className="animate-pulse" /> : <Check size={16} color={COLORS.success} />}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-            <platform.icon size={20} color={platform.alert ? COLORS.danger : COLORS.textSecondary} />
-            <span style={{ fontSize: "13px", fontWeight: 600 }}>{platform.name}</span>
+    {/* Platform Security Matrix - Expanded */}
+    <Card title="Multi-Platform Security Matrix" subtitle="Real-time asset protection across global networks">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
+        {[
+          { name: "Facebook", icon: Facebook, status: "Secured", alert: false },
+          { name: "Instagram", icon: Instagram, status: "Secured", alert: false },
+          { name: "X (Twitter)", icon: Twitter, status: "Alert Detected", alert: true },
+          { name: "YouTube", icon: Youtube, status: "Secured", alert: false },
+          { name: "TikTok", icon: Music2, status: "Secured", alert: false },
+          { name: "LinkedIn", icon: Linkedin, status: "Secured", alert: false },
+          { name: "Reddit", icon: Share, status: "Review Required", alert: true, warning: true },
+          { name: "Telegram", icon: Send, status: "Secured", alert: false },
+        ].map((platform, i) => (
+          <div key={i} style={{ padding: "20px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${platform.alert ? COLORS.danger + '40' : COLORS.border}`, transition: "all 0.3s ease" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
+              <platform.icon size={24} color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.textSecondary} />
+              {platform.alert ? <AlertCircle size={16} color={COLORS.danger} className="animate-pulse" /> : platform.warning ? <AlertTriangle size={16} color={COLORS.warning} /> : <Check size={16} color={COLORS.success} />}
+            </div>
+            <p style={{ fontSize: "14px", fontWeight: 600, margin: "0 0 8px" }}>{platform.name}</p>
+            <Badge color={platform.alert ? COLORS.danger : platform.warning ? COLORS.warning : COLORS.success}>{platform.status}</Badge>
+            {platform.alert && (
+              <button style={{ width: "100%", marginTop: "16px", padding: "8px", background: "rgba(239,68,68,0.1)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>
+                Analyze Threat
+              </button>
+            )}
           </div>
-          <Badge color={platform.alert ? COLORS.danger : COLORS.success}>{platform.status}</Badge>
-          {platform.alert && (
-            <button style={{ width: "100%", marginTop: "16px", padding: "8px", background: "rgba(239,68,68,0.1)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, fontSize: "10px", fontWeight: 700, cursor: "pointer" }}>
-              View Intelligence
-            </button>
-          )}
-        </Card>
-      ))}
-    </div>
+        ))}
+      </div>
+    </Card>
   </div>
 );
+
+const ProfileView = ({ onDeleteAccount }: any) => {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmStep, setConfirmStep] = useState(1);
+
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto", width: "100%", animation: "fadeIn 0.5s ease-out" }}>
+      <Card title="Member Profile" subtitle="Manage your security identity and credentials">
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px", padding: "20px 0" }}>
+          {/* User Info */}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px", padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "16px", border: `1px solid ${COLORS.border}` }}>
+            <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "linear-gradient(45deg, #222, #444)", border: `2px solid ${COLORS.accent}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <User size={40} color={COLORS.accent} />
+            </div>
+            <div>
+              <h2 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Everett Williams</h2>
+              <p style={{ fontSize: "13px", color: COLORS.accent, margin: "4px 0 0" }}>Elite Partner • Member since 2024</p>
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <Badge color={COLORS.success}>Identity Verified</Badge>
+                <Badge color={COLORS.accentSecondary}>2FA Active</Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase" }}>Full Name</label>
+              <input defaultValue="Everett Williams" style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase" }}>Email Address</label>
+              <input defaultValue="everett@senotastudios.com" style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none" }} />
+            </div>
+          </div>
+
+          <div style={{ padding: "24px", background: "rgba(239,68,68,0.03)", borderRadius: "16px", border: `1px solid ${COLORS.danger}20`, marginTop: "20px" }}>
+            <h4 style={{ fontSize: "14px", color: COLORS.danger, margin: "0 0 8px" }}>Danger Zone</h4>
+            <p style={{ fontSize: "12px", color: COLORS.textSecondary, marginBottom: "20px" }}>Permanently delete your account, all asset signatures, and historical security data.</p>
+            <button 
+              onClick={() => setShowDeleteModal(true)}
+              style={{ padding: "12px 24px", background: "transparent", border: `1px solid ${COLORS.danger}`, color: COLORS.danger, borderRadius: "8px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}
+            >
+              Delete Account & Data
+            </button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={showDeleteModal} onClose={() => { setShowDeleteModal(false); setConfirmStep(1); }} title="Critical Action Required">
+        {confirmStep === 1 ? (
+          <div>
+            <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
+              <AlertTriangle size={48} color={COLORS.danger} />
+              <div>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: "15px" }}>Are you absolutely sure?</p>
+                <p style={{ fontSize: "13px", color: COLORS.textSecondary, marginTop: "8px", lineHeight: 1.5 }}>
+                  This action is irreversible. You will lose access to the Vault and all your protected asset signatures will be purged.
+                </p>
+              </div>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.02)", padding: "16px", borderRadius: "8px", marginBottom: "24px" }}>
+              <p style={{ fontSize: "12px", fontWeight: 600, marginBottom: "12px" }}>The following will occur:</p>
+              <ul style={{ fontSize: "12px", color: COLORS.textSecondary, paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                <li>All 2,400+ digital signatures will be permanently deleted.</li>
+                <li>Global monitoring for your assets will cease immediately.</li>
+                <li>Your personal information and login credentials will be wiped.</li>
+                <li>You will be removed from all secure mailing lists.</li>
+              </ul>
+            </div>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={() => setShowDeleteModal(false)} style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.05)", border: "none", borderRadius: "8px", color: "#FFF", cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setConfirmStep(2)} style={{ flex: 1, padding: "12px", background: COLORS.danger, border: "none", borderRadius: "8px", color: "#FFF", fontWeight: 600, cursor: "pointer" }}>Proceed</button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "16px", textAlign: "center" }}>Final Confirmation</p>
+            <p style={{ fontSize: "13px", color: COLORS.textSecondary, textAlign: "center", marginBottom: "24px" }}>
+              Type <span style={{ color: COLORS.textPrimary, fontWeight: 700 }}>DELETE</span> to confirm permanent account removal.
+            </p>
+            <input placeholder="Type DELETE" style={{ width: "100%", background: COLORS.bg, border: `1px solid ${COLORS.danger}`, color: "#FFF", padding: "14px", borderRadius: "8px", textAlign: "center", outline: "none", marginBottom: "24px" }} />
+            <button 
+              onClick={() => { onDeleteAccount(); setShowDeleteModal(false); }}
+              style={{ width: "100%", padding: "14px", background: COLORS.danger, border: "none", borderRadius: "8px", color: "#FFF", fontWeight: 700, cursor: "pointer" }}
+            >
+              Permanently Delete Everything
+            </button>
+          </div>
+        )}
+      </Modal>
+    </div>
+  );
+};
 
 const EnforcementView = () => (
   <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
@@ -437,39 +572,6 @@ const EnforcementView = () => (
   </div>
 );
 
-const IntelligenceView = () => (
-  <div style={{ display: "flex", flexDirection: "column", gap: "24px", animation: "fadeIn 0.5s ease-out" }}>
-    <Card title="Advanced Risk Intelligence" subtitle="Predictive analytics and threat vector modeling" extra={<BarChart3 size={18} color={COLORS.accent} />}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px", marginTop: "20px" }}>
-        <div style={{ padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-          <h4 style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", margin: "0 0 16px", letterSpacing: "0.1em" }}>Primary Leak Vector</h4>
-          <p style={{ fontSize: "24px", fontWeight: 500, margin: 0 }}>Social Media</p>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px" }}>
-            <TrendingUp size={14} color={COLORS.danger} />
-            <span style={{ fontSize: "11px", color: COLORS.danger }}>+12.4% Surge</span>
-          </div>
-        </div>
-        <div style={{ padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-          <h4 style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", margin: "0 0 16px", letterSpacing: "0.1em" }}>Threat Intelligence Level</h4>
-          <p style={{ fontSize: "24px", fontWeight: 500, margin: 0 }}>Elevated</p>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px" }}>
-            <AlertCircle size={14} color={COLORS.warning} />
-            <span style={{ fontSize: "11px", color: COLORS.warning }}>Active Campaign Detected</span>
-          </div>
-        </div>
-        <div style={{ padding: "24px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
-          <h4 style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", margin: "0 0 16px", letterSpacing: "0.1em" }}>Protected Asset Value</h4>
-          <p style={{ fontSize: "24px", fontWeight: 500, margin: 0 }}>$2.48M</p>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px" }}>
-            <Shield size={14} color={COLORS.success} />
-            <span style={{ fontSize: "11px", color: COLORS.success }}>Total Impact Mitigated</span>
-          </div>
-        </div>
-      </div>
-    </Card>
-  </div>
-);
-
 const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -507,33 +609,6 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
             <p style={{ fontSize: "11px", color: COLORS.textSecondary, marginTop: "20px" }}>Supported: PNG, JPG, TIFF, MP4, MOV (Max 2GB)</p>
           </div>
 
-          {/* Configuration */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Protection Level</label>
-              <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
-                <option>Standard Vault Protection</option>
-                <option>Enhanced Neural Fingerprinting</option>
-                <option>Real-Time Global Monitoring</option>
-                <option>Elite Legal Enforcement</option>
-              </select>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Category</label>
-              <select style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px" }}>
-                <option>Commercial Photography</option>
-                <option>Brand Identity / Logos</option>
-                <option>Cinematic Content</option>
-                <option>Intellectual Property</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <label style={{ fontSize: "12px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>Asset Metadata (Optional)</label>
-            <textarea placeholder="Enter asset description, copyright details, or licensing terms..." style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, color: "#FFF", padding: "14px", borderRadius: "8px", outline: "none", fontSize: "13px", minHeight: "100px", resize: "none" }} />
-          </div>
-
           <button 
             onClick={() => alert("Upload complete. Check Digital Signatures for pending approvals.")}
             style={{ 
@@ -552,8 +627,6 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
               boxShadow: `0 0 30px ${COLORS.accent}40`,
               transition: "all 0.3s ease"
             }} 
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")} 
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
           >
             <ShieldCheck size={20} />
             Initialize Vault Protection
@@ -567,22 +640,43 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
 /* ── Main Dashboard ──────────────────────────────────────────── */
 export default function VaultMemberDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [pendingAssets, setPendingAssets] = useState<PendingAsset[]>([]);
-  const [activeSignatures, setActiveSignatures] = useState<ActiveSignature[]>([
-    { id: "S-001", name: "Brand_Logo_2026.svg", type: "Vector", date: "Jul 08, 2026", hash: "9x2f...1e0a" },
-    { id: "S-002", name: "Campaign_Video_01.mp4", type: "Video", date: "Jul 07, 2026", hash: "4a8c...d9f2" },
-  ]);
+  
+  // Persistent Data Logic
+  const [pendingAssets, setPendingAssets] = useState<PendingAsset[]>(() => {
+    const saved = localStorage.getItem("vault_pending");
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [activeSignatures, setActiveSignatures] = useState<ActiveSignature[]>(() => {
+    const saved = localStorage.getItem("vault_signatures");
+    return saved ? JSON.parse(saved) : [
+      { id: "S-001", name: "Brand_Logo_2026.svg", type: "Vector", date: "Jul 08, 2026", hash: "9x2f...1e0a" },
+      { id: "S-002", name: "Campaign_Video_01.mp4", type: "Video", date: "Jul 07, 2026", hash: "4a8c...d9f2" },
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("vault_pending", JSON.stringify(pendingAssets));
+  }, [pendingAssets]);
+
+  useEffect(() => {
+    localStorage.setItem("vault_signatures", JSON.stringify(activeSignatures));
+  }, [activeSignatures]);
 
   const handleFileUpload = (files: FileList) => {
-    const newAssets: PendingAsset[] = Array.from(files).map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      type: file.type,
-      size: (file.size / 1024 / 1024).toFixed(2) + " MB",
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-    }));
+    const newAssets: PendingAsset[] = Array.from(files).map(file => {
+      const isMedia = file.type.startsWith('image/') || file.type.startsWith('video/');
+      return {
+        id: Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        type: file.type,
+        size: (file.size / 1024 / 1024).toFixed(2) + " MB",
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        preview: isMedia ? URL.createObjectURL(file) : undefined
+      };
+    });
     setPendingAssets(prev => [...prev, ...newAssets]);
-    setActiveTab("signatures"); // Redirect to signatures to see pending work
+    setActiveTab("signatures");
   };
 
   const handleApproveSignature = (asset: PendingAsset) => {
@@ -591,20 +685,33 @@ export default function VaultMemberDashboard() {
       name: asset.name,
       type: asset.type.split('/')[1]?.toUpperCase() || "Asset",
       date: asset.date,
-      hash: Math.random().toString(36).substr(2, 8) + "..." + Math.random().toString(36).substr(2, 4)
+      hash: Math.random().toString(36).substr(2, 8) + "..." + Math.random().toString(36).substr(2, 4),
+      preview: asset.preview
     };
     setActiveSignatures(prev => [newSignature, ...prev]);
     setPendingAssets(prev => prev.filter(a => a.id !== asset.id));
   };
 
+  const handleDeletePending = (id: string) => {
+    setPendingAssets(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleDeleteActive = (id: string) => {
+    setActiveSignatures(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleDeleteAccount = () => {
+    localStorage.clear();
+    window.location.href = "https://senotastudios.com";
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case "overview": return <OverviewView />;
-      case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={activeSignatures} onApprove={handleApproveSignature} />;
+      case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={activeSignatures} onApprove={handleApproveSignature} onDeletePending={handleDeletePending} onDeleteActive={handleDeleteActive} />;
       case "monitoring": return <GlobalMonitorView />;
       case "enforcement": return <EnforcementView />;
-      case "intelligence": return <IntelligenceView />;
-      case "secure_asset": return <SecureAssetView onUpload={handleFileUpload} />;
+      case "profile": return <ProfileView onDeleteAccount={handleDeleteAccount} />;
       default: return <OverviewView />;
     }
   };
@@ -615,7 +722,7 @@ export default function VaultMemberDashboard() {
       case "signatures": return "Digital Signatures";
       case "monitoring": return "Global Monitor";
       case "enforcement": return "Legal Enforcement";
-      case "intelligence": return "Intelligence Analytics";
+      case "profile": return "Member Profile";
       case "secure_asset": return "Secure New Asset";
       default: return "Dashboard";
     }
@@ -634,6 +741,8 @@ export default function VaultMemberDashboard() {
         .animate-spin-slow { animation: spin 3s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
       `}</style>
 
       {/* ── SIDEBAR ── */}
@@ -668,7 +777,7 @@ export default function VaultMemberDashboard() {
             { icon: Fingerprint, label: "Digital Signatures", id: "signatures" },
             { icon: Globe, label: "Global Monitor", id: "monitoring" },
             { icon: ShieldCheck, label: "Legal Enforcement", id: "enforcement" },
-            { icon: BarChart3, label: "Intelligence Analytics", id: "intelligence" },
+            { icon: User, label: "Member Profile", id: "profile" },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
