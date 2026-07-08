@@ -1,7 +1,7 @@
 /**
  * SENOTA — Vault Member Dashboard
- * Aegis-inspired aesthetic with full interactivity
- * 3D rotating globe, expandable threat stickers, and multi-tab command center
+ * Sophisticated "Executive Terminal" aesthetic
+ * Minimalist professional design with high-end data visualization
  */
 
 import { useState, useEffect, useRef } from "react";
@@ -29,8 +29,23 @@ import {
   Bell,
   Home,
   X,
+  ArrowUpRight,
+  ShieldCheck,
+  Search,
 } from "lucide-react";
-import { ThreeDGlobe } from "../components/ThreeDGlobe";
+
+/* ── Sophisticated Theme Constants ────────────────────────────────── */
+const COLORS = {
+  bg: "#050505",
+  surface: "#0D0D0D",
+  border: "rgba(255, 255, 255, 0.08)",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#808080",
+  accent: "#D4AF37", // Muted Gold for luxury feel
+  accentSecondary: "#3B82F6", // Muted Blue for professional trust
+  success: "#10B981",
+  danger: "#EF4444",
+};
 
 /* ── Mock Data ────────────────────────────────────────────────── */
 const RECENT_DETECTIONS = [
@@ -72,17 +87,6 @@ const RECENT_DETECTIONS = [
   },
 ];
 
-const THREAT_LOCATIONS = [
-  { x: 20, y: 35, intensity: "high" },
-  { x: 50, y: 25, intensity: "high" },
-  { x: 75, y: 40, intensity: "medium" },
-  { x: 35, y: 60, intensity: "high" },
-  { x: 65, y: 70, intensity: "low" },
-  { x: 85, y: 55, intensity: "medium" },
-  { x: 25, y: 75, intensity: "high" },
-  { x: 60, y: 50, intensity: "medium" },
-];
-
 const DETECTION_TREND = [
   { day: "May 18", count: 120 },
   { day: "May 19", count: 150 },
@@ -100,7 +104,6 @@ const TOP_LEAK_SOURCES = [
   { name: "Websites", percentage: 13 },
 ];
 
-// Stolen content data for globe
 const STOLEN_CONTENT_MARKERS = [
   {
     id: 1,
@@ -146,379 +149,28 @@ const STOLEN_CONTENT_MARKERS = [
     confidence: 95,
     status: "Protected",
   },
-  {
-    id: 5,
-    lat: 48.8566,
-    lng: 2.3522,
-    city: "Paris, France",
-    content: "Campaign Video Clip",
-    platform: "YouTube",
-    date: "12 hours ago",
-    confidence: 89,
-    status: "Resolved",
-  },
 ];
 
-/* ── Interactive Globe Component ────────────────────────────────── */
-function InteractiveGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [rotation, setRotation] = useState({ x: 0.5, y: 0 });
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [expandedMarkerId, setExpandedMarkerId] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (isHovered || isDragging) return;
-
-    const interval = setInterval(() => {
-      setRotation((prev) => ({ ...prev, y: prev.y + 0.002 }));
-    }, 50);
-
-    return () => clearInterval(interval);
-  }, [isHovered, isDragging]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const dx = e.clientX - dragStart.x;
-    const dy = e.clientY - dragStart.y;
-    setRotation((prev) => ({
-      x: prev.x + dy * 0.01,
-      y: prev.y + dx * 0.01,
-    }));
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Convert lat/lng to 3D coordinates
-  const latLngTo3D = (lat: number, lng: number, radius: number) => {
-    const phi = ((90 - lat) * Math.PI) / 180;
-    const theta = ((lng + 180) * Math.PI) / 180;
-    return {
-      x: radius * Math.sin(phi) * Math.cos(theta),
-      y: radius * Math.cos(phi),
-      z: radius * Math.sin(phi) * Math.sin(theta),
-    };
-  };
-
-  // Simple 3D projection
-  const project3D = (point: { x: number; y: number; z: number }, scale: number) => {
-    const rotX = (p: { x: number; y: number; z: number }) => ({
-      x: p.x,
-      y: p.y * Math.cos(rotation.x) - p.z * Math.sin(rotation.x),
-      z: p.y * Math.sin(rotation.x) + p.z * Math.cos(rotation.x),
-    });
-
-    const rotY = (p: { x: number; y: number; z: number }) => ({
-      x: p.x * Math.cos(rotation.y) + p.z * Math.sin(rotation.y),
-      y: p.y,
-      z: -p.x * Math.sin(rotation.y) + p.z * Math.cos(rotation.y),
-    });
-
-    const p1 = rotX(point);
-    const p2 = rotY(p1);
-
-    const distance = 200;
-    const scale2d = distance / (distance + p2.z);
-
-    return {
-      x: p2.x * scale2d + scale,
-      y: p2.y * scale2d + scale,
-      z: p2.z,
-    };
-  };
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "400px",
-        background: "linear-gradient(135deg, rgba(30,20,80,0.4), rgba(50,30,100,0.3))",
-        border: "1px solid rgba(124,58,237,0.3)",
-        borderRadius: "12px",
-        overflow: "hidden",
-        cursor: isDragging ? "grabbing" : isHovered ? "grab" : "default",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        handleMouseUp();
-      }}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    >
-      <canvas
-        ref={canvasRef}
-        width={800}
-        height={400}
-        style={{
-          display: "block",
-          width: "100%",
-          height: "100%",
-        }}
-      />
-
-      {/* Threat markers overlay */}
-      <div style={{ position: "absolute", inset: 0 }}>
-        {STOLEN_CONTENT_MARKERS.map((marker) => {
-          const pos3d = latLngTo3D(marker.lat, marker.lng, 100);
-          const pos2d = project3D(pos3d, 400);
-
-          // Only show if in front of globe
-          if (pos2d.z < 0) return null;
-
-          const isExpanded = expandedMarkerId === marker.id;
-
-          return (
-            <div
-              key={marker.id}
-              style={{
-                position: "absolute",
-                left: `${(pos2d.x / 800) * 100}%`,
-                top: `${(pos2d.y / 400) * 100}%`,
-                transform: "translate(-50%, -50%)",
-                zIndex: pos2d.z > 0 ? 10 : 1,
-              }}
-            >
-              {/* Marker dot */}
-              <div
-                style={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  boxShadow: "0 0 15px rgba(239,68,68,0.8)",
-                  cursor: "pointer",
-                }}
-              />
-
-              {/* Sticker */}
-              <div
-                onMouseEnter={() => setExpandedMarkerId(marker.id)}
-                onMouseLeave={() => setExpandedMarkerId(null)}
-                style={{
-                  position: "absolute",
-                  left: "20px",
-                  top: "-10px",
-                  background: "rgba(20,10,50,0.95)",
-                  border: "1px solid rgba(239,68,68,0.5)",
-                  borderRadius: "8px",
-                  padding: isExpanded ? "16px" : "8px 12px",
-                  minWidth: isExpanded ? "280px" : "auto",
-                  maxWidth: "300px",
-                  backdropFilter: "blur(10px)",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  zIndex: 20,
-                }}
-              >
-                <p
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: isExpanded ? "12px" : "10px",
-                    fontWeight: 700,
-                    color: "#EF4444",
-                    margin: 0,
-                    marginBottom: isExpanded ? "8px" : 0,
-                  }}
-                >
-                  {marker.city}
-                </p>
-
-                {isExpanded && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "11px",
-                          color: "#A78BFA",
-                          margin: 0,
-                          marginBottom: "2px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Content
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "10px",
-                          color: "#C0C0E0",
-                          margin: 0,
-                        }}
-                      >
-                        {marker.content}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "11px",
-                          color: "#A78BFA",
-                          margin: 0,
-                          marginBottom: "2px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Platform
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "10px",
-                          color: "#C0C0E0",
-                          margin: 0,
-                        }}
-                      >
-                        {marker.platform}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "11px",
-                          color: "#A78BFA",
-                          margin: 0,
-                          marginBottom: "2px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Confidence
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            flex: 1,
-                            height: "4px",
-                            background: "rgba(255,255,255,0.1)",
-                            borderRadius: "2px",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <div
-                            style={{
-                              height: "100%",
-                              width: `${marker.confidence}%`,
-                              background: "linear-gradient(90deg, #A78BFA, #10B981)",
-                            }}
-                          />
-                        </div>
-                        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#A78BFA" }}>
-                          {marker.confidence}%
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: "11px",
-                          color: "#A78BFA",
-                          margin: 0,
-                          marginBottom: "2px",
-                          fontWeight: 600,
-                        }}
-                      >
-                        Status
-                      </p>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "3px 8px",
-                          background: "rgba(16,185,129,0.1)",
-                          color: "#10B981",
-                          fontFamily: "'Space Mono', monospace",
-                          fontSize: "8px",
-                          borderRadius: "4px",
-                          fontWeight: 600,
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {marker.status}
-                      </span>
-                    </div>
-
-                    <p
-                      style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "8px",
-                        color: "#4040A0",
-                        margin: 0,
-                        marginTop: "4px",
-                      }}
-                    >
-                      {marker.date}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Instructions */}
-      {!isDragging && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: "12px",
-            left: "12px",
-            fontFamily: "'Space Mono', monospace",
-            fontSize: "9px",
-            color: "#4040A0",
-          }}
-        >
-          {isHovered ? "Click & drag to rotate" : "Hover to interact"}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── Animated Circular Gauge ────────────────────────────────────── */
-function SafetyGauge() {
-  const score = 98;
+/* ── Sophisticated Data Visualization ────────────────────────── */
+function PerformanceGauge({ score }: { score: number }) {
   const circumference = 2 * Math.PI * 60;
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div style={{ position: "relative", width: "200px", height: "200px", margin: "0 auto" }}>
-      <svg width="200" height="200" style={{ transform: "rotate(-90deg)" }}>
-        <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(124,58,237,0.2)" strokeWidth="10" />
+    <div style={{ position: "relative", width: "160px", height: "160px", margin: "0 auto" }}>
+      <svg width="160" height="160" style={{ transform: "rotate(-90deg)" }}>
+        <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="4" />
         <circle
-          cx="100"
-          cy="100"
+          cx="80"
+          cy="80"
           r="60"
           fill="none"
-          stroke="#10B981"
-          strokeWidth="10"
+          stroke={COLORS.accent}
+          strokeWidth="4"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 1s ease" }}
+          style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)" }}
         />
       </svg>
       <div
@@ -531,24 +183,23 @@ function SafetyGauge() {
           justifyContent: "center",
         }}
       >
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "48px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
+        <p style={{ fontFamily: "'Helvetica Neue', Arial, sans-serif", fontSize: "32px", fontWeight: 300, color: "#FFFFFF", margin: 0, letterSpacing: "-0.02em" }}>
           {score}%
         </p>
-        <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#10B981", textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
-          Safety Score
+        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "10px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0, marginTop: "4px" }}>
+          Integrity
         </p>
       </div>
     </div>
   );
 }
 
-/* ── Detection Trend Chart ────────────────────────────────────── */
-function DetectionTrendChart() {
+function TrendLine() {
   const maxCount = Math.max(...DETECTION_TREND.map((d) => d.count));
-  const chartHeight = 80;
+  const chartHeight = 60;
 
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: "4px", height: `${chartHeight}px` }}>
+    <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", height: `${chartHeight}px`, width: "100%" }}>
       {DETECTION_TREND.map((item, i) => {
         const barHeight = (item.count / maxCount) * chartHeight;
         return (
@@ -557,21 +208,10 @@ function DetectionTrendChart() {
             style={{
               flex: 1,
               height: `${barHeight}px`,
-              background: "linear-gradient(180deg, #A78BFA, #7C3AED)",
-              borderRadius: "4px 4px 0 0",
-              opacity: 0.8,
-              transition: "all 0.2s ease",
-              cursor: "pointer",
+              background: i === DETECTION_TREND.length - 1 ? COLORS.accent : "rgba(255,255,255,0.1)",
+              borderRadius: "1px",
+              transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "1";
-              (e.currentTarget as HTMLElement).style.boxShadow = "0 0 20px rgba(124,58,237,0.6)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "0.8";
-              (e.currentTarget as HTMLElement).style.boxShadow = "none";
-            }}
-            title={`${item.day}: ${item.count} detections`}
           />
         );
       })}
@@ -579,952 +219,283 @@ function DetectionTrendChart() {
   );
 }
 
-/* ── Donut Chart ────────────────────────────────────────────── */
-function DonutChart() {
-  const colors = ["#A78BFA", "#60A5FA", "#10B981", "#F59E0B"];
-  let currentAngle = -90;
-
-  return (
-    <div style={{ position: "relative", width: "140px", height: "140px", margin: "0 auto" }}>
-      <svg width="140" height="140">
-        {TOP_LEAK_SOURCES.map((source, i) => {
-          const startAngle = (currentAngle * Math.PI) / 180;
-          const sliceAngle = (source.percentage / 100) * 360;
-          const endAngle = ((currentAngle + sliceAngle) * Math.PI) / 180;
-
-          const x1 = 70 + 50 * Math.cos(startAngle);
-          const y1 = 70 + 50 * Math.sin(startAngle);
-          const x2 = 70 + 50 * Math.cos(endAngle);
-          const y2 = 70 + 50 * Math.sin(endAngle);
-
-          const largeArc = sliceAngle > 180 ? 1 : 0;
-
-          const pathData = [
-            `M 70 70`,
-            `L ${x1} ${y1}`,
-            `A 50 50 0 ${largeArc} 1 ${x2} ${y2}`,
-            "Z",
-          ].join(" ");
-
-          currentAngle += sliceAngle;
-
-          return (
-            <path
-              key={i}
-              d={pathData}
-              fill={colors[i]}
-              opacity="0.8"
-              style={{ transition: "opacity 0.2s ease", cursor: "pointer" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as SVGElement).style.opacity = "1";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as SVGElement).style.opacity = "0.8";
-              }}
-            />
-          );
-        })}
-        <circle cx="70" cy="70" r="30" fill="#000000" />
-      </svg>
-    </div>
-  );
-}
-
 /* ── Main Dashboard ──────────────────────────────────────────── */
 export default function VaultMemberDashboard() {
-  const [activeTab, setActiveTab] = useState<"threat_intelligence" | "fingerprinting" | "monitoring" | "response" | "analytics">("threat_intelligence");
-  const [timeRange, setTimeRange] = useState("7days");
-  const [showTimeDropdown, setShowTimeDropdown] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: "New threat detected", time: "2 min ago", read: false },
-    { id: 2, title: "Takedown completed", time: "1 hour ago", read: false },
-    { id: 3, title: "Weekly report ready", time: "3 hours ago", read: true },
-  ]);
-
-  const generateRandomData = () => ({
-    threats: Math.floor(Math.random() * 50) + 10,
-    assets: Math.floor(Math.random() * 5000) + 1000,
-    detections: Math.floor(Math.random() * 100) + 20,
-    takedowns: Math.floor(Math.random() * 200) + 50,
-    score: Math.floor(Math.random() * 20) + 80,
-  });
-
-  const [tabData, setTabData] = useState({
-    threat_intelligence: generateRandomData(),
-    fingerprinting: generateRandomData(),
-    monitoring: generateRandomData(),
-    response: generateRandomData(),
-    analytics: generateRandomData(),
-  });
-
-  const markNotificationsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const timeRangeOptions = [
-    { label: "Last 24 Hours", value: "24h" },
-    { label: "Last 7 Days", value: "7days" },
-    { label: "Last 30 Days", value: "30days" },
-    { label: "Last 90 Days", value: "90days" },
-  ];
-
-  const tabLabels = {
-    threat_intelligence: "Threat Intelligence",
-    fingerprinting: "Fingerprinting",
-    monitoring: "Monitoring",
-    response: "Response",
-    analytics: "Analytics",
-  };
-
-  const currentData = tabData[activeTab];
+  const [activeTab, setActiveTab] = useState("threat_intelligence");
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#000000", color: "#FFFFFF" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: COLORS.bg, color: COLORS.textPrimary, fontFamily: "'Inter', sans-serif" }}>
       <style>{`
-        @keyframes float-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        
+        .nav-button:hover { background: rgba(255,255,255,0.03); color: #FFFFFF; }
+        .card:hover { border-color: rgba(255,255,255,0.15); }
       `}</style>
 
       {/* ── SIDEBAR ── */}
       <div
         style={{
-          width: "200px",
-          background: "linear-gradient(180deg, #0A0A1A 0%, #0D0D2B 100%)",
-          borderRight: "1px solid rgba(124,58,237,0.2)",
-          padding: "24px 16px",
+          width: "240px",
+          background: COLORS.surface,
+          borderRight: `1px solid ${COLORS.border}`,
+          padding: "40px 24px",
           display: "flex",
           flexDirection: "column",
-          gap: "32px",
+          gap: "48px",
         }}
       >
-        {/* Logo */}
-        <a
-          href="https://senotastudios.com"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "12px",
-            background: "rgba(124,58,237,0.1)",
-            borderRadius: "10px",
-            marginBottom: "8px",
-            textDecoration: "none",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.2)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-          }}
-        >
-          <Shield size={24} style={{ color: "#A78BFA" }} />
-          <div>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-              VAULT
-            </p>
-            <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", color: "#6060A0", margin: 0 }}>
-              SENOTA
-            </p>
-          </div>
-        </a>
+        {/* Brand */}
+        <div style={{ padding: "0 8px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.2em", margin: 0, color: COLORS.textPrimary }}>
+            SENOTA
+          </p>
+          <p style={{ fontSize: "9px", color: COLORS.accent, letterSpacing: "0.3em", margin: 0, marginTop: "4px", fontWeight: 500 }}>
+            VAULT
+          </p>
+        </div>
 
         {/* Navigation */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {[
-            { icon: AlertTriangle, label: "Threat Intelligence", id: "threat_intelligence" },
-            { icon: Fingerprint, label: "Fingerprinting", id: "fingerprinting" },
-            { icon: Eye, label: "Monitoring", id: "monitoring" },
-            { icon: Zap, label: "Response", id: "response" },
-            { icon: BarChart3, label: "Analytics", id: "analytics" },
+            { icon: Activity, label: "Overview", id: "threat_intelligence" },
+            { icon: Fingerprint, label: "Signatures", id: "fingerprinting" },
+            { icon: Globe, label: "Global Monitor", id: "monitoring" },
+            { icon: ShieldCheck, label: "Enforcement", id: "response" },
+            { icon: BarChart3, label: "Intelligence", id: "analytics" },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id as any)}
+                onClick={() => setActiveTab(item.id)}
+                className="nav-button"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "12px",
-                  padding: "12px 14px",
-                  background: isActive ? "rgba(124,58,237,0.2)" : "transparent",
-                  border: isActive ? "1px solid rgba(124,58,237,0.4)" : "1px solid transparent",
-                  borderRadius: "8px",
-                  color: isActive ? "#A78BFA" : "#6060A0",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
+                  padding: "12px 16px",
+                  background: isActive ? "rgba(255,255,255,0.05)" : "transparent",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: isActive ? "#FFFFFF" : COLORS.textSecondary,
+                  fontSize: "13px",
+                  fontWeight: isActive ? 500 : 400,
                   cursor: "pointer",
                   transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.08)";
-                    (e.currentTarget as HTMLElement).style.color = "#A78BFA";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
-                    (e.currentTarget as HTMLElement).style.color = "#6060A0";
-                  }
+                  textAlign: "left",
                 }}
               >
-                <Icon size={16} />
+                <Icon size={16} strokeWidth={isActive ? 2 : 1.5} />
                 <span>{item.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Spacer */}
         <div style={{ flex: 1 }} />
 
-        {/* Help & Support */}
-        <div
-          style={{
-            padding: "16px",
-            background: "rgba(124,58,237,0.08)",
-            border: "1px solid rgba(124,58,237,0.2)",
-            borderRadius: "10px",
-            textAlign: "center",
-          }}
-        >
-          <HelpCircle size={20} style={{ color: "#A78BFA", margin: "0 auto 8px", display: "block" }} />
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, color: "#FFFFFF", margin: 0, marginBottom: "4px" }}>
-            Need Help?
-          </p>
-          <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "9px", color: "#6060A0", margin: 0, marginBottom: "8px" }}>
-            Contact our support team 24/7
-          </p>
+        {/* User */}
+        <div style={{ padding: "0 8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
+            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(45deg, #222, #444)", border: `1px solid ${COLORS.border}` }} />
+            <div>
+              <p style={{ fontSize: "12px", fontWeight: 600, margin: 0 }}>Everett Williams</p>
+              <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>Executive Account</p>
+            </div>
+          </div>
           <button
             style={{
               width: "100%",
-              padding: "6px",
-              background: "rgba(124,58,237,0.3)",
-              border: "1px solid rgba(124,58,237,0.4)",
-              borderRadius: "6px",
-              color: "#A78BFA",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "10px",
-              fontWeight: 600,
+              padding: "10px",
+              background: "transparent",
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: "4px",
+              color: COLORS.textSecondary,
+              fontSize: "11px",
               cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.5)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.3)";
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
             }}
           >
-            Contact Support
+            <LogOut size={14} />
+            Sign Out
           </button>
-        </div>
-
-        {/* User Profile */}
-        <div
-          style={{
-            padding: "12px",
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(124,58,237,0.15)",
-            borderRadius: "10px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            cursor: "pointer",
-          }}
-        >
-          <div>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", fontWeight: 600, color: "#FFFFFF", margin: 0 }}>
-              Vault Admin
-            </p>
-            <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "8px", color: "#6060A0", margin: 0 }}>
-              admin@vault.io
-            </p>
-          </div>
-          <ChevronDown size={14} style={{ color: "#6060A0" }} />
         </div>
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div style={{ flex: 1, overflow: "auto" }}>
+      <div style={{ flex: 1, overflow: "auto", padding: "40px 60px" }}>
         {/* Header */}
-        <div
-          style={{
-            padding: "24px 32px",
-            background: "linear-gradient(90deg, rgba(124,58,237,0.05), rgba(91,33,182,0.03))",
-            borderBottom: "1px solid rgba(124,58,237,0.15)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "60px" }}>
           <div>
-            <h1
-              style={{
-                fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                fontSize: "28px",
-                fontWeight: 700,
-                color: "#FFFFFF",
-                margin: 0,
-                marginBottom: "4px",
-              }}
-            >
-              {tabLabels[activeTab]}
-            </h1>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "#8080B0", margin: 0 }}>
-              Real-time monitoring of unauthorized content leaks and brand risks across the digital landscape.
+            <h1 style={{ fontSize: "32px", fontWeight: 300, margin: 0, letterSpacing: "-0.02em" }}>Executive Overview</h1>
+            <p style={{ fontSize: "14px", color: COLORS.textSecondary, margin: 0, marginTop: "8px" }}>
+              Digital asset protection and global risk intelligence.
             </p>
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {/* Home Button */}
-            <a
-              href="https://senotastudios.com"
-              style={{
-                padding: "10px 14px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "6px",
-                color: "#A78BFA",
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "12px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                transition: "all 0.2s ease",
-                textDecoration: "none",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
-              }}
-            >
-              <Home size={14} />
-              Home
-            </a>
-
-            {/* Notifications */}
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  markNotificationsRead();
-                }}
-                style={{
-                  padding: "10px 14px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(124,58,237,0.2)",
-                  borderRadius: "6px",
-                  color: "#A78BFA",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  transition: "all 0.2s ease",
-                  position: "relative",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
-                }}
-              >
-                <Bell size={14} />
-                Notifications
-                {notifications.some((n) => !n.read) && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "6px",
-                      right: "6px",
-                      width: "6px",
-                      height: "6px",
-                      borderRadius: "50%",
-                      background: "#EF4444",
-                    }}
-                  />
-                )}
-              </button>
-
-              {showNotifications && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    right: 0,
-                    marginTop: "8px",
-                    background: "rgba(20,10,50,0.95)",
-                    border: "1px solid rgba(124,58,237,0.3)",
-                    borderRadius: "8px",
-                    minWidth: "280px",
-                    maxHeight: "300px",
-                    overflowY: "auto",
-                    zIndex: 1000,
-                    backdropFilter: "blur(10px)",
-                  }}
-                >
-                  {notifications.map((notif) => (
-                    <div
-                      key={notif.id}
-                      style={{
-                        padding: "12px 16px",
-                        borderBottom: "1px solid rgba(124,58,237,0.15)",
-                        cursor: "pointer",
-                        transition: "background 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "transparent";
-                      }}
-                    >
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 600, color: "#FFFFFF", margin: 0, marginBottom: "4px" }}>
-                        {notif.title}
-                      </p>
-                      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "9px", color: "#6060A0", margin: 0 }}>
-                        {notif.time}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 16px", background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "4px" }}>
+              <Search size={14} color={COLORS.textSecondary} />
+              <input 
+                placeholder="Search assets..." 
+                style={{ background: "transparent", border: "none", color: "#FFF", fontSize: "13px", outline: "none", width: "150px" }}
+              />
             </div>
-
-            {/* Time Range Dropdown */}
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setShowTimeDropdown(!showTimeDropdown)}
-                style={{
-                  padding: "8px 16px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(124,58,237,0.2)",
-                  borderRadius: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#A78BFA",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.05)";
-                }}
-              >
-                <span>{timeRangeOptions.find((o) => o.value === timeRange)?.label}</span>
-                <ChevronDown size={14} />
-              </button>
-
-              {showTimeDropdown && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "100%",
-                    right: 0,
-                    marginTop: "8px",
-                    background: "rgba(20,10,50,0.95)",
-                    border: "1px solid rgba(124,58,237,0.3)",
-                    borderRadius: "8px",
-                    minWidth: "180px",
-                    zIndex: 1000,
-                    backdropFilter: "blur(10px)",
-                  }}
-                >
-                  {timeRangeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setTimeRange(option.value);
-                        setShowTimeDropdown(false);
-                      }}
-                      style={{
-                        display: "block",
-                        width: "100%",
-                        padding: "12px 16px",
-                        background: timeRange === option.value ? "rgba(124,58,237,0.2)" : "transparent",
-                        border: "none",
-                        color: timeRange === option.value ? "#A78BFA" : "#C0C0E0",
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: "12px",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = "rgba(124,58,237,0.15)";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (timeRange !== option.value) {
-                          (e.currentTarget as HTMLElement).style.background = "transparent";
-                        }
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <button style={{ padding: "8px 20px", background: COLORS.accent, color: "#000", border: "none", borderRadius: "4px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+              Secure New Asset
+            </button>
           </div>
         </div>
 
-        {/* Content Grid */}
-        <div style={{ padding: "32px" }}>
-          {activeTab === "threat_intelligence" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-              {/* Left Column */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                {/* Global Threat Map */}
-                <div
-                  style={{
-                    padding: "20px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "12px",
-                    animation: "float-up 0.6s ease-out",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                    <Globe size={16} style={{ color: "#A78BFA" }} />
-                    <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                      Global Threat Map
-                    </h3>
-                  </div>
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      height: "280px",
-                      background: "linear-gradient(135deg, rgba(30,20,80,0.4), rgba(50,30,100,0.3))",
-                      border: "1px solid rgba(124,58,237,0.3)",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <svg width="100%" height="100%" style={{ position: "absolute", inset: 0 }} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                      <defs>
-                        <pattern id="grid" width="5" height="5" patternUnits="userSpaceOnUse">
-                          <path d="M 5 0 L 0 0 0 5" fill="none" stroke="rgba(124,58,237,0.1)" strokeWidth="0.3" />
-                        </pattern>
-                      </defs>
-                      <rect width="100" height="100" fill="url(#grid)" />
-                      <path d="M 15 20 L 25 15 L 30 25 L 20 35 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-                      <path d="M 40 10 L 55 5 L 60 20 L 50 30 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-                      <path d="M 65 25 L 85 20 L 90 40 L 75 45 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-                      <path d="M 20 50 L 40 45 L 45 65 L 25 70 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-                      <path d="M 60 55 L 80 50 L 85 70 L 70 75 Z" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.2)" strokeWidth="0.5" />
-                      {THREAT_LOCATIONS.map((loc, i) => {
-                        const radius = loc.intensity === "high" ? 3 : loc.intensity === "medium" ? 2 : 1.5;
-                        const color = loc.intensity === "high" ? "#EF4444" : loc.intensity === "medium" ? "#F59E0B" : "#A78BFA";
-                        return (
-                          <g key={i}>
-                            <circle cx={loc.x} cy={loc.y} r={radius * 1.8} fill={color} opacity="0.3" />
-                            <circle cx={loc.x} cy={loc.y} r={radius} fill={color} opacity="0.9" />
-                          </g>
-                        );
-                      })}
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Recent Detections Table */}
-                <div
-                  style={{
-                    padding: "20px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "16px" }}>
-                    Recent Detections
-                  </h3>
-
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ borderBottom: "1px solid rgba(124,58,237,0.15)" }}>
-                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
-                            Content
-                          </th>
-                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
-                            Source
-                          </th>
-                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
-                            Confidence
-                          </th>
-                          <th style={{ padding: "10px 8px", textAlign: "left", fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#6060A0", fontWeight: 600, textTransform: "uppercase" }}>
-                            Status
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {RECENT_DETECTIONS.map((detection, i) => {
-                          const statusColors = {
-                            protected: { bg: "rgba(16,185,129,0.1)", text: "#10B981", label: "Protected" },
-                            reviewing: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Reviewing" },
-                            takedown_initiated: { bg: "rgba(124,58,237,0.1)", text: "#A78BFA", label: "Takedown" },
-                            pending_review: { bg: "rgba(245,158,11,0.1)", text: "#F59E0B", label: "Pending" },
-                          };
-                          const sc = statusColors[detection.status as keyof typeof statusColors];
-
-                          return (
-                            <tr key={i} style={{ borderBottom: "1px solid rgba(124,58,237,0.1)" }}>
-                              <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#C0C0E0" }}>
-                                {detection.title.substring(0, 20)}...
-                              </td>
-                              <td style={{ padding: "10px 8px", fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#A78BFA" }}>
-                                {detection.source}
-                              </td>
-                              <td style={{ padding: "10px 8px" }}>
-                                <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#A78BFA" }}>
-                                  {detection.confidence}%
-                                </span>
-                              </td>
-                              <td style={{ padding: "10px 8px" }}>
-                                <span
-                                  style={{
-                                    display: "inline-block",
-                                    padding: "4px 10px",
-                                    background: sc.bg,
-                                    color: sc.text,
-                                    fontFamily: "'Space Mono', monospace",
-                                    fontSize: "9px",
-                                    borderRadius: "4px",
-                                    fontWeight: 600,
-                                    textTransform: "uppercase",
-                                  }}
-                                >
-                                  {sc.label}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                {/* Active Protection Status */}
-                <div
-                  style={{
-                    padding: "20px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(16,185,129,0.3)",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <CheckCircle size={16} style={{ color: "#10B981" }} />
-                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                        Active Protection
-                      </h3>
-                    </div>
-                  </div>
-
-                  <SafetyGauge />
-
-                  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                    {[
-                      { icon: Lock, label: "Monitored Assets", value: currentData.assets },
-                      { icon: AlertTriangle, label: "Active Detections", value: currentData.detections },
-                      { icon: Shield, label: "Protected Images", value: currentData.threats * 100 },
-                      { icon: Zap, label: "Takedown Requests", value: currentData.takedowns },
-                    ].map((item, i) => {
-                      const Icon = item.icon;
-                      return (
-                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <Icon size={14} style={{ color: "#A78BFA" }} />
-                            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
-                              {item.label}
-                            </span>
-                          </div>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                            {item.value.toLocaleString()}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "16px",
-                      padding: "10px",
-                      background: "rgba(16,185,129,0.08)",
-                      border: "1px solid rgba(16,185,129,0.2)",
-                      borderRadius: "6px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                  >
-                    <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "10px", color: "#10B981" }}>
-                      All systems operational
-                    </span>
-                  </div>
-                </div>
-
-                {/* Detection Trend */}
-                <div
-                  style={{
-                    padding: "20px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                    <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                      Detection Trend
-                    </h3>
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6060A0" }}>7 Days</span>
-                  </div>
-
-                  <DetectionTrendChart />
-
-                  <div style={{ marginTop: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                    <TrendingUp size={14} style={{ color: "#10B981" }} />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                      {currentData.detections * 10}
-                    </span>
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#8080B0" }}>
-                      Total Detections
-                    </span>
-                  </div>
-
-                  <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-                    <TrendingUp size={12} style={{ color: "#10B981" }} />
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: "11px", color: "#10B981", fontWeight: 600 }}>
-                      +18.2%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Top Leak Sources */}
-                <div
-                  style={{
-                    padding: "20px",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(124,58,237,0.2)",
-                    borderRadius: "12px",
-                  }}
-                >
-                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0, marginBottom: "20px" }}>
-                    Top Leak Sources
-                  </h3>
-
-                  <DonutChart />
-
-                  <div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                    {TOP_LEAK_SOURCES.map((source, i) => {
-                      const colors = ["#A78BFA", "#60A5FA", "#10B981", "#F59E0B"];
-                      return (
-                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                            <div
-                              style={{
-                                width: "8px",
-                                height: "8px",
-                                borderRadius: "50%",
-                                background: colors[i],
-                              }}
-                            />
-                            <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "#C0C0E0" }}>
-                              {source.name}
-                            </span>
-                          </div>
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", fontWeight: 700, color: "#FFFFFF" }}>
-                            {source.percentage}%
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+        {/* Stats Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", marginBottom: "48px" }}>
+          {[
+            { label: "Monitored Assets", value: "1,885", trend: "+12.5%" },
+            { label: "Active Detections", value: "55", trend: "-4.2%", color: COLORS.danger },
+            { label: "Protected Images", value: "2,400", trend: "+8.1%" },
+            { label: "Takedown Success", value: "99.7%", trend: "+0.2%" },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="card"
+              style={{
+                padding: "24px",
+                background: COLORS.surface,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: "8px",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <p style={{ fontSize: "11px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0, marginBottom: "12px" }}>
+                {stat.label}
+              </p>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
+                <p style={{ fontSize: "24px", fontWeight: 400, margin: 0 }}>{stat.value}</p>
+                <p style={{ fontSize: "11px", color: stat.color || COLORS.success, fontWeight: 500, margin: 0 }}>
+                  {stat.trend}
+                </p>
               </div>
             </div>
-          )}
+          ))}
+        </div>
 
-          {activeTab === "monitoring" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div
-                style={{
-                  padding: "20px",
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px solid rgba(124,58,237,0.2)",
-                  borderRadius: "12px",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                  <Globe size={16} style={{ color: "#A78BFA" }} />
-                  <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                    Live Global Threat Monitor
-                  </h3>
-                </div>
-                <ThreeDGlobe markers={STOLEN_CONTENT_MARKERS} />
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px" }}>
-                {[
-                  { label: "Active Monitors", value: currentData.assets, icon: Eye },
-                  { label: "Threats Detected", value: currentData.detections, icon: AlertTriangle },
-                  { label: "Response Time", value: "< 2 min", icon: Clock },
-                  { label: "Coverage", value: "178 countries", icon: Globe },
-                ].map((stat, i) => {
-                  const Icon = stat.icon;
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        padding: "16px",
-                        background: "rgba(255,255,255,0.02)",
-                        border: "1px solid rgba(124,58,237,0.2)",
-                        borderRadius: "10px",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <Icon size={14} style={{ color: "#A78BFA" }} />
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "11px", color: "#6060A0", textTransform: "uppercase" }}>
-                          {stat.label}
-                        </span>
+        {/* Main Intelligence Grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr", gap: "24px" }}>
+          {/* Left Column: Table */}
+          <div
+            style={{
+              background: COLORS.surface,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "24px", borderBottom: `1px solid ${COLORS.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 500, margin: 0 }}>Critical Detections</h3>
+              <button style={{ fontSize: "12px", color: COLORS.accent, background: "none", border: "none", cursor: "pointer" }}>View All Report</button>
+            </div>
+            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${COLORS.border}` }}>
+                  {["Asset", "Source", "Confidence", "Status"].map((h) => (
+                    <th key={h} style={{ padding: "16px 24px", fontSize: "11px", color: COLORS.textSecondary, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {RECENT_DETECTIONS.map((row) => (
+                  <tr key={row.id} style={{ borderBottom: `1px solid ${COLORS.border}`, transition: "background 0.2s ease" }} className="table-row">
+                    <td style={{ padding: "20px 24px" }}>
+                      <p style={{ fontSize: "13px", fontWeight: 500, margin: 0 }}>{row.title}</p>
+                      <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: 0, marginTop: "4px" }}>{row.location}</p>
+                    </td>
+                    <td style={{ padding: "20px 24px", fontSize: "13px", color: COLORS.textSecondary }}>{row.source}</td>
+                    <td style={{ padding: "20px 24px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ flex: 1, width: "60px", height: "2px", background: "rgba(255,255,255,0.05)" }}>
+                          <div style={{ width: `${row.confidence}%`, height: "100%", background: COLORS.accent }} />
+                        </div>
+                        <span style={{ fontSize: "11px", color: COLORS.textSecondary }}>{row.confidence}%</span>
                       </div>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "24px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
-                        {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
-                      </p>
-                    </div>
-                  );
-                })}
+                    </td>
+                    <td style={{ padding: "20px 24px" }}>
+                      <span style={{ 
+                        fontSize: "10px", 
+                        padding: "4px 10px", 
+                        borderRadius: "2px", 
+                        background: row.status === "protected" ? "rgba(16,185,129,0.1)" : "rgba(212,175,55,0.1)",
+                        color: row.status === "protected" ? COLORS.success : COLORS.accent,
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                        letterSpacing: "0.05em"
+                      }}>
+                        {row.status.replace("_", " ")}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Right Column: Charts */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+            <div
+              style={{
+                padding: "32px",
+                background: COLORS.surface,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: "8px",
+                textAlign: "center",
+              }}
+            >
+              <h3 style={{ fontSize: "14px", fontWeight: 500, margin: 0, marginBottom: "32px", color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                Security Posture
+              </h3>
+              <PerformanceGauge score={98} />
+              <div style={{ marginTop: "32px", display: "flex", justifyContent: "center", gap: "24px" }}>
+                <div>
+                  <p style={{ fontSize: "18px", fontWeight: 400, margin: 0 }}>1.2k</p>
+                  <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>Scanned</p>
+                </div>
+                <div style={{ width: "1px", height: "30px", background: COLORS.border }} />
+                <div>
+                  <p style={{ fontSize: "18px", fontWeight: 400, margin: 0 }}>0</p>
+                  <p style={{ fontSize: "10px", color: COLORS.textSecondary, margin: 0 }}>Breaches</p>
+                </div>
               </div>
             </div>
-          )}
 
-          {activeTab === "fingerprinting" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-              {[
-                { title: "Assets Fingerprinted", value: currentData.assets, icon: Fingerprint },
-                { title: "Unique Signatures", value: currentData.assets * 2, icon: Lock },
-                { title: "Detection Rate", value: "99.7%", icon: CheckCircle },
-                { title: "Processing Speed", value: "< 1s", icon: Zap },
-              ].map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      padding: "24px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid rgba(124,58,237,0.2)",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                      <Icon size={16} style={{ color: "#A78BFA" }} />
-                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                        {stat.title}
-                      </h3>
-                    </div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
-                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
-                    </p>
-                  </div>
-                );
-              })}
+            <div
+              style={{
+                padding: "24px",
+                background: COLORS.surface,
+                border: `1px solid ${COLORS.border}`,
+                borderRadius: "8px",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "24px" }}>
+                <h3 style={{ fontSize: "14px", fontWeight: 500, margin: 0, color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Risk Velocity
+                </h3>
+                <TrendingUp size={14} color={COLORS.success} />
+              </div>
+              <TrendLine />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "16px" }}>
+                <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: 0 }}>May 18</p>
+                <p style={{ fontSize: "11px", color: COLORS.textPrimary, fontWeight: 600, margin: 0 }}>+18.2% Increase</p>
+                <p style={{ fontSize: "11px", color: COLORS.textSecondary, margin: 0 }}>Today</p>
+              </div>
             </div>
-          )}
-
-          {activeTab === "response" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-              {[
-                { title: "Takedowns Sent", value: currentData.takedowns, icon: Zap, color: "#EF4444" },
-                { title: "Success Rate", value: "94%", icon: CheckCircle, color: "#10B981" },
-                { title: "Avg Response Time", value: "2.3 hrs", icon: Clock, color: "#F59E0B" },
-                { title: "Active Cases", value: currentData.threats, icon: AlertTriangle, color: "#A78BFA" },
-              ].map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      padding: "24px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid rgba(124,58,237,0.2)",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                      <Icon size={16} style={{ color: stat.color }} />
-                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                        {stat.title}
-                      </h3>
-                    </div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
-                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {activeTab === "analytics" && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-              {[
-                { title: "Total Threats Analyzed", value: currentData.threats * 100, icon: BarChart3 },
-                { title: "Avg Confidence Score", value: "94%", icon: CheckCircle },
-                { title: "Trend (7 Days)", value: "+24%", icon: TrendingUp },
-                { title: "Data Sources", value: "500M+", icon: Globe },
-              ].map((stat, i) => {
-                const Icon = stat.icon;
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      padding: "24px",
-                      background: "rgba(255,255,255,0.02)",
-                      border: "1px solid rgba(124,58,237,0.2)",
-                      borderRadius: "12px",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                      <Icon size={16} style={{ color: "#A78BFA" }} />
-                      <h3 style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", fontWeight: 700, color: "#FFFFFF", margin: 0 }}>
-                        {stat.title}
-                      </h3>
-                    </div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "32px", fontWeight: 800, color: "#FFFFFF", margin: 0 }}>
-                      {typeof stat.value === "number" ? stat.value.toLocaleString() : stat.value}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
