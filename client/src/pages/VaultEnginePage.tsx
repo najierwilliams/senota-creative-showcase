@@ -279,7 +279,7 @@ const ScanningView = () => {
                 <div style={{ textAlign: "right" }}><ChevronRight size={14} color={COLORS.textSecondary} style={{ transform: expandedScan === scan.id ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }} /></div>
               </div>
               {expandedScan === scan.id && (
-                <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderTop: `1px solid ${COLORS.border}`, fontSize: "12px", color: COLORS.textSecondary", lineHeight: 1.6 }}>
+                <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderTop: `1px solid ${COLORS.border}`, fontSize: "12px", color: COLORS.textSecondary, lineHeight: 1.6 }}>
                   <p style={{ margin: 0, marginBottom: "12px" }}>Scan Details for {scan.target}:</p>
                   <ul style={{ margin: 0, paddingLeft: "20px" }}>
                     <li>Fingerprint matches: {scan.results} instances detected</li>
