@@ -1211,31 +1211,67 @@ export default function VaultMemberDashboard() {
             { icon: ShieldCheck, label: "Legal Enforcement", id: "enforcement" },
             { icon: ArrowUpRight, label: "Update Tiers", id: "update" },
             { icon: Gift, label: "Referral Program", id: "referrals" },
+            { icon: Cpu, label: "Engine", id: "engine", external: true },
             { icon: User, label: "Member Profile", id: "profile" },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className="nav-button"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "12px 16px",
-                borderRadius: "8px",
-                border: "none",
-                background: activeTab === item.id ? "rgba(212,175,55,0.08)" : "transparent",
-                color: activeTab === item.id ? COLORS.accent : COLORS.textSecondary,
-                fontSize: "13px",
-                fontWeight: 500,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                textAlign: "left",
-              }}
-            >
-              <item.icon size={18} />
-              {item.label}
-            </button>
+          ].map((item: any) => (
+            {item.external ? (
+              <a
+                key={item.id}
+                href="/vault/engine"
+                className="nav-button"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "12px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "transparent",
+                  color: COLORS.textSecondary,
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "left",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                  e.currentTarget.style.color = "#FFFFFF";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = COLORS.textSecondary;
+                }}
+              >
+                <item.icon size={18} />
+                {item.label}
+              </a>
+            ) : (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className="nav-button"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "12px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: activeTab === item.id ? "rgba(212,175,55,0.08)" : "transparent",
+                  color: activeTab === item.id ? COLORS.accent : COLORS.textSecondary,
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  textAlign: "left",
+                }}
+              >
+                <item.icon size={18} />
+                {item.label}
+              </button>
+            )}
           ))}
         </div>
 
