@@ -1095,7 +1095,10 @@ export default function VaultMemberDashboard() {
       );
   
       formData.append("file", file);
-  
+
+      console.log("customer_id", formData.get("customer_id"));
+      console.log("file", formData.get("file"));
+      
       const response = await fetch(
         "https://vault-eight-gray.vercel.app/upload",
         {
