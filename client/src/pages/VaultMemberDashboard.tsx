@@ -457,21 +457,21 @@ const SignaturesView = ({ pendingAssets, activeSignatures, onApprove, onDeletePe
             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: `1px solid ${COLORS.border}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                 <div style={{ width: "50px", height: "50px", background: "#1a1a1a", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
-                  {asset.preview ? <img src={asset.preview} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (
-                    asset.type === "Video" ? <Music2 size={20} color={COLORS.textSecondary} /> : <FileText size={20} color={COLORS.textSecondary} />
+                  {asset.preview_url ? <img src={asset.preview_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (
+                    asset.content_type?.startsWith("video/") ? <Music2 size={20} color={COLORS.textSecondary} /> : <FileText size={20} color={COLORS.textSecondary} />
                   )}
                 </div>
                 <div>
                   <p style={{ fontSize: "13px", fontWeight: 600, margin: 0 }}>{asset.name}</p>
                   <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.type}</span>
-                    <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.hash}</span>
+                    <span style={{ fontSize: "10px", color: COLORS.accentSecondary }}>{asset.content_type}</span>
+                    <span style={{ fontSize: "10px", color: COLORS.textSecondary, fontFamily: "monospace" }}>{asset.asset_id}</span>
                   </div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 <button onClick={() => handleDownload(asset)} style={{ padding: "8px", background: "rgba(255,255,255,0.03)", border: `1px solid ${COLORS.border}`, borderRadius: "6px", color: COLORS.textSecondary, cursor: "pointer" }}><Download size={16} /></button>
-                <button onClick={() => setDeleteTarget({ id: asset.id, type: 'active' })} style={{ padding: "8px", background: "rgba(239,68,68,0.05)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, cursor: "pointer" }}><Trash2 size={16} /></button>
+                <button onClick={() => setDeleteTarget({ id: asset.asset_id, type: 'active' })} style={{ padding: "8px", background: "rgba(239,68,68,0.05)", border: `1px solid ${COLORS.danger}30`, borderRadius: "6px", color: COLORS.danger, cursor: "pointer" }}><Trash2 size={16} /></button>
               </div>
             </div>
           ))}
@@ -1008,7 +1008,13 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
             ref={fileInputRef} 
             style={{ display: "none" }} 
             multiple 
-            onChange={(e) => e.target.files && onUpload(e.target.files)}
+            onChange={async (e) => {
+                if (!e.target.files) return;
+            
+                await onUpload(e.target.files);
+            
+                e.target.value = "";
+            }}
           />
           <div 
             onClick={() => fileInputRef.current?.click()}
@@ -1023,7 +1029,7 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
             }} 
             onMouseEnter={(e) => (e.currentTarget.style.borderColor = COLORS.accent)} 
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = COLORS.border)}
-          >
+      
             <div style={{ width: "64px", height: "64px", background: "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
               <Plus size={32} color={COLORS.accent} />
             </div>
@@ -1032,28 +1038,6 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
             <p style={{ fontSize: "11px", color: COLORS.textSecondary, marginTop: "20px" }}>Supported: PNG, JPG, TIFF, MP4, MOV (Max 2GB)</p>
           </div>
 
-          <button 
-            onClick={() => alert("Assets initialized. Proceed to Digital Signatures for approval.")}
-            style={{ 
-              padding: "18px", 
-              background: COLORS.accent, 
-              color: "#000", 
-              border: "none", 
-              borderRadius: "8px", 
-              fontSize: "15px", 
-              fontWeight: 700, 
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "10px",
-              boxShadow: `0 0 30px ${COLORS.accent}40`,
-              transition: "all 0.3s ease"
-            }} 
-          >
-            <ShieldCheck size={20} />
-            Initialize Vault Protection
-          </button>
         </div>
       </Card>
     </div>
@@ -1080,6 +1064,9 @@ export default function VaultMemberDashboard() {
     ];
   });
 
+    const [vaultAssets, setVaultAssets] = useState<any[]>([]);
+    const [loadingVaultAssets, setLoadingVaultAssets] = useState(false);
+
   useEffect(() => {
     localStorage.setItem("vault_pending", JSON.stringify(pendingAssets));
   }, [pendingAssets]);
@@ -1088,18 +1075,79 @@ export default function VaultMemberDashboard() {
     localStorage.setItem("vault_signatures", JSON.stringify(activeSignatures));
   }, [activeSignatures]);
 
-  const handleFileUpload = (files: FileList) => {
-    const newAssets: PendingAsset[] = Array.from(files).map(file => {
-      const isMedia = file.type.startsWith('image/') || file.type.startsWith('video/');
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        type: file.type,
-        size: (file.size / 1024 / 1024).toFixed(2) + " MB",
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-        preview: isMedia ? URL.createObjectURL(file) : undefined,
-        blob: file
-      };
+  useEffect(() => {
+    loadVaultAssets();
+  }, []);
+
+  const handleFileUpload = async (files: FileList) => {
+    if (!files.length) return;
+  
+    const file = files[0];
+  
+    try {
+      const formData = new FormData();
+  
+      // TEMPORARY
+      // We will replace this with the logged-in user's ID later.
+      formData.append(
+          "customer_id",
+          currentUser.id
+      );
+  
+      formData.append("file", file);
+  
+      const response = await fetch(
+        "https://vault-eight-gray.vercel.app/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(
+          result.detail
+            ? JSON.stringify(result.detail)
+            : "Upload failed."
+        );
+      }
+  
+      alert("Asset secured successfully.");
+  
+      // We'll replace this with a real refresh
+      await loadVaultAssets();
+  
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const loadVaultAssets = async () => {
+      try {
+        setLoadingVaultAssets(true);
+    
+        const customerId = "test_user_001"; // Temporary until auth is connected
+    
+        const response = await fetch(
+          `https://vault-eight-gray.vercel.app/customers/${customerId}/assets`
+        );
+    
+        const data = await response.json();
+    
+        if (!response.ok) {
+          throw new Error(data.detail || "Unable to load assets.");
+        }
+    
+        setVaultAssets(Array.isArray(data) ? data : (data.assets || []));
+      } catch (error) {
+        console.error("Failed to load Vault assets:", error);
+      } finally {
+        setLoadingVaultAssets(false);
+      }
+    };
+  
     });
     setPendingAssets(prev => [...prev, ...newAssets]);
     setActiveTab("signatures");
@@ -1135,7 +1183,7 @@ export default function VaultMemberDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case "overview": return <OverviewView />;
-      case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={activeSignatures} onApprove={handleApproveSignature} onDeletePending={handleDeletePending} onDeleteActive={handleDeleteActive} />;
+      case "signatures": return <SignaturesView pendingAssets={pendingAssets} activeSignatures={vaultAssets} onApprove={handleApproveSignature} onDeletePending={handleDeletePending} onDeleteActive={handleDeleteActive} />;
       case "monitoring": return <GlobalMonitorView />;
       case "enforcement": return <EnforcementView />;
       case "referrals": return <ReferralsView />;
