@@ -1091,7 +1091,7 @@ export default function VaultMemberDashboard() {
       // We will replace this with the logged-in user's ID later.
       formData.append(
           "customer_id",
-          currentUser.id
+          "test_user_001"
       );
   
       formData.append("file", file);
@@ -1147,11 +1147,6 @@ export default function VaultMemberDashboard() {
         setLoadingVaultAssets(false);
       }
     };
-  
-    });
-    setPendingAssets(prev => [...prev, ...newAssets]);
-    setActiveTab("signatures");
-  };
 
   const handleApproveSignature = (asset: PendingAsset) => {
     const newSignature: ActiveSignature = {
