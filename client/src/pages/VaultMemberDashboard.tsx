@@ -1029,7 +1029,7 @@ const SecureAssetView = ({ onUpload }: { onUpload: (files: FileList) => void }) 
             }} 
             onMouseEnter={(e) => (e.currentTarget.style.borderColor = COLORS.accent)} 
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = COLORS.border)}
-      
+          >
             <div style={{ width: "64px", height: "64px", background: "rgba(255,255,255,0.03)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
               <Plus size={32} color={COLORS.accent} />
             </div>
